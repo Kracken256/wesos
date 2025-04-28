@@ -62,6 +62,76 @@ namespace wesos::types {
     constexpr auto operator--() const -> GenericNumber { return {unwrap() - 1}; }
     constexpr auto operator++(int) const -> GenericNumber { return {unwrap() + 1}; }
     constexpr auto operator--(int) const -> GenericNumber { return {unwrap() - 1}; }
+
+    [[nodiscard]] static constexpr auto max() -> GenericNumber {
+      using namespace detail;
+
+      enum {
+        u8_max = 0xff,
+        u16_max = 0xffff,
+        u32_max = 0xffffffff,
+        u64_max = 0xffffffffffffffff,
+        i8_max = 0x7f,
+        i16_max = 0x7fff,
+        i32_max = 0x7fffffff,
+        i64_max = 0x7fffffffffffffff,
+      };
+
+      if constexpr (is_same_v<ValueGeneric, __u8>) {
+        return u8_max;
+      } else if constexpr (is_same_v<ValueGeneric, __u16>) {
+        return u16_max;
+      } else if constexpr (is_same_v<ValueGeneric, __u32>) {
+        return u32_max;
+      } else if constexpr (is_same_v<ValueGeneric, __u64>) {
+        return u64_max;
+      } else if constexpr (is_same_v<ValueGeneric, __i8>) {
+        return i8_max;
+      } else if constexpr (is_same_v<ValueGeneric, __i16>) {
+        return i16_max;
+      } else if constexpr (is_same_v<ValueGeneric, __i32>) {
+        return i32_max;
+      } else if constexpr (is_same_v<ValueGeneric, __i64>) {
+        return i64_max;
+      } else {
+        static_assert(is_same_v<ValueGeneric, ValueGeneric>, "Unsupported type");
+      }
+    }
+
+    [[nodiscard]] static constexpr auto min() -> GenericNumber {
+      using namespace detail;
+
+      enum {
+        u8_min = 0,
+        u16_min = 0,
+        u32_min = 0,
+        u64_min = 0,
+        i8_min = -0x80,
+        i16_min = -0x8000,
+        i32_min = -0x80000000,
+        i64_min = -0x8000000000000000,
+      };
+
+      if constexpr (is_same_v<ValueGeneric, __u8>) {
+        return u8_min;
+      } else if constexpr (is_same_v<ValueGeneric, __u16>) {
+        return u16_min;
+      } else if constexpr (is_same_v<ValueGeneric, __u32>) {
+        return u32_min;
+      } else if constexpr (is_same_v<ValueGeneric, __u64>) {
+        return u64_min;
+      } else if constexpr (is_same_v<ValueGeneric, __i8>) {
+        return i8_min;
+      } else if constexpr (is_same_v<ValueGeneric, __i16>) {
+        return i16_min;
+      } else if constexpr (is_same_v<ValueGeneric, __i32>) {
+        return i32_min;
+      } else if constexpr (is_same_v<ValueGeneric, __i64>) {
+        return i64_min;
+      } else {
+        static_assert(is_same_v<ValueGeneric, ValueGeneric>, "Unsupported type");
+      }
+    }
   };
 
   template <class LGeneric, class RGeneric>
