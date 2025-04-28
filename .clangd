@@ -28,7 +28,7 @@ CompileFlags:
       -fno-rtti,
       -fno-exceptions,
       -nostdlib,
-      -nostdinc,
-      -ffreestanding,
+      -fno-asynchronous-unwind-tables,
+      -fno-unwind-tables,
       -std=c++20,
     ]
