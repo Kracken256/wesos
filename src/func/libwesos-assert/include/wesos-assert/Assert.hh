@@ -23,7 +23,7 @@ namespace wesos {
 #ifdef NDEBUG
 #define assert_invariant(condition, message) (void)(condition)
 #else
-#define assert_invariant(condition, ...) wesos::always_assert(condition __VA_ARGS__)
+#define assert_invariant(...) wesos::always_assert(__VA_ARGS__)
 #endif
 
   // NOLINTEND(readability-identifier-naming)

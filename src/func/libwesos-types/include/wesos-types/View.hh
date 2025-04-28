@@ -71,5 +71,13 @@ namespace wesos::types {
         -> View<ElementGeneric> {
       return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
     }
+
+    void reflect(void* m, auto cb, auto& depth) const {
+      ++depth;
+      for (const auto& ele : *this) {
+        ele.reflect(m, cb, depth);
+      }
+      --depth;
+    }
   };
 }  // namespace wesos::types

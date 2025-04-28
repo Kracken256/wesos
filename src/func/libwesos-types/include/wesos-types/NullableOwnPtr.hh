@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <wesos-assert/Assert.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/OwnPtr.hh>
 
 namespace wesos::types {
   template <typename PointeeGeneric>
@@ -24,15 +26,33 @@ namespace wesos::types {
     constexpr auto operator<=>(const NullableOwnPtr& other) const = default;
     constexpr ~NullableOwnPtr() = default;
 
-    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& { return *m_ptr; }
+    [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
+
+    [[nodiscard]] constexpr auto into_raw() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto get_unchecked() const -> OwnPtr<PointeeGeneric> { return m_ptr; }
+    [[nodiscard]] constexpr auto get() const -> OwnPtr<PointeeGeneric> {
+      always_assert(isset(), "Unwrapping a null pointer");
+      return m_ptr;
+    }
+
+    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* {
+      assert_invariant(isset(), "Dereferencing a null pointer");
+      return m_ptr;
+    }
+
+    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& {
+      assert_invariant(isset(), "Dereferencing a null pointer");
+      return *m_ptr;
+    }
 
     [[nodiscard]] constexpr auto add(usize i) const {
-      return NullableOwnPtr(unwrap() + i.unwrap());
+      assert_invariant(isset(), "Adding to a null pointer");
+      return NullableOwnPtr(into_raw() + i.unwrap());
     }
+
     [[nodiscard]] constexpr auto sub(usize i) const {
-      return NullableOwnPtr(unwrap() - i.unwrap());
+      assert_invariant(isset(), "Subtracting from a null pointer");
+      return NullableOwnPtr(into_raw() - i.unwrap());
     }
 
     void reflect(void* m, auto cb, auto&) const {
