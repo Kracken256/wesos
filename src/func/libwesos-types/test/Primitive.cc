@@ -5,8 +5,6 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include "wesos-types/Primitive.hh"
-
 #include <gtest/gtest.h>
 
 #include <wesos-types/Types.hh>

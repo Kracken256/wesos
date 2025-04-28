@@ -12,11 +12,15 @@
 #include <wesos-types/Lambda.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>
+#include <wesos-types/NullableOwnPtr.hh>
+#include <wesos-types/NullableRefPtr.hh>
 #include <wesos-types/Numeric.hh>
-#include <wesos-types/Pointer.hh>
+#include <wesos-types/OwnPtr.hh>
 #include <wesos-types/Primitive.hh>
+#include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
+#include <wesos-types/View.hh>
 
 namespace wesos {
   using types::f32;
@@ -38,8 +42,12 @@ namespace wesos {
   using types::Quadlet;
   using types::Triplet;
 
+  using types::NullableOwnPtr;
+  using types::NullableRefPtr;
   using types::OwnPtr;
   using types::RefPtr;
+
+  using types::View;
 
   using types::operator""_u8;
   using types::operator""_u16;

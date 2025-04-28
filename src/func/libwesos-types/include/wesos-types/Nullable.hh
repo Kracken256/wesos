@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <wesos-assert/Assert.hh>
 #include <wesos-types/Array.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
@@ -42,7 +43,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto isset() const -> bool { return m_isset; }
 
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& {
-      /// FIXME: Do bounds checking
+      always_assert(isset());
       return m_value.m_obj;
     }
 
@@ -51,7 +52,7 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto unwrap() -> ValueGeneric& {
-      /// FIXME: Do bounds checking
+      always_assert(isset());
       return m_value.m_obj;
     }
 

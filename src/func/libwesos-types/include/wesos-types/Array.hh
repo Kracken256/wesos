@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <wesos-assert/Assert.hh>
 #include <wesos-types/Numeric.hh>
 
 namespace wesos::types {
@@ -39,7 +40,7 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
-      /// FIXME: Do bounds checking
+      always_assert(i < length());
       return m_data[i];
     }
 
@@ -48,14 +49,14 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
-      /// FIXME: Do bounds checking
+      always_assert(i < length());
       return m_data[i];
     }
 
     [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return m_data[i]; }
 
     constexpr void set(usize i, const ElementGeneric& value) {
-      /// FIXME: Do bounds checking
+      always_assert(i < length());
       m_data[i] = value;
     }
 
