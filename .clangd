@@ -1,5 +1,5 @@
 InlayHints:
-  BlockEnd: Yes
+  BlockEnd: No
   Designators: No
   Enabled: Yes
   ParameterNames: Yes
