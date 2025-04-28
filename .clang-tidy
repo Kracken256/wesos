@@ -55,13 +55,6 @@ CheckOptions:
   - key: readability-identifier-naming.GlobalFunctionSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.GlobalPointerCase
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalPointerPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalPointerSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.GlobalVariableCase
     value: "TODO:"
   - key: readability-identifier-naming.GlobalVariablePrefix
@@ -77,13 +70,6 @@ CheckOptions:
   - key: readability-identifier-naming.InlineNamespacePrefix
     value: "TODO:"
   - key: readability-identifier-naming.InlineNamespaceSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.LocalPointerCase
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalPointerPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalPointerSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.LocalVariableCase
@@ -133,13 +119,6 @@ CheckOptions:
   - key: readability-identifier-naming.ParameterPackPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ParameterPackSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.PointerParameterCase
-    value: "TODO:"
-  - key: readability-identifier-naming.PointerParameterPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.PointerParameterSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.PrivateMemberCase
