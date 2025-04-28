@@ -20,6 +20,7 @@ namespace wesos::types {
     constexpr OwnPtr(OwnPtr&& other) = default;
     constexpr auto operator=(const OwnPtr&) -> OwnPtr& = default;
     constexpr auto operator=(OwnPtr&& other) -> OwnPtr& = default;
+    constexpr auto operator<=>(const OwnPtr& other) const = default;
     constexpr ~OwnPtr() = default;
 
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
@@ -47,6 +48,7 @@ namespace wesos::types {
     constexpr RefPtr(RefPtr&& other) = default;
     constexpr auto operator=(const RefPtr&) -> RefPtr& = default;
     constexpr auto operator=(RefPtr&& other) -> RefPtr& = default;
+    constexpr auto operator<=>(const RefPtr& other) const = default;
     constexpr ~RefPtr() = default;
 
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
