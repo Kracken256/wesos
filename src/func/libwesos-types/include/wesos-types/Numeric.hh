@@ -8,25 +8,26 @@
 #pragma once
 
 #include <wesos-types/Primitive.hh>
-#include <wesos-types/ReflectionCallback.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
 
 namespace wesos::types {
   template <class ValueGeneric>
-  class NumbericProtocol {
+  class GenericNumber {
     ValueGeneric m_value;
 
   public:
-    constexpr NumbericProtocol() : m_value(0){};
-    constexpr NumbericProtocol(ValueGeneric x) : m_value(x) {}
-    constexpr NumbericProtocol(const NumbericProtocol& other) = default;
-    constexpr NumbericProtocol(NumbericProtocol&& other) = default;
-    constexpr auto operator=(const NumbericProtocol& other) -> NumbericProtocol& = default;
-    constexpr auto operator=(NumbericProtocol&& other) -> NumbericProtocol& = default;
-    constexpr auto operator<=>(const NumbericProtocol& other) const = default;
+    using ValueType = ValueGeneric;
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth&) const {
+    constexpr GenericNumber() : m_value(0){};
+    constexpr GenericNumber(ValueGeneric x) : m_value(x) {}
+    constexpr GenericNumber(const GenericNumber& other) = default;
+    constexpr GenericNumber(GenericNumber&& other) = default;
+    constexpr auto operator=(const GenericNumber& other) -> GenericNumber& = default;
+    constexpr auto operator=(GenericNumber&& other) -> GenericNumber& = default;
+    constexpr auto operator<=>(const GenericNumber& other) const = default;
+
+    void reflect(void* m, auto cb, auto&) const {
       cb(m, reinterpret_cast<const void*>(&m_value), sizeof(ValueGeneric));
     }
 
@@ -34,59 +35,97 @@ namespace wesos::types {
 
     template <class DestGeneric>
     [[nodiscard]] constexpr auto cast_to() const -> DestGeneric {
+      static_assert(sizeof(DestGeneric) >= sizeof(*this),
+                    "Implicit conversion is disallowed because it loses numeric precision. Use "
+                    "trunc_to() instead.");
+      static_assert(!is_same_v<typename DestGeneric::ValueType, ValueGeneric>,
+                    "Explicit conversion is disallowed because the destination type is the same as "
+                    "source type.");
+
       return static_cast<DestGeneric>(unwrap());
     }
 
-#define W_DECLARE_NUMERIC_PROTOCOL_OP(op)                                             \
-  constexpr auto operator op(const NumbericProtocol& other) const->NumbericProtocol { \
-    static_assert(is_same_v<decltype(*this), decltype(other)>,                        \
-                  "Implicit conversion is disallowed");                               \
-    return {unwrap() op other.unwrap()};                                              \
+    template <class DestGeneric>
+    [[nodiscard]] constexpr auto trunc_to() const -> DestGeneric {
+      static_assert(
+          sizeof(DestGeneric) < sizeof(*this),
+          "Explicit truncation is disallowed because it is redundant. Use cast_to() instead.");
+      return {static_cast<DestGeneric::ValueType>(unwrap())};
+    }
+
+    template <class DestGeneric>
+    [[nodiscard]] constexpr auto unsafe_cast() const -> DestGeneric {
+      return {static_cast<DestGeneric>(unwrap())};
+    }
+
+    constexpr auto operator++() const -> GenericNumber { return {unwrap() + 1}; }
+    constexpr auto operator--() const -> GenericNumber { return {unwrap() - 1}; }
+    constexpr auto operator++(int) const -> GenericNumber { return {unwrap() + 1}; }
+    constexpr auto operator--(int) const -> GenericNumber { return {unwrap() - 1}; }
+  };
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator+(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() + rhs.unwrap());
   }
 
-    W_DECLARE_NUMERIC_PROTOCOL_OP(+)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(-)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(*)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(/)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(%)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(&)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(|)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(^)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(<<)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(>>)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(==)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(!=)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(<=)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(>=)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(<)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(>)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(&&)
-    W_DECLARE_NUMERIC_PROTOCOL_OP(||)
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator-(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() - rhs.unwrap());
+  }
 
-#undef W_DECLARE_NUMERIC_PROTOCOL_OP
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator*(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() * rhs.unwrap());
+  }
 
-    constexpr auto operator++() const -> NumbericProtocol { return {unwrap() + 1}; }
-    constexpr auto operator--() const -> NumbericProtocol { return {unwrap() - 1}; }
-    constexpr auto operator++(int) const -> NumbericProtocol { return {unwrap() + 1}; }
-    constexpr auto operator--(int) const -> NumbericProtocol { return {unwrap() - 1}; }
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator/(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() / rhs.unwrap());
+  }
 
-    constexpr operator bool() const { return unwrap() != 0; }
-  };
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator%(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() % rhs.unwrap());
+  }
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator&(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() & rhs.unwrap());
+  }
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator|(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() | rhs.unwrap());
+  }
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator^(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() ^ rhs.unwrap());
+  }
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator<<(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() << rhs.unwrap());
+  }
+
+  template <class LGeneric, class RGeneric>
+  constexpr auto operator>>(GenericNumber<LGeneric> lhs, GenericNumber<RGeneric> rhs) {
+    return GenericNumber(lhs.unwrap() >> rhs.unwrap());
+  }
 
   // NOLINTBEGIN(readability-identifier-naming)
 
-  using u8 = NumbericProtocol<detail::__u8>;
-  using u16 = NumbericProtocol<detail::__u16>;
-  using u32 = NumbericProtocol<detail::__u32>;
-  using u64 = NumbericProtocol<detail::__u64>;
-  using i8 = NumbericProtocol<detail::__i8>;
-  using i16 = NumbericProtocol<detail::__i16>;
-  using i32 = NumbericProtocol<detail::__i32>;
-  using i64 = NumbericProtocol<detail::__i64>;
-
-  using f32 = NumbericProtocol<detail::__f32>;
-  using f64 = NumbericProtocol<detail::__f64>;
-
+  using u8 = GenericNumber<detail::__u8>;
+  using u16 = GenericNumber<detail::__u16>;
+  using u32 = GenericNumber<detail::__u32>;
+  using u64 = GenericNumber<detail::__u64>;
+  using i8 = GenericNumber<detail::__i8>;
+  using i16 = GenericNumber<detail::__i16>;
+  using i32 = GenericNumber<detail::__i32>;
+  using i64 = GenericNumber<detail::__i64>;
+  using f32 = GenericNumber<detail::__f32>;
+  using f64 = GenericNumber<detail::__f64>;
   using usize = decltype([]() {
     if constexpr (sizeof(void*) == sizeof(u8)) {
       return u8{};
@@ -102,6 +141,46 @@ namespace wesos::types {
   }());
 
   static_assert(sizeof(usize) == sizeof(void*), "Pointer size is not supported");
+
+  constexpr auto operator"" _u8(unsigned long long x) -> u8 {
+    return {static_cast<detail::__u8>(x)};
+  }
+
+  constexpr auto operator"" _u16(unsigned long long x) -> u16 {
+    return {static_cast<detail::__u16>(x)};
+  }
+
+  constexpr auto operator"" _u32(unsigned long long x) -> u32 {
+    return {static_cast<detail::__u32>(x)};
+  }
+
+  constexpr auto operator"" _u64(unsigned long long x) -> u64 {
+    return {static_cast<detail::__u64>(x)};
+  }
+
+  constexpr auto operator"" _i8(unsigned long long x) -> i8 {
+    return {static_cast<detail::__i8>(x)};
+  }
+
+  constexpr auto operator"" _i16(unsigned long long x) -> i16 {
+    return {static_cast<detail::__i16>(x)};
+  }
+
+  constexpr auto operator"" _i32(unsigned long long x) -> i32 {
+    return {static_cast<detail::__i32>(x)};
+  }
+
+  constexpr auto operator"" _i64(unsigned long long x) -> i64 {
+    return {static_cast<detail::__i64>(x)};
+  }
+
+  constexpr auto operator"" _f32(long double x) -> f32 { return {static_cast<detail::__f32>(x)}; }
+
+  constexpr auto operator"" _f64(long double x) -> f64 { return {static_cast<detail::__f64>(x)}; }
+
+  constexpr auto operator"" _usize(unsigned long long x) -> usize {
+    return {static_cast<usize>(x)};
+  }
 
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types

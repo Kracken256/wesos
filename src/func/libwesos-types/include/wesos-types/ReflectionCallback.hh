@@ -7,8 +7,8 @@
 
 #pragma once
 
-namespace wesos::types {
+namespace wesos::types::detail {
   using ReflectionDepth = unsigned int;
   using ReflectionSize = unsigned int;
   using ReflectionCallback = void(void* m, const void* base, ReflectionSize size);
-}  // namespace wesos::types
+}  // namespace wesos::types::detail

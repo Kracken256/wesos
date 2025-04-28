@@ -34,7 +34,7 @@ namespace wesos::types {
       m_b = TypeBGeneric();
     }
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+    void reflect(void* m, auto cb, auto& depth) const {
       ++depth;
       m_a.reflect(m, cb, depth);
       m_b.reflect(m, cb, depth);
@@ -70,7 +70,7 @@ namespace wesos::types {
       m_c = TypeCGeneric();
     }
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+    void reflect(void* m, auto cb, auto& depth) const {
       ++depth;
       m_a.reflect(m, cb, depth);
       m_b.reflect(m, cb, depth);
@@ -112,7 +112,7 @@ namespace wesos::types {
       m_d = TypeDGeneric();
     }
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+    void reflect(void* m, auto cb, auto& depth) const {
       ++depth;
       m_a.reflect(m, cb, depth);
       m_b.reflect(m, cb, depth);

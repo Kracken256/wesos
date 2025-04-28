@@ -88,7 +88,7 @@ namespace wesos::types {
 
     constexpr auto into_pointer() -> ElementGeneric* { return m_data; }
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+    void reflect(void* m, auto cb, auto& depth) const {
       ++depth;
       for (auto ele : *this) {
         ele.reflect(m, cb, depth);

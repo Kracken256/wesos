@@ -77,7 +77,7 @@ namespace wesos::types {
       }
     }
 
-    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+    void reflect(void* m, auto cb, auto& depth) const {
       ++depth;
       if (isset()) {
         m_value.m_obj.reflect(m, cb, depth);
