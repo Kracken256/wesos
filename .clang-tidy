@@ -13,13 +13,6 @@ CheckOptions:
   - key: readability-identifier-naming.ClassSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.ClassConstantCase
-    value: CamelCase
-  - key: readability-identifier-naming.ClassConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ClassConstantSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.ClassMemberCase
     value: "TODO:"
   - key: readability-identifier-naming.ClassMemberPrefix
@@ -39,34 +32,6 @@ CheckOptions:
   - key: readability-identifier-naming.ConceptPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ConceptSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstantCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstantMemberCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantMemberPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantMemberSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstantParameterCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantParameterPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantParameterSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstantPointerParameterCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantPointerParameterPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstantPointerParameterSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.ConstexprFunctionCase
@@ -97,32 +62,11 @@ CheckOptions:
   - key: readability-identifier-naming.EnumSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.EnumConstantCase
-    value: CamelCase
-  - key: readability-identifier-naming.EnumConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.EnumConstantSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.FunctionCase
     value: "TODO:"
   - key: readability-identifier-naming.FunctionPrefix
     value: "TODO:"
   - key: readability-identifier-naming.FunctionSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.GlobalConstantCase
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalConstantSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.GlobalConstantPointerCase
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalConstantPointerPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalConstantPointerSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.GlobalFunctionCase
@@ -154,20 +98,6 @@ CheckOptions:
   - key: readability-identifier-naming.InlineNamespacePrefix
     value: "TODO:"
   - key: readability-identifier-naming.InlineNamespaceSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.LocalConstantCase
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalConstantSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.LocalConstantPointerCase
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalConstantPointerPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.LocalConstantPointerSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.LocalPointerCase
@@ -273,20 +203,6 @@ CheckOptions:
   - key: readability-identifier-naming.PublicMethodPrefix
     value: "TODO:"
   - key: readability-identifier-naming.PublicMethodSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ScopedEnumConstantCase
-    value: CamelCase
-  - key: readability-identifier-naming.ScopedEnumConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ScopedEnumConstantSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.StaticConstantCase
-    value: "TODO:"
-  - key: readability-identifier-naming.StaticConstantPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.StaticConstantSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.StaticVariableCase
