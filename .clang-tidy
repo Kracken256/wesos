@@ -34,27 +34,6 @@ CheckOptions:
   - key: readability-identifier-naming.ConceptSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.ConstexprFunctionCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprFunctionPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprFunctionSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstexprMethodCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprMethodPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprMethodSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ConstexprVariableCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprVariablePrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ConstexprVariableSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.EnumCase
     value: CamelCase
   - key: readability-identifier-naming.EnumPrefix
