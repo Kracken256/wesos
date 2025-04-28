@@ -13,7 +13,6 @@
 #include <wesos-types/Template.hh>
 
 namespace wesos::types {
-
   template <class ValueGeneric>
   class NumbericProtocol {
     ValueGeneric m_value;
@@ -87,19 +86,21 @@ namespace wesos::types {
   using f32 = NumbericProtocol<detail::__f32>;
   using f64 = NumbericProtocol<detail::__f64>;
 
+  using usize = decltype([]() {
+    if constexpr (sizeof(void*) == sizeof(u8)) {
+      return u8{};
+    } else if constexpr (sizeof(void*) == sizeof(u16)) {
+      return u16{};
+    } else if constexpr (sizeof(void*) == sizeof(u32)) {
+      return u32{};
+    } else if constexpr (sizeof(void*) == sizeof(u64)) {
+      return u64{};
+    } else {
+      static_assert(is_same_v<i8, i8>, "Pointer size is not supported");
+    }
+  }());
+
+  static_assert(sizeof(usize) == sizeof(void*), "Pointer size is not supported");
+
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types
-
-namespace wesos {
-  using types::i16;
-  using types::i32;
-  using types::i64;
-  using types::i8;
-  using types::u16;
-  using types::u32;
-  using types::u64;
-  using types::u8;
-
-  using types::f32;
-  using types::f64;
-}  // namespace wesos
