@@ -5,6 +5,9 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#include <wesos-kern/boot/Options.hh>
+#include <wesos-types/Types.hh>
+
 namespace wesos::kern {
   [[gnu::section(".text._start"), noreturn]] void start() {
     /// TODO: Implement the kernel
