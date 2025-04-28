@@ -8,24 +8,16 @@ CheckOptions:
 
   - key: readability-identifier-naming.ClassCase
     value: CamelCase
-  - key: readability-identifier-naming.ClassPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ClassSuffix
-    value: "TODO:"
 
   - key: readability-identifier-naming.ClassMemberCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.ClassMemberPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ClassMemberSuffix
-    value: "TODO:"
+    value: "m_"
 
   - key: readability-identifier-naming.ClassMethodCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.ClassMethodPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ClassMethodSuffix
-    value: "TODO:"
+    value: "m_"
 
   - key: readability-identifier-naming.ConceptCase
     value: CamelCase
@@ -42,21 +34,14 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.FunctionCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.FunctionPrefix
     value: "TODO:"
   - key: readability-identifier-naming.FunctionSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.GlobalFunctionCase
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalFunctionPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.GlobalFunctionSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.GlobalVariableCase
-    value: "TODO:"
+    value: UPPER_CASE
   - key: readability-identifier-naming.GlobalVariablePrefix
     value: "TODO:"
   - key: readability-identifier-naming.GlobalVariableSuffix
@@ -66,7 +51,7 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.LocalVariableCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.LocalVariablePrefix
     value: "TODO:"
   - key: readability-identifier-naming.LocalVariableSuffix
@@ -80,42 +65,42 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.MemberCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.MemberPrefix
     value: "TODO:"
   - key: readability-identifier-naming.MemberSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.MethodCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.MethodPrefix
     value: "TODO:"
   - key: readability-identifier-naming.MethodSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.NamespaceCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.NamespacePrefix
     value: "TODO:"
   - key: readability-identifier-naming.NamespaceSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.ParameterCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.ParameterPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ParameterSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.ParameterPackCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.ParameterPackPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ParameterPackSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.StaticVariableCase
-    value: "TODO:"
+    value: UPPER_CASE
   - key: readability-identifier-naming.StaticVariablePrefix
     value: "TODO:"
   - key: readability-identifier-naming.StaticVariableSuffix
@@ -178,14 +163,14 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.VariableCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.VariablePrefix
     value: "TODO:"
   - key: readability-identifier-naming.VariableSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.VirtualMethodCase
-    value: "TODO:"
+    value: lower_case
   - key: readability-identifier-naming.VirtualMethodPrefix
     value: "TODO:"
   - key: readability-identifier-naming.VirtualMethodSuffix
