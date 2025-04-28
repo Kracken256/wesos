@@ -2,7 +2,7 @@ Checks: "-*,readability-*,-readability-named-parameter,-readability-convert-memb
 WarningsAsErrors: "-*"
 CheckOptions:
   - key: readability-identifier-naming.AbstractClassCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.AbstractClassPrefix
     value: "TODO:"
   - key: readability-identifier-naming.AbstractClassSuffix
@@ -15,14 +15,14 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.ClassCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.ClassPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ClassSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.ClassConstantCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.ClassConstantPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ClassConstantSuffix
@@ -43,7 +43,7 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.ConceptCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.ConceptPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ConceptSuffix
@@ -99,14 +99,14 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.EnumCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.EnumPrefix
     value: "TODO:"
   - key: readability-identifier-naming.EnumSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.EnumConstantCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.EnumConstantPrefix
     value: "TODO:"
   - key: readability-identifier-naming.EnumConstantSuffix
@@ -287,7 +287,7 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.ScopedEnumConstantCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.ScopedEnumConstantPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ScopedEnumConstantSuffix
@@ -308,7 +308,7 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.StructCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.StructPrefix
     value: "TODO:"
   - key: readability-identifier-naming.StructSuffix
@@ -329,14 +329,14 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.TypeAliasCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.TypeAliasPrefix
     value: "TODO:"
   - key: readability-identifier-naming.TypeAliasSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.TypedefCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.TypedefPrefix
     value: "TODO:"
   - key: readability-identifier-naming.TypedefSuffix
@@ -350,7 +350,7 @@ CheckOptions:
     value: "TODO:"
 
   - key: readability-identifier-naming.UnionCase
-    value: "TODO:"
+    value: CamelCase
   - key: readability-identifier-naming.UnionPrefix
     value: "TODO:"
   - key: readability-identifier-naming.UnionSuffix
