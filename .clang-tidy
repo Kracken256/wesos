@@ -1,0 +1,536 @@
+Checks: "-*,readability-*,-readability-named-parameter,-readability-convert-member-functions-to-static,portability-*,-readability-make-member-function-const,performance-*,-performance-no-int-to-ptr,modernize-*,concurrency-*,clang-analyzer-*"
+WarningsAsErrors: "-*"
+CheckOptions:
+  - key: readability-identifier-naming.AbstractClassCase
+    value: "TODO:"
+  - key: readability-identifier-naming.AbstractClassPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.AbstractClassSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.AbstractClassIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.AbstractClassHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.AggressiveDependentMemberLookup
+    value: "TODO:"
+
+  - key: readability-identifier-naming.CheckAnonFieldInParent
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ClassCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ClassConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ClassMemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ClassMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ClassMethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConceptCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConceptPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConceptSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConceptIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstantMemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantMemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantMemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantMemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantMemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstantParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantParameterIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantParameterHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstantPointerParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantPointerParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantPointerParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantPointerParameterIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstantPointerParameterHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstexprFunctionCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprFunctionPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprFunctionSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprFunctionIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstexprMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprMethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprVariablePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprVariableSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprVariableIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ConstexprVariableHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.EnumCase
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.EnumConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.EnumConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.FunctionCase
+    value: "TODO:"
+  - key: readability-identifier-naming.FunctionPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.FunctionSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.FunctionIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GetConfigPerFile
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GlobalConstantPointerCase
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantPointerPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantPointerSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantPointerIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalConstantPointerHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GlobalFunctionCase
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalFunctionPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalFunctionSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalFunctionIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GlobalPointerCase
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalPointerPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalPointerSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalPointerIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalPointerHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalVariableSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalVariableIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.GlobalVariableHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.IgnoreMainLikeFunctions
+    value: "TODO:"
+
+  - key: readability-identifier-naming.InlineNamespaceCase
+    value: "TODO:"
+  - key: readability-identifier-naming.InlineNamespacePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.InlineNamespaceSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.InlineNamespaceIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.LocalConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.LocalConstantPointerCase
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantPointerPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantPointerSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantPointerIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalConstantPointerHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.LocalPointerCase
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalPointerPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalPointerSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalPointerIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalPointerHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.LocalVariableCase
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalVariablePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalVariableSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalVariableIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.LocalVariableHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: "TODO:"
+  - key: readability-identifier-naming.MacroDefinitionPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.MacroDefinitionSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.MacroDefinitionIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.MemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.MemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.MemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.MemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.MemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.MethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.MethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.MethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.MethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.NamespaceCase
+    value: "TODO:"
+  - key: readability-identifier-naming.NamespacePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.NamespaceSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.NamespaceIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ParameterPackCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterPackPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterPackSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ParameterPackIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.PointerParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.PointerParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.PointerParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.PointerParameterIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.PointerParameterHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.PrivateMemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.PrivateMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.PrivateMethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ProtectedMemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ProtectedMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ProtectedMethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.PublicMemberCase
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMemberPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMemberSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMemberIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMemberHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.PublicMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.PublicMethodIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ScopedEnumConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ScopedEnumConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ScopedEnumConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ScopedEnumConstantIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.StaticConstantCase
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticConstantPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticConstantSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticConstantIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticConstantHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.StaticVariableCase
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticVariablePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticVariableSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticVariableIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.StaticVariableHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.StructCase
+    value: "TODO:"
+  - key: readability-identifier-naming.StructPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.StructSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.StructIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.TemplateParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateParameterIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.TemplateTemplateParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateTemplateParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateTemplateParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.TemplateTemplateParameterIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.TypeAliasCase
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeAliasPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeAliasSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeAliasIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.TypedefCase
+    value: "TODO:"
+  - key: readability-identifier-naming.TypedefPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypedefSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypedefIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.TypeTemplateParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeTemplateParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeTemplateParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.TypeTemplateParameterIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.UnionCase
+    value: "TODO:"
+  - key: readability-identifier-naming.UnionPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.UnionSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.UnionIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.ValueTemplateParameterCase
+    value: "TODO:"
+  - key: readability-identifier-naming.ValueTemplateParameterPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.ValueTemplateParameterSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.ValueTemplateParameterIgnoredRegexp
+    value: "TODO:"
+
+  - key: readability-identifier-naming.VariableCase
+    value: "TODO:"
+  - key: readability-identifier-naming.VariablePrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.VariableSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.VariableIgnoredRegexp
+    value: "TODO:"
+  - key: readability-identifier-naming.VariableHungarianPrefix
+    value: "TODO:"
+
+  - key: readability-identifier-naming.VirtualMethodCase
+    value: "TODO:"
+  - key: readability-identifier-naming.VirtualMethodPrefix
+    value: "TODO:"
+  - key: readability-identifier-naming.VirtualMethodSuffix
+    value: "TODO:"
+  - key: readability-identifier-naming.VirtualMethodIgnoredRegexp
+    value: "TODO:"
