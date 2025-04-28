@@ -11,15 +11,18 @@ elseif(NOT BUILD_MODE STREQUAL "--rapid" AND NOT BUILD_MODE STREQUAL "--debug" A
   Valid options are '--rapid', '--debug', '--release'")
 endif()
 
+################################################################################
+# SET BUILD DEFAULT CONFIGURATION
+################################################################################
 if(BUILD_MODE STREQUAL "--rapid")
   message(STATUS "Rapid build mode selected")
-  # TODO: Add rapid build mode specific configurations
+  include(clang-global/rapid-mode)
 elseif(BUILD_MODE STREQUAL "--debug")
   message(STATUS "Debug build mode selected")
-  # TODO: Add debug build mode specific configurations
+  include(clang-global/debug-mode)
 elseif(BUILD_MODE STREQUAL "--release")
   message(STATUS "Release build mode selected")
-  # TODO: Add release build mode specific configurations
+  include(clang-global/release-mode)
 else()
   message(FATAL_ERROR "Unknown build mode: ${BUILD_MODE}.")
 endif()
