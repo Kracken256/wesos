@@ -65,13 +65,6 @@ CheckOptions:
   - key: readability-identifier-naming.IgnoreMainLikeFunctions
     value: "TODO:"
 
-  - key: readability-identifier-naming.InlineNamespaceCase
-    value: "TODO:"
-  - key: readability-identifier-naming.InlineNamespacePrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.InlineNamespaceSuffix
-    value: "TODO:"
-
   - key: readability-identifier-naming.LocalVariableCase
     value: "TODO:"
   - key: readability-identifier-naming.LocalVariablePrefix
@@ -119,48 +112,6 @@ CheckOptions:
   - key: readability-identifier-naming.ParameterPackPrefix
     value: "TODO:"
   - key: readability-identifier-naming.ParameterPackSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.PrivateMemberCase
-    value: "TODO:"
-  - key: readability-identifier-naming.PrivateMemberPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.PrivateMemberSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.PrivateMethodCase
-    value: "TODO:"
-  - key: readability-identifier-naming.PrivateMethodPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.PrivateMethodSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ProtectedMemberCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ProtectedMemberPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ProtectedMemberSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.ProtectedMethodCase
-    value: "TODO:"
-  - key: readability-identifier-naming.ProtectedMethodPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.ProtectedMethodSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.PublicMemberCase
-    value: "TODO:"
-  - key: readability-identifier-naming.PublicMemberPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.PublicMemberSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.PublicMethodCase
-    value: "TODO:"
-  - key: readability-identifier-naming.PublicMethodPrefix
-    value: "TODO:"
-  - key: readability-identifier-naming.PublicMethodSuffix
     value: "TODO:"
 
   - key: readability-identifier-naming.StaticVariableCase
