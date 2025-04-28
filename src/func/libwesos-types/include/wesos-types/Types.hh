@@ -13,6 +13,7 @@
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/Pointer.hh>
 #include <wesos-types/Primitive.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
@@ -36,6 +37,9 @@ namespace wesos {
   using types::Pair;
   using types::Quadlet;
   using types::Triplet;
+
+  using types::OwnPtr;
+  using types::RefPtr;
 
   using types::operator""_u8;
   using types::operator""_u16;
