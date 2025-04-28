@@ -9,7 +9,7 @@
 
 namespace wesos::types::detail {
   enum class PrimitiveTypeSize : unsigned char {
-    NULL = 0,
+    Empty = 0,
 
     U8 = 1,
     U16 = 2,

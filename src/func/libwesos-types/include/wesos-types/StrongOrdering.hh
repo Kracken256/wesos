@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef _COMPARE
+
 namespace std {
   // NOLINTBEGIN(readability-identifier-naming)
 
@@ -276,3 +278,5 @@ namespace std {
 
   // NOLINTEND(readability-identifier-naming)
 }  // namespace std
+
+#endif

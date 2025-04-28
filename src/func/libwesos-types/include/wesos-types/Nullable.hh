@@ -11,8 +11,6 @@
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 
-#include "wesos-types/Primitive.hh"
-
 namespace wesos::types {
   template <class ValueGeneric>
   class Nullable {
