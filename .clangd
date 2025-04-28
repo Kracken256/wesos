@@ -1,0 +1,34 @@
+InlayHints:
+  BlockEnd: Yes
+  Designators: No
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: No
+  TypeNameLimit: 24
+Diagnostics:
+  ClangTidy:
+    Add: modernize* readability* performance* bugprone* cppcoreguidelines*
+CompileFlags:
+  Add:
+    [
+      -Wall,
+      -Wextra,
+      -Wpedantic,
+      -Werror,
+      -Wshadow,
+      -Wconversion,
+      -Wsign-conversion,
+      -Wno-error=unused-parameter,
+      -Wno-error=unused-variable,
+      -Wno-error=unused-function,
+      -Wno-error=deprecated,
+      -fstack-protector,
+      -fPIC,
+      -fno-omit-frame-pointer,
+      -fno-rtti,
+      -fno-exceptions,
+      -nostdlib,
+      -nostdinc,
+      -ffreestanding,
+      -std=c++20,
+    ]
