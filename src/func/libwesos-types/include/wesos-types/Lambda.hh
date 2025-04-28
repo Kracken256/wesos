@@ -44,6 +44,8 @@ namespace wesos::types {
 
     constexpr Lambda(Null) : m_callable(nullptr) {}
 
+    constexpr auto operator<=>(const Lambda& other) const = default;
+
     Lambda(const Lambda& other)
         : m_callable(other.m_callable ? other.m_callable->clone() : nullptr) {}
 

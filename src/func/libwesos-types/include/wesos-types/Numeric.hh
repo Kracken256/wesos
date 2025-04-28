@@ -27,10 +27,6 @@ namespace wesos::types {
     constexpr auto operator=(GenericNumber&& other) -> GenericNumber& = default;
     constexpr auto operator<=>(const GenericNumber& other) const = default;
 
-    void reflect(void* m, auto cb, auto&) const {
-      cb(m, reinterpret_cast<const void*>(&m_value), sizeof(ValueGeneric));
-    }
-
     [[nodiscard]] constexpr auto unwrap() const -> ValueGeneric { return m_value; }
 
     template <class DestGeneric>

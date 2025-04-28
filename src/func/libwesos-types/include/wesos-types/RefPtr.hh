@@ -30,10 +30,6 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto add(usize i) const { return RefPtr(unwrap() + i.unwrap()); }
     [[nodiscard]] constexpr auto sub(usize i) const { return RefPtr(unwrap() - i.unwrap()); }
-
-    void reflect(void* m, auto cb, auto&) const {
-      cb(m, reinterpret_cast<const void*>(&m_ptr), sizeof(m_ptr));
-    }
   };
 
   static_assert(sizeof(RefPtr<void*>) == sizeof(void*),

@@ -88,13 +88,5 @@ namespace wesos::types {
     constexpr auto end() -> ElementGeneric* { return m_data + CountGeneric; }
 
     constexpr auto into_pointer() -> ElementGeneric* { return m_data; }
-
-    void reflect(void* m, auto cb, auto& depth) const {
-      ++depth;
-      for (auto ele : *this) {
-        ele.reflect(m, cb, depth);
-      }
-      --depth;
-    }
   };
 }  // namespace wesos::types

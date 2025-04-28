@@ -17,7 +17,7 @@ namespace wesos::types {
     constexpr Null(Null&&) = default;
     constexpr auto operator=(const Null&) -> Null& = default;
     constexpr auto operator=(Null&&) -> Null& = default;
-
     constexpr auto operator<=>(const Null&) const = default;
+    constexpr ~Null() = default;
   } null;  // NOLINT(readability-identifier-naming)
 }  // namespace wesos::types

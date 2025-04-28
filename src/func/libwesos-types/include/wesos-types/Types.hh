@@ -20,6 +20,7 @@
 #include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
+#include <wesos-types/Untrusted.hh>
 #include <wesos-types/View.hh>
 
 namespace wesos {
@@ -42,12 +43,15 @@ namespace wesos {
   using types::Quadlet;
   using types::Triplet;
 
+  using types::null;
   using types::NullableOwnPtr;
   using types::NullableRefPtr;
   using types::OwnPtr;
   using types::RefPtr;
 
   using types::View;
+
+  using types::Untrusted;
 
   using types::operator""_u8;
   using types::operator""_u16;

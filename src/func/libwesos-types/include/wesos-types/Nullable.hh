@@ -42,6 +42,8 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto isset() const -> bool { return m_isset; }
 
+    constexpr operator bool() { return isset(); }
+
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& {
       always_assert(isset());
       return m_value.m_obj;
@@ -65,27 +67,17 @@ namespace wesos::types {
       }
     }
 
-    void anew() {
+    constexpr void anew() {
       unset();
       m_value.m_obj = ValueGeneric();
       m_isset = true;
     }
 
-    void fill() {
+    constexpr void fill() {
       if (!isset()) {
         m_value.m_obj = ValueGeneric();
         m_isset = true;
       }
-    }
-
-    void reflect(void* m, auto cb, auto& depth) const {
-      ++depth;
-      if (isset()) {
-        m_value.m_obj.reflect(m, cb, depth);
-      } else {
-        cb(m, nullptr, 0);
-      }
-      --depth;
     }
   };
 }  // namespace wesos::types

@@ -28,7 +28,21 @@ namespace wesos::types {
     constexpr View(View<ElementGeneric>&& other) = default;
     constexpr auto operator=(const View<ElementGeneric>& other) -> View<ElementGeneric>& = default;
     constexpr auto operator=(View<ElementGeneric>&& other) -> View<ElementGeneric>& = default;
-    constexpr auto operator<=>(const View<ElementGeneric>& other) const = default;
+
+    constexpr auto operator<=>(const View<ElementGeneric>& other) const {
+      /// FIXME: Ensure this is correct
+
+      const usize min_size = m_size < other.m_size ? m_size : other.m_size;
+
+      for (usize i = 0; i < min_size; ++i) {
+        if (auto cmp = get_unchecked(i) <=> other.get_unchecked(i); cmp != 0) {
+          return cmp;
+        }
+      }
+
+      return m_size <=> other.m_size;
+    }
+
     constexpr ~View() = default;
 
     [[nodiscard]] constexpr auto begin() const -> Ptr { return m_base; }
@@ -70,14 +84,6 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count = usize::max()) const
         -> View<ElementGeneric> {
       return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
-    }
-
-    void reflect(void* m, auto cb, auto& depth) const {
-      ++depth;
-      for (const auto& ele : *this) {
-        ele.reflect(m, cb, depth);
-      }
-      --depth;
     }
   };
 }  // namespace wesos::types

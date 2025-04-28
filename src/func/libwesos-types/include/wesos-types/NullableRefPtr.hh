@@ -54,10 +54,6 @@ namespace wesos::types {
       assert_invariant(isset(), "Subtracting from a null pointer");
       return NullableRefPtr(into_raw() - i.unwrap());
     }
-
-    void reflect(void* m, auto cb, auto&) const {
-      cb(m, reinterpret_cast<const void*>(&m_ptr), sizeof(m_ptr));
-    }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),
