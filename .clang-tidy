@@ -1,4 +1,4 @@
-Checks: "-*,readability-*,-readability-named-parameter,-readability-convert-member-functions-to-static,portability-*,-readability-make-member-function-const,performance-*,-performance-no-int-to-ptr,modernize-*,concurrency-*,clang-analyzer-*"
+Checks: "-*,readability-*,-readability-named-parameter,-readability-identifier-length,-readability-convert-member-functions-to-static,portability-*,-readability-make-member-function-const,performance-*,-performance-no-int-to-ptr,modernize-*,concurrency-*,clang-analyzer-*"
 WarningsAsErrors: "-*"
 CheckOptions:
   - key: readability-identifier-naming.AbstractClassCase
