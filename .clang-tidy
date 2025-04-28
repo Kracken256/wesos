@@ -8,12 +8,6 @@ CheckOptions:
   - key: readability-identifier-naming.AbstractClassSuffix
     value: "TODO:"
 
-  - key: readability-identifier-naming.AggressiveDependentMemberLookup
-    value: "TODO:"
-
-  - key: readability-identifier-naming.CheckAnonFieldInParent
-    value: "TODO:"
-
   - key: readability-identifier-naming.ClassCase
     value: CamelCase
   - key: readability-identifier-naming.ClassPrefix
@@ -117,9 +111,6 @@ CheckOptions:
   - key: readability-identifier-naming.FunctionPrefix
     value: "TODO:"
   - key: readability-identifier-naming.FunctionSuffix
-    value: "TODO:"
-
-  - key: readability-identifier-naming.GetConfigPerFile
     value: "TODO:"
 
   - key: readability-identifier-naming.GlobalConstantCase
