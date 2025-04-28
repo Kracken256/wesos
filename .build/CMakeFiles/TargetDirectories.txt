@@ -1,0 +1,2 @@
+/home/wesjo/Documents/Projects/wesos/.build/CMakeFiles/edit_cache.dir
+/home/wesjo/Documents/Projects/wesos/.build/CMakeFiles/rebuild_cache.dir
