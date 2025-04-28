@@ -26,9 +26,8 @@ namespace wesos::types {
     constexpr auto operator=(NumbericProtocol&& other) -> NumbericProtocol& = default;
     constexpr auto operator<=>(const NumbericProtocol& other) const = default;
 
-    void reflect(const ReflectionCallback& cb) const {
-      cb(reinterpret_cast<void*>(&m_value),
-         static_cast<detail::PrimitiveTypeSize>(sizeof(ValueGeneric)));
+    void reflect(void* m, ReflectionCallback cb, ReflectionDepth&) const {
+      cb(m, reinterpret_cast<const void*>(&m_value), sizeof(ValueGeneric));
     }
 
     [[nodiscard]] constexpr auto unwrap() const -> ValueGeneric { return m_value; }
@@ -70,6 +69,8 @@ namespace wesos::types {
     constexpr auto operator--() const -> NumbericProtocol { return {unwrap() - 1}; }
     constexpr auto operator++(int) const -> NumbericProtocol { return {unwrap() + 1}; }
     constexpr auto operator--(int) const -> NumbericProtocol { return {unwrap() - 1}; }
+
+    constexpr operator bool() const { return unwrap() != 0; }
   };
 
   // NOLINTBEGIN(readability-identifier-naming)

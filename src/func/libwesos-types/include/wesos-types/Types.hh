@@ -8,6 +8,7 @@
 #pragma once
 
 #include <wesos-types/Array.hh>
+#include <wesos-types/Group.hh>
 #include <wesos-types/Lambda.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>

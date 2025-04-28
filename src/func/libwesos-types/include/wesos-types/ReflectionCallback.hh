@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <wesos-types/Lambda.hh>
-#include <wesos-types/Primitive.hh>
-
 namespace wesos::types {
-  using ReflectionCallback = Lambda<void(const void* base, detail::PrimitiveTypeSize)>;
+  using ReflectionDepth = unsigned int;
+  using ReflectionSize = unsigned int;
+  using ReflectionCallback = void(void* m, const void* base, ReflectionSize size);
 }  // namespace wesos::types

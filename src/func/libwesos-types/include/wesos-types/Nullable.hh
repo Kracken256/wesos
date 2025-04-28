@@ -11,6 +11,8 @@
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 
+#include "wesos-types/Primitive.hh"
+
 namespace wesos::types {
   template <class ValueGeneric>
   class Nullable {
@@ -75,6 +77,16 @@ namespace wesos::types {
         m_value.m_obj = ValueGeneric();
         m_isset = true;
       }
+    }
+
+    void reflect(void* m, ReflectionCallback cb, ReflectionDepth& depth) const {
+      ++depth;
+      if (isset()) {
+        m_value.m_obj.reflect(m, cb, depth);
+      } else {
+        cb(m, nullptr, 0);
+      }
+      --depth;
     }
   };
 }  // namespace wesos::types
