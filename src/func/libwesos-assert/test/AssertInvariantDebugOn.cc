@@ -7,16 +7,18 @@
 
 #include <gtest/gtest.h>
 
+#undef NDEBUG
 #include <wesos-assert/Assert.hh>
 
-TEST(Assert, AlwaysAssert) {
+TEST(assert_invariant, ndebug) {
   wesos::assert::register_message_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
 
-  // Test that always_assert does not abort when the condition is true
-  EXPECT_NO_FATAL_FAILURE(wesos::always_assert(true, "This should not fail"));
+  // Test that assert_invariant does not abort when the condition is true
+  EXPECT_NO_FATAL_FAILURE(assert_invariant(true, "This should not fail"));
 
-  // Test that always_assert aborts when the condition is false
-  EXPECT_DEATH(wesos::always_assert(false, "This should fail"), "This should fail");
+  // Test that assert_invariant does not abort when the condition is false
+  // because NDEBUG makes it a no-op
+  EXPECT_DEATH(assert_invariant(false, "This should fail"), "This should fail");
 }
