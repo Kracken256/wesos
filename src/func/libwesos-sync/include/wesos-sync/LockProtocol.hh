@@ -9,11 +9,10 @@
 
 namespace wesos::sync {
   class LockProtocol {
-    bool m_locked = false;
-
   protected:
-    virtual void virt_lock() = 0;
-    virtual void virt_unlock() = 0;
+    virtual auto virt_lock() -> void = 0;
+    virtual auto virt_try_lock() -> bool = 0;
+    virtual auto virt_unlock() -> void = 0;
 
   public:
     class LockLease final {
@@ -29,17 +28,9 @@ namespace wesos::sync {
       ~LockLease() { m_parent.unlock(); }
     };
 
-    void lock() {
-      virt_lock();
-      m_locked = true;
-    }
-
-    void unlock() {
-      m_locked = false;
-      virt_unlock();
-    }
-
-    [[nodiscard]] auto is_locked() const -> bool { return m_locked; }
+    void lock() { virt_lock(); }
+    auto try_lock() -> bool { return virt_try_lock(); }
+    void unlock() { virt_unlock(); }
 
     [[nodiscard]] auto lease() -> LockLease {
       lock();
