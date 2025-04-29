@@ -19,12 +19,13 @@ namespace wesos::heap {
      * @warning Neither parameter needs to be a power of two.
      * @warning This function may return uninitialized memory.
      */
-    [[nodiscard, gnu::pure]] virtual auto virt_allocate(usize n_bytes, usize align) -> void* = 0;
+    [[nodiscard, gnu::pure]] virtual auto virt_allocate(usize n_bytes,
+                                                        usize align) -> NullableOwnPtr<u8> = 0;
 
     /**
      * @warning This function is not idempotent (double frees constitute UB)
      */
-    virtual void virt_deallocate(void* ptr) = 0;
+    virtual void virt_deallocate(NullableOwnPtr<u8> ptr) = 0;
 
   public:
     virtual ~HeapProtocol() = 0;
@@ -38,14 +39,15 @@ namespace wesos::heap {
      * @warning Not all instances are thread-safe
      */
     [[nodiscard, gnu::pure]] auto allocate(usize n_bytes, usize align = DEFAULT_ALIGNMENT_GLOBAL,
-                                           bool zero_memory = true) -> void*;
+                                           bool zero_memory = true) -> NullableOwnPtr<u8>;
 
     /**
      * @brief Deallocate a contiguous memory block
+     * @param ptr maybe nullptr
      * @warning Not all instances are idempotent
      * @warning Not all instances are thread-safe
      */
-    void deallocate(void* ptr);
+    void deallocate(NullableOwnPtr<u8> ptr);
 
     static constexpr usize DEFAULT_ALIGNMENT_GLOBAL = 16;
   };
