@@ -9,10 +9,10 @@
 
 namespace wesos {
   namespace assert {
-    using MessageCallback = void (*)(void* m, const char*);
+    using OutputCallback = void (*)(void* m, const char*);
     using AbortCallback = void (*)(void* m);
 
-    void register_message_callback(void* m, MessageCallback cb);
+    void register_output_callback(void* m, OutputCallback cb);
     void register_abort_callback(void* m, AbortCallback cb);
   }  // namespace assert
 

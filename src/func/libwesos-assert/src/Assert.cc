@@ -10,7 +10,7 @@
 #include <wesos-sync/SpinLock.hh>
 
 namespace wesos::assert {
-  static void default_message_callback(void*, const char* message) {
+  static void default_output_callback(void*, const char* message) {
     // This will run on bare-metal, so we can't use printf
     // or any other standard library functions. Just discard the message.
 
@@ -19,31 +19,46 @@ namespace wesos::assert {
 
   static void default_abort_callback(void*) { __builtin_trap(); }
 
-  static MessageCallback MESSAGE_CALLBACK_GLOBAL = default_message_callback;
-  static AbortCallback ABORT_CALLBACK_GLOBAL = default_abort_callback;
-  static void* ABORT_CALLBACK_DATA_GLOBAL = nullptr;
-  static void* MESSAGE_CALLBACK_DATA_GLOBAL = nullptr;
+  static struct OutputConfig {
+    OutputCallback m_func = default_output_callback;
+    void* m_data = nullptr;
+  } OUTPUT_GLOBAL;
 
-  /// FIXME: Use a mutex to protect the global variables
+  static struct AbortConfig {
+    AbortCallback m_func = default_abort_callback;
+    void* m_data = nullptr;
+  } ABORT_GLOBAL;
+
+  static sync::SpinLock OUTPUT_LOCK_GLOBAL;
+  static sync::SpinLock ABORT_LOCK_GLOBAL;
 }  // namespace wesos::assert
 
-SYM_EXPORT void wesos::assert::register_message_callback(void* m, MessageCallback cb) {
-  always_assert(cb != nullptr, "Message callback cannot be null");
+SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback cb) {
+  always_assert(cb != nullptr, "Output callback cannot be null");
 
-  MESSAGE_CALLBACK_DATA_GLOBAL = m;
-  MESSAGE_CALLBACK_GLOBAL = cb;
+  OUTPUT_LOCK_GLOBAL.critical_section([&] {
+    OUTPUT_GLOBAL.m_func = cb;
+    OUTPUT_GLOBAL.m_data = m;
+  });
 }
 
 SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb) {
   always_assert(cb != nullptr, "Abort callback cannot be null");
 
-  ABORT_CALLBACK_DATA_GLOBAL = m;
-  ABORT_CALLBACK_GLOBAL = cb;
+  ABORT_LOCK_GLOBAL.critical_section([&] {
+    ABORT_GLOBAL.m_func = cb;
+    ABORT_GLOBAL.m_data = m;
+  });
 }
 
 SYM_EXPORT void wesos::always_assert(bool condition, const char* message) {
   if (!condition) [[unlikely]] {
-    assert::MESSAGE_CALLBACK_GLOBAL(assert::MESSAGE_CALLBACK_DATA_GLOBAL, message);
-    assert::ABORT_CALLBACK_GLOBAL(assert::ABORT_CALLBACK_DATA_GLOBAL);
+    using namespace assert;
+
+    auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
+    auto abort_copy = ABORT_LOCK_GLOBAL.critical_section([] { return ABORT_GLOBAL; });
+
+    output_copy.m_func(output_copy.m_data, message);
+    abort_copy.m_func(abort_copy.m_data);
   }
 }

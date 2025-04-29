@@ -10,7 +10,7 @@
 #include <wesos-assert/Assert.hh>
 
 TEST(always_assert, call) {
-  wesos::assert::register_message_callback(nullptr, [](void*, const char* message) {
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
 

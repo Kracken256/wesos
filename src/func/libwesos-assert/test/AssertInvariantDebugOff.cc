@@ -11,7 +11,7 @@
 #include <wesos-assert/Assert.hh>
 
 TEST(assert_invariant, no_ndebug) {
-  wesos::assert::register_message_callback(nullptr, [](void*, const char* message) {
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
 
