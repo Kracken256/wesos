@@ -8,6 +8,7 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/RefPtr.hh>
 
@@ -18,6 +19,7 @@ namespace wesos::types {
 
   public:
     constexpr NullableRefPtr() : m_ptr(nullptr) {}
+    constexpr NullableRefPtr(Null) : m_ptr(nullptr) {}
     constexpr NullableRefPtr(PointeeGeneric* ptr) : m_ptr(ptr) {}
     constexpr NullableRefPtr(const NullableRefPtr&) = default;
     constexpr NullableRefPtr(NullableRefPtr&& other) = default;
