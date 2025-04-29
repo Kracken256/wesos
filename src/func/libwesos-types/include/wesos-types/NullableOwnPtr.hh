@@ -14,6 +14,9 @@
 
 namespace wesos::types {
   template <typename PointeeGeneric>
+  class NullableRefPtr;
+
+  template <typename PointeeGeneric>
   class NullableOwnPtr {
     PointeeGeneric* m_ptr;
 
@@ -56,6 +59,8 @@ namespace wesos::types {
       assert_invariant(isset(), "Subtracting from a null pointer");
       return NullableOwnPtr(into_raw() - i.unwrap());
     }
+
+    [[nodiscard]] constexpr auto take_ref() const { return NullableRefPtr(into_raw()); }
   };
 
   static_assert(sizeof(NullableOwnPtr<void*>) == sizeof(void*),
