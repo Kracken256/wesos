@@ -7,6 +7,7 @@
 
 #include <wesos-assert/Assert.hh>
 #include <wesos-assert/Export.hh>
+#include <wesos-sync/SpinLock.hh>
 
 namespace wesos::assert {
   static void default_message_callback(void*, const char* message) {
