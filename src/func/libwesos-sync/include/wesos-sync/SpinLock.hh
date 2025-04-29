@@ -7,6 +7,19 @@
 
 #pragma once
 
+#include <wesos-sync/Atomic.hh>
+#include <wesos-sync/LockProtocol.hh>
+
 namespace wesos::sync {
-  /// TODO:
-}
+  class SpinLock : public LockProtocol {
+    Atomic<bool> m_locked;
+
+  protected:
+    auto virt_lock() -> void override;
+    auto virt_unlock() -> void override;
+    auto virt_try_lock() -> bool override;
+
+  public:
+    constexpr SpinLock() : m_locked(false) {}
+  };
+}  // namespace wesos::sync
