@@ -14,22 +14,22 @@
 using namespace wesos::heap;
 
 SYM_EXPORT auto HeapProtocol::allocate(usize n_bytes, usize align,
-                                       bool zero_memory) -> NullableOwnPtr<u8> {
+                                       bool zero_memory) -> Nullable<View<u8>> {
   if (n_bytes == 0 || align == 0) [[unlikely]] {
     return null;
   }
 
-  auto ptr = virt_allocate(n_bytes, align);
+  auto slice_opt = virt_allocate(n_bytes, align);
 
-  if (ptr != nullptr && zero_memory) {
-    memset(ptr.into_raw(), 0, n_bytes.unwrap());
+  if (slice_opt.isset() && zero_memory) {
+    memset(slice_opt.unwrap().into_ptr().into_raw(), 0, n_bytes.unwrap());
   }
 
-  return ptr;
+  return slice_opt;
 }
 
-SYM_EXPORT void HeapProtocol::deallocate(NullableOwnPtr<u8> ptr) {
-  if (ptr != nullptr) [[likely]] {
-    virt_deallocate(ptr);
+SYM_EXPORT void HeapProtocol::deallocate(Nullable<View<u8>> ptr) {
+  if (ptr.isset()) [[likely]] {
+    virt_deallocate(ptr.unwrap());
   }
 }

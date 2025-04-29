@@ -7,8 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include <wesos-heap/ContiguousIntrusiveHeap.hh>
+#include <wesos-heap/ElementaryIntrusiveHeap.hh>
 
-TEST(ContiguousIntrusiveHeap, ContiguousIntrusiveHeap) {
+TEST(ElementaryIntrusiveHeap, ElementaryIntrusiveHeap) {
   /// TODO:
 }
