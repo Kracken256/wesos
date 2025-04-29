@@ -45,12 +45,12 @@ namespace wesos::types {
     constexpr ~View() = default;
 
     [[nodiscard]] constexpr auto begin() -> Ptr { return m_base; }
-    [[nodiscard]] constexpr auto end() -> Ptr { return m_base + m_size; }
+    [[nodiscard]] constexpr auto end() -> Ptr { return m_base.add(m_size); }
     [[nodiscard]] constexpr auto cbegin() const -> NullableRefPtr<const ElementGeneric> {
       return m_base;
     }
     [[nodiscard]] constexpr auto cend() const -> NullableRefPtr<const ElementGeneric> {
-      return m_base + m_size;
+      return m_base.add(m_size);
     }
 
     [[nodiscard]] constexpr auto into_ptr() -> NullableRefPtr<ElementGeneric> { return m_base; }
