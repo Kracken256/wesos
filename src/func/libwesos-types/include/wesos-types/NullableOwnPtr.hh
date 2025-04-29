@@ -60,6 +60,11 @@ namespace wesos::types {
       return NullableOwnPtr(into_raw() - i.unwrap());
     }
 
+    constexpr auto operator++() const -> NullableOwnPtr { return {into_raw() + 1}; }
+    constexpr auto operator--() const -> NullableOwnPtr { return {into_raw() - 1}; }
+    constexpr auto operator++(int) const -> NullableOwnPtr { return {into_raw() + 1}; }
+    constexpr auto operator--(int) const -> NullableOwnPtr { return {into_raw() - 1}; }
+
     [[nodiscard]] constexpr auto take_ref() const { return NullableRefPtr(into_raw()); }
   };
 
