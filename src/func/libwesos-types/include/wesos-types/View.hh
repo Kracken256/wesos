@@ -44,13 +44,18 @@ namespace wesos::types {
 
     constexpr ~View() = default;
 
-    [[nodiscard]] constexpr auto begin() const -> Ptr { return m_base; }
-    [[nodiscard]] constexpr auto end() const -> Ptr { return m_base + m_size; }
+    [[nodiscard]] constexpr auto begin() -> Ptr { return m_base; }
+    [[nodiscard]] constexpr auto end() -> Ptr { return m_base + m_size; }
     [[nodiscard]] constexpr auto cbegin() const -> NullableRefPtr<const ElementGeneric> {
       return m_base;
     }
     [[nodiscard]] constexpr auto cend() const -> NullableRefPtr<const ElementGeneric> {
       return m_base + m_size;
+    }
+
+    [[nodiscard]] constexpr auto into_ptr() -> NullableRefPtr<ElementGeneric> { return m_base; }
+    [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<const ElementGeneric> {
+      return m_base;
     }
 
     [[nodiscard]] constexpr auto size() const -> usize { return m_size; }
@@ -74,13 +79,24 @@ namespace wesos::types {
       return *(m_base.add(i));
     }
 
-    [[nodiscard]] constexpr auto subview(usize i,
-                                         usize count = usize::max()) const -> View<ElementGeneric> {
+    [[nodiscard]] constexpr auto subview(usize i, usize count = usize::max()) const
+        -> View<const ElementGeneric> {
       always_assert(i < size());
       return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count = usize::max()) const
+        -> View<const ElementGeneric> {
+      return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
+    }
+
+    [[nodiscard]] constexpr auto subview(usize i,
+                                         usize count = usize::max()) -> View<ElementGeneric> {
+      always_assert(i < size());
+      return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
+    }
+
+    [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count = usize::max())
         -> View<ElementGeneric> {
       return View<ElementGeneric>(m_base.add(i), i + count > size() ? size() - i : count);
     }
