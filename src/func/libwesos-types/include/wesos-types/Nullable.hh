@@ -60,6 +60,10 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto unwrap_unchecked() -> ValueGeneric& { return m_value.m_obj; }
 
+    [[nodiscard]] constexpr auto value_or(ValueGeneric&& y) const -> ValueGeneric {
+      return isset() ? m_value.m_obj : y;
+    }
+
     void unset() {
       if (isset()) {
         m_value.m_obj.~ValueGeneric();
