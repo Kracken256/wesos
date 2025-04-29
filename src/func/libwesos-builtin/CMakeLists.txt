@@ -11,6 +11,7 @@ install(DIRECTORY "include/" DESTINATION "include")
 
 file(GLOB_RECURSE TEST_FILES "test/*.cc")
 add_executable(test-wesos-builtin ${TEST_FILES})
+target_compile_options(test-wesos-builtin PRIVATE -O0)
 target_link_libraries(test-wesos-builtin wesos-builtin gtest gtest_main)
 install(TARGETS test-wesos-builtin)
 add_dependencies(test-wesos-builtin wesos-builtin)
