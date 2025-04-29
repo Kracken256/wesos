@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_WIDE_LIBRARIES
+  libwesos-builtin
   libwesos-assert
   libwesos-types
   libwesos-heap
