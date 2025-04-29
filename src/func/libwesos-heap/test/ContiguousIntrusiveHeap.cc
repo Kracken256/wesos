@@ -9,4 +9,6 @@
 
 #include <wesos-heap/ContiguousIntrusiveHeap.hh>
 
-TEST(ContiguousIntrusiveHeap, ContiguousIntrusiveHeap) {}
+TEST(ContiguousIntrusiveHeap, ContiguousIntrusiveHeap) {
+  /// TODO:
+}
