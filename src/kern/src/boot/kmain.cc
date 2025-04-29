@@ -6,10 +6,12 @@
  */
 
 #include <wesos-kern/boot/Options.hh>
-#include <wesos-types/Types.hh>
 
 namespace wesos::kern {
-  [[gnu::section(".text._start"), noreturn]] void start() {
+  [[gnu::section(".text._start"), noreturn]] void start(Untrusted<boot::Options> boot_settings) {
+    const auto& settings = boot_settings.unwrap();
+    (void)settings;
+
     /// TODO: Implement the kernel
 
     while (true) {
