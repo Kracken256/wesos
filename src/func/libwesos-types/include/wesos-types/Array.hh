@@ -9,6 +9,7 @@
 
 #include <wesos-assert/Assert.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/View.hh>
 
 namespace wesos::types {
   template <class ElementGeneric, auto CountGeneric>
@@ -24,7 +25,7 @@ namespace wesos::types {
     constexpr auto operator<=>(const Array& other) const = default;
     constexpr ~Array() = default;
 
-    [[nodiscard]] constexpr auto length() const { return CountGeneric; }
+    [[nodiscard]] constexpr auto length() const -> usize { return CountGeneric; }
     [[nodiscard]] constexpr auto empty() const -> bool { return length() == 0; }
 
     constexpr void clear() {
@@ -88,5 +89,7 @@ namespace wesos::types {
     constexpr auto end() -> ElementGeneric* { return m_data + CountGeneric; }
 
     constexpr auto into_pointer() -> ElementGeneric* { return m_data; }
+
+    constexpr auto as_view() { return View<ElementGeneric>(begin(), length()); }
   };
 }  // namespace wesos::types
