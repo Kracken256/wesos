@@ -1,5 +1,3 @@
-ENTRY(_ZN5wesos4kern5startEv)
-
 SECTIONS
 {
   . = 0x100000; /* Load at 1MB */
