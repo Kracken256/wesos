@@ -7,34 +7,23 @@
 
 #pragma once
 
-#include <wesos-assert/Assert.hh>
-#include <wesos-types/Numeric.hh>
+#include <wesos-types/PtrBase.hh>
 
 namespace wesos::types {
   template <typename PointeeGeneric>
-  class OwnPtr {
-    PointeeGeneric* m_ptr;
+  class OwnPtr;
 
+  template <typename PointeeGeneric>
+  class OwnPtr : public PtrBase<PointeeGeneric, OwnPtr<PointeeGeneric>> {
   public:
-    constexpr OwnPtr(PointeeGeneric* ptr) : m_ptr(ptr) { assert_invariant(ptr != nullptr); }
+    constexpr OwnPtr(PointeeGeneric* ptr) : PtrBase<PointeeGeneric, OwnPtr<PointeeGeneric>>(ptr) {}
     constexpr OwnPtr(const OwnPtr&) = default;
-    constexpr OwnPtr(OwnPtr&& other) = default;
+    constexpr OwnPtr(OwnPtr&&) = default;
     constexpr auto operator=(const OwnPtr&) -> OwnPtr& = default;
-    constexpr auto operator=(OwnPtr&& other) -> OwnPtr& = default;
-    constexpr auto operator<=>(const OwnPtr& other) const = default;
+    constexpr auto operator=(OwnPtr&&) -> OwnPtr& = default;
     constexpr ~OwnPtr() = default;
 
-    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& { return *m_ptr; }
-
-    [[nodiscard]] constexpr auto add(usize i) const { return OwnPtr(unwrap() + i.unwrap()); }
-    [[nodiscard]] constexpr auto sub(usize i) const { return OwnPtr(unwrap() - i.unwrap()); }
-
-    constexpr auto operator++() const -> OwnPtr { return {unwrap() + 1}; }
-    constexpr auto operator--() const -> OwnPtr { return {unwrap() - 1}; }
-    constexpr auto operator++(int) const -> OwnPtr { return {unwrap() + 1}; }
-    constexpr auto operator--(int) const -> OwnPtr { return {unwrap() - 1}; }
+    [[nodiscard]] constexpr auto operator<=>(const OwnPtr&) const = default;
   };
 
   static_assert(sizeof(OwnPtr<void*>) == sizeof(void*),
