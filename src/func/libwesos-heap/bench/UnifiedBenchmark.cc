@@ -38,9 +38,7 @@ namespace wesos::heap::testing {
     for (usize size = min_size; size <= max_size; size++) {
       for (auto align = min_align; align <= max_align; align = align.next()) {
         auto ptr = allocate(size, align, false);
-
         alloc_count += ptr.isset();
-
         deallocate(ptr);
       }
     }

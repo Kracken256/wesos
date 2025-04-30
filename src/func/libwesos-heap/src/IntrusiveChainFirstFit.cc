@@ -34,7 +34,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
     -> Nullable<View<u8>> {
-  for (NullableRefPtr<Chunk> node = m_front, prev = null; node.isset();
+  for (NullableRefPtr<Chunk> node = m_front, prev = m_front; node.isset();
        prev = node, node = node->m_next) {
     const auto chunk_size = node->m_size;
     const auto chunk_ptr = RefPtr(reinterpret_cast<u8*>(node.unwrap()));
@@ -45,18 +45,24 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
       continue;
     }
 
-    const auto chunk_subview = View<u8>(aligned_chunk_ptr.unwrap(), chunk_size - unused_amount);
+    auto chunk_subview = View<u8>(aligned_chunk_ptr.unwrap(), chunk_size - unused_amount);
+    auto object_subview = chunk_subview.subview_unchecked(0, size.unwrap());
+    auto partition_subview = chunk_subview.subview_unchecked(size.unwrap());
 
-    /// TODO: Handle chunk splitting
-    /// TODO: Let the previous node reclaim the `unused_amount`. If no previous free node
+    if (partition_subview.size() >= sizeof(Chunk)) {
+      const RefPtr partition_ptr = reinterpret_cast<Chunk*>(partition_subview.into_ptr().unwrap());
 
-    if (prev.isset()) {
-      prev->m_next = node->m_next;
-    } else {
-      m_front = null;
+      partition_ptr->m_next = node->m_next;
+      partition_ptr->m_size = partition_subview.size();
+
+      node->m_next = partition_ptr;
+
+      /// TODO: Handle chunk splitting
     }
 
-    return chunk_subview;
+    prev->m_next = node->m_next;
+
+    return object_subview;
   }
 
   return null;
