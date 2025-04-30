@@ -16,8 +16,8 @@ TEST(assert_invariant, no_ndebug) {
   });
 
   // Test that assert_invariant does not abort when the condition is true
-  EXPECT_NO_FATAL_FAILURE(assert_invariant(true, "This should not fail"));
+  EXPECT_NO_FATAL_FAILURE(wesos::assert_invariant(true, "This should not fail"));
 
   // Test that assert_invariant aborts when the condition is false
-  EXPECT_NO_FATAL_FAILURE(assert_invariant(false, "This should fail"));
+  EXPECT_NO_FATAL_FAILURE(wesos::assert_invariant(false, "This should fail"));
 }

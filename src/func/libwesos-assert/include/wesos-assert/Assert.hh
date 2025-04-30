@@ -18,14 +18,15 @@ namespace wesos {
 
   void always_assert(bool condition, const char* message = nullptr);
 
-  // NOLINTBEGIN(readability-identifier-naming)
-
 #ifdef NDEBUG
-#define assert_invariant(condition, message) (void)(condition)
+  static constexpr void assert_invariant(bool condition, const char* message = nullptr) {
+    (void)condition;
+    (void)message;
+  }
 #else
-#define assert_invariant(...) wesos::always_assert(__VA_ARGS__)
+  static constexpr void assert_invariant(bool condition, const char* message = nullptr) {
+    always_assert(condition, message);
+  }
 #endif
-
-  // NOLINTEND(readability-identifier-naming)
 
 }  // namespace wesos
