@@ -1,77 +1,78 @@
-// /**
-//  * This file is part of the WesOS project.
-//  *
-//  * WesOS is public domain software: you can redistribute it and/or modify
-//  * it under the terms of the Unlicense(https://unlicense.org/).
-//  */
+/**
+ * This file is part of the WesOS project.
+ *
+ * WesOS is public domain software: you can redistribute it and/or modify
+ * it under the terms of the Unlicense(https://unlicense.org/).
+ */
 
-// #include <wesos-builtin/Export.hh>
-// #include <wesos-heap/IntrusivePool.hh>
+#include <wesos-builtin/Export.hh>
+#include <wesos-heap/IntrusivePool.hh>
 
-// using namespace wesos;
-// using namespace wesos::heap;
+using namespace wesos;
+using namespace wesos::heap;
 
-// SYM_EXPORT IntrusivePool::IntrusivePool(View<u8> chunk) {
-//   utilize_memory(chunk);
-// }
+SYM_EXPORT IntrusivePool::IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size,
+                                        PowerOfTwo<usize> object_align, View<u8> initial_pool)
+    : m_object_size(object_size), m_object_align(object_align) {
+  utilize(initial_pool);
+}
 
-// SYM_EXPORT IntrusivePool::IntrusivePool(View<View<u8>> chunks) {
-//   for (const auto& chunk : chunks) {
-//     utilize_memory(chunk);
-//   }
-// }
+SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
+    : m_freelist_head(o.m_freelist_head),
+      m_object_size(o.m_object_size),
+      m_object_align(o.m_object_align) {
+  // Any allocations from the source will fail after a move.
 
-// static auto align_pointer(void* ptr, usize align) -> void* {
-//   /// TODO: Implement this function
-//   return ptr;
-// }
+  o.m_freelist_head = nullptr;
+}
 
-// static auto calculate_minimum_allowable_size(void* base, usize n_bytes, usize align) -> usize {
-//   /// TODO: Implement this function
-//   return 0;
-// }
+SYM_EXPORT auto IntrusivePool::operator=(IntrusivePool&& o) -> IntrusivePool& {
+  m_object_size = o.m_object_size;
+  m_object_align = o.m_object_align;
+  m_freelist_head = o.m_freelist_head;
 
-// SYM_EXPORT auto IntrusivePool::virt_allocate(usize n_bytes,
-//                                                        usize align) -> Nullable<View<u8>> {
-//   if (!m_freelist_head.isset()) [[unlikely]] {
-//     return null;
-//   }
+  // Any allocations from the source will fail after a move.
+  o.m_freelist_head = nullptr;
 
-//   NullableRefPtr<FreeNode> head = m_freelist_head;
+  return *this;
+}
 
-//   while (head.isset()) {
-//     NullableRefPtr<FreeNode> node = head;
-//     head = head->m_next;
+SYM_EXPORT auto IntrusivePool::virt_allocate(Least<usize, 0> size,
+                                             PowerOfTwo<usize> align) -> Nullable<View<u8>> {
+  if (!m_freelist_head.isset() || size > object_size() || align > object_align()) [[unlikely]] {
+    return null;
+  }
 
-//     const auto min_allowed = calculate_minimum_allowable_size(node.into_raw(), n_bytes, align);
+  const auto freenode = m_freelist_head;
+  m_freelist_head = freenode->m_next;
 
-//     if (node->m_size >= min_allowed) {
-//       /// TODO: Implement heap allocate
-//     }
-//   }
+  auto* object_ptr = reinterpret_cast<u8*>(freenode.unwrap());
+  auto object = View<u8>(object_ptr, object_size());
 
-//   return null;
-// }
+  return object;
+}
 
-// SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
-//   /**
-//    * Yeah... So, there is basically no security checks because
-//    * there is nothing to assert over. Oh, well...
-//    */
+SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
+  assert_invariant(ptr.size() == object_size());
 
-//   auto free_node_view = ptr.subview(0, sizeof(FreeNode));
-//   auto* free_node = reinterpret_cast<FreeNode*>(free_node_view.into_ptr().into_raw());
+  auto free_node_view = ptr.subview_unchecked(0, sizeof(FreeNode));
+  auto* free_node = reinterpret_cast<FreeNode*>(free_node_view.into_ptr().unwrap());
 
-//   free_node->m_size = ptr.size();
-//   free_node->m_next = m_freelist_head;
-//   m_freelist_head = free_node;
-// }
+  free_node->m_next = m_freelist_head;
+  m_freelist_head = free_node;
+}
 
-// SYM_EXPORT void IntrusivePool::utilize_memory(View<u8> chunk) {
-//   if (chunk.size() < sizeof(FreeNode)) [[unlikely]] {
-//     return;
-//   }
+SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMemory {
+  const auto prefix_unused = extra_memory.into_ptr().into_uptr() & (m_object_align.unwrap() - 1);
 
-//   // Wierd, but it works..
-//   deallocate(chunk);
-// }
+  if (extra_memory.size() < sizeof(FreeNode)) [[unlikely]] {
+    return {};
+  }
+
+  /// TODO: Utilize supplied memory
+
+  // Wierd, but it works..
+  deallocate(extra_memory);
+
+  return {};
+}

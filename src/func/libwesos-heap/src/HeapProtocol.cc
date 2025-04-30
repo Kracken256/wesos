@@ -18,7 +18,7 @@ SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, PowerOfTwo<u
   auto slice_opt = virt_allocate(size, align);
 
   if (slice_opt.isset() && zero_memory) {
-    memset(slice_opt.unwrap().into_ptr().into_raw(), 0, size);
+    memset(slice_opt.unwrap().into_ptr().unwrap(), 0, size);
   }
 
   return slice_opt;

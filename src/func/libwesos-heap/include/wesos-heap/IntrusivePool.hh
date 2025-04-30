@@ -17,17 +17,22 @@ namespace wesos::heap {
     };
 
     NullableRefPtr<FreeNode> m_freelist_head;
-    Least<usize, 1> m_object_size;
-    Least<usize, 1> m_object_align;
+    ClampLeast<usize, sizeof(FreeNode)> m_object_size;
+    PowerOfTwo<usize> m_object_align;
+
+    [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
+    [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
 
   protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, Least<usize, 1> align)
+    [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
         -> Nullable<View<u8>> override;
 
     void virt_deallocate(View<u8> ptr) override;
 
+    auto virt_utilize(View<u8> extra_memory) -> LeftoverMemory override;
+
   public:
-    IntrusivePool(Least<usize, 1> object_size, Least<usize, 1> object_align,
+    IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size, PowerOfTwo<usize> object_align,
                   View<u8> initial_pool = View<u8>::create_empty());
     IntrusivePool(const IntrusivePool&) = delete;
     IntrusivePool(IntrusivePool&&);
@@ -36,7 +41,5 @@ namespace wesos::heap {
     ~IntrusivePool() override = default;
 
     [[nodiscard]] constexpr auto operator<=>(const IntrusivePool&) const = default;
-
-    void utilize_memory(View<u8> chunk);
   };
 }  // namespace wesos::heap
