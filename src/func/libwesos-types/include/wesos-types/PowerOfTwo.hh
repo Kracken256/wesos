@@ -15,7 +15,7 @@ namespace wesos::types {
   class PowerOfTwo {
     ValueGeneric m_value;
 
-    constexpr PowerOfTwo() = default;
+    constexpr PowerOfTwo(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
     static constexpr auto is_power_of_two(auto x) {
       return x > static_cast<ValueGeneric>(0) &&
@@ -38,10 +38,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> PowerOfTwo {
       assert_invariant(is_power_of_two(x));
-
-      PowerOfTwo obj;
-      obj.m_value = move(x);
-      return obj;
+      return PowerOfTwo(move(x), true);
     }
   };
 }  // namespace wesos::types
