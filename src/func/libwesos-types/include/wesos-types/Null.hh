@@ -10,14 +10,15 @@
 #include <wesos-types/StrongOrdering.hh>
 
 namespace wesos::types {
-  constexpr class Null {
+  constexpr class Null final {
   public:
     constexpr Null() = default;
     constexpr Null(const Null&) = default;
     constexpr Null(Null&&) = default;
     constexpr auto operator=(const Null&) -> Null& = default;
     constexpr auto operator=(Null&&) -> Null& = default;
-    constexpr auto operator<=>(const Null&) const = default;
     constexpr ~Null() = default;
+
+    constexpr auto operator<=>(const Null&) const = default;
   } null;  // NOLINT(readability-identifier-naming)
 }  // namespace wesos::types
