@@ -15,7 +15,7 @@ namespace wesos::types {
   class ClampLeast {
     ValueGeneric m_value;
 
-    constexpr ClampLeast() = default;
+    constexpr ClampLeast(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
     constexpr ClampLeast(ValueGeneric x) {
@@ -37,9 +37,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> ClampLeast {
       assert_invariant(x >= LeastValue);
-      ClampLeast obj;
-      obj.m_value = move(x);
-      return obj;
+      return ClampLeast(move(x), true);
     }
   };
 }  // namespace wesos::types
