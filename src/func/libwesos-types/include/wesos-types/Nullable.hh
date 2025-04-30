@@ -28,6 +28,7 @@ namespace wesos::types {
   public:
     constexpr Nullable() = default;
     constexpr Nullable(Null) {}
+    constexpr Nullable(nullptr_t) {}
     constexpr Nullable(ValueGeneric x) { assign(move(x)); }
     constexpr Nullable(const Nullable&) = default;
     constexpr Nullable(Nullable&& o) {
@@ -48,7 +49,24 @@ namespace wesos::types {
     }
     constexpr ~Nullable() { unset(); }
 
-    [[nodiscard]] constexpr auto operator<=>(const Nullable&) const = default;
+    [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::partial_ordering {
+      const bool a_set = isset();
+      const bool b_set = o.isset();
+
+      if (a_set && b_set) {
+        return get() <=> o.get();
+      }
+
+      if (!a_set && !b_set) {
+        return std::partial_ordering::equivalent;
+      }
+
+      return a_set ? std::partial_ordering::greater : std::partial_ordering::less;
+    };
+
+    [[nodiscard]] constexpr auto operator==(Null) const -> bool { return !isset(); }
+    [[nodiscard]] constexpr auto operator==(nullptr_t) const -> bool { return !isset(); }
+
     [[nodiscard]] constexpr auto isset() const -> bool { return m_isset; }
     [[nodiscard]] constexpr operator bool() { return isset(); }
 

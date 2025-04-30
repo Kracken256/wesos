@@ -21,4 +21,6 @@ namespace wesos::types {
 
     constexpr auto operator<=>(const Null&) const = default;
   } null;  // NOLINT(readability-identifier-naming)
+
+  using nullptr_t = decltype(nullptr);  // NOLINT(readability-identifier-naming)
 }  // namespace wesos::types
