@@ -6,7 +6,7 @@
  */
 
 #include <cstring>
-#include <wesos-assert/Export.hh>
+#include <wesos-builtin/Export.hh>
 #include <wesos-builtin/Memory.hh>
 #include <wesos-heap/HeapProtocol.hh>
 #include <wesos-types/Null.hh>

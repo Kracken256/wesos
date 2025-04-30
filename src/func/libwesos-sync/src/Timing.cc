@@ -5,7 +5,7 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include <wesos-assert/Export.hh>
+#include <wesos-builtin/Export.hh>
 #include <wesos-sync/Timing.hh>
 
 SYM_EXPORT void wesos::sync::ephemeral_pause() {

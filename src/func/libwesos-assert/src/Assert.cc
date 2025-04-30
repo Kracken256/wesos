@@ -6,7 +6,7 @@
  */
 
 #include <wesos-assert/Assert.hh>
-#include <wesos-assert/Export.hh>
+#include <wesos-builtin/Export.hh>
 #include <wesos-sync/SpinLock.hh>
 
 namespace wesos::assert {

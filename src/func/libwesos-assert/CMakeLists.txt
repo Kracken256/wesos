@@ -6,7 +6,7 @@ file(GLOB_RECURSE SOURCE_FILES "src/*.cc")
 
 add_library(wesos-assert STATIC ${SOURCE_FILES})
 target_include_directories(wesos-assert PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(wesos-assert wesos-sync)
+target_link_libraries(wesos-assert wesos-sync wesos-builtin)
 install(TARGETS wesos-assert)
 install(DIRECTORY "include/" DESTINATION "include")
 
