@@ -33,12 +33,13 @@ TEST(IntrusivePool, Allocate) {
   constexpr auto align_limit = 256;
   constexpr auto alloc_limit = 31;
 
+  std::pmr::polymorphic_allocator<u8> service;
+
   for (usize size = sizeof(void*); size < prime_size_limit; size++) {
     for (usize align = 1; align < align_limit; align *= 2) {
       const auto space_per_object = ((size + align - 1) & -align);
       const auto buffer_size = space_per_object * alloc_limit;
 
-      std::pmr::polymorphic_allocator<u8> service;
       u8* buf = reinterpret_cast<u8*>(service.allocate_bytes(buffer_size, align));
       ASSERT_NE(buf, nullptr);
 
@@ -46,7 +47,7 @@ TEST(IntrusivePool, Allocate) {
       auto heap = heap::IntrusivePool(size, align, buf_view);
 
       for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-        EXPECT_NE(heap.allocate_nosync(size, align), null)
+        EXPECT_NE(heap.allocate_nosync(size, align, false), null)
             << "Failed on size(" << size << "), " << "align(" << align << ")";
       }
 
