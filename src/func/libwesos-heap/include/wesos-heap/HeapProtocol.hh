@@ -7,45 +7,44 @@
 
 #pragma once
 
+#include <wesos-sync/SpinLock.hh>
 #include <wesos-types/Types.hh>
 
 namespace wesos::heap {
   class HeapProtocol {
+    sync::SpinLock m_mutex;
+
   protected:
     /**
-     * @param align > 0;
-     * @param n_bytes > 0;
-     *
-     * @warning Neither parameter needs to be a power of two.
-     * @warning This function may return uninitialized memory.
+     * @param align doesn't need to be a power of 2.
+     * @warning This function returns uninitialized memory.
      */
-    [[nodiscard, gnu::pure]] virtual auto virt_allocate(usize n_bytes,
-                                                        usize align) -> Nullable<View<u8>> = 0;
+    [[nodiscard, gnu::pure]] virtual auto virt_allocate(Least<usize, 0> size, Least<usize, 1> align)
+        -> Nullable<View<u8>> = 0;
 
-    /**
-     * @warning This function might not be idempotent (double frees constitute UB)
-     */
     virtual void virt_deallocate(View<u8> ptr) = 0;
 
   public:
     virtual ~HeapProtocol() = 0;
 
-    /**
-     * @brief Allocate a contiguous memory block
-     * @param align >= 0;
-     * @param n_bytes >= 0;
-     *
-     * @warning Neither parameter needs to be a power of two.
-     * @warning Not all instances are thread-safe
-     */
-    [[nodiscard, gnu::pure]] auto allocate(usize n_bytes, usize align = DEFAULT_ALIGNMENT_GLOBAL,
+    ///===========================================================================================
+    /// UNLOCKED THREAD-UNSAFE ACCESS
+    ///===========================================================================================
+
+    [[nodiscard, gnu::pure]] auto allocate_nosync(Least<usize, 0> size,
+                                                  Least<usize, 1> align = DEFAULT_ALIGNMENT_GLOBAL,
+                                                  bool zero_memory = true) -> Nullable<View<u8>>;
+
+    void deallocate_nosync(Nullable<View<u8>> ptr);
+
+    ///===========================================================================================
+    /// INTERNALLY LOCKED THREAD-SAFE ACCESS
+    ///===========================================================================================
+
+    [[nodiscard, gnu::pure]] auto allocate(Least<usize, 0> size,
+                                           Least<usize, 1> align = DEFAULT_ALIGNMENT_GLOBAL,
                                            bool zero_memory = true) -> Nullable<View<u8>>;
 
-    /**
-     * @brief Deallocate a contiguous memory block
-     * @warning Not all instances are idempotent
-     * @warning Not all instances are thread-safe
-     */
     void deallocate(Nullable<View<u8>> ptr);
 
     static constexpr usize DEFAULT_ALIGNMENT_GLOBAL = 16;
