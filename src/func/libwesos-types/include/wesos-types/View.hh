@@ -116,6 +116,20 @@ namespace wesos::types {
       return size() <=> o.size();
     }
 
+    [[nodiscard]] constexpr auto operator==(const View& o) const -> bool {
+      if (size() != o.size()) {
+        return false;
+      }
+
+      for (usize i = 0; i < size(); ++i) {
+        if (get_unchecked(i) != o.get_unchecked(i)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     ///========================================================================================
 
     constexpr auto set(usize i, ElementGeneric x) -> View& {

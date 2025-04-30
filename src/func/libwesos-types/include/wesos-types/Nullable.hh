@@ -66,6 +66,21 @@ namespace wesos::types {
       return a_set ? std::strong_ordering::greater : std::strong_ordering::less;
     };
 
+    [[nodiscard]] constexpr auto operator==(const Nullable& o) const -> bool {
+      const bool a_set = isset();
+      const bool b_set = o.isset();
+
+      if (a_set && b_set) {
+        return get() == o.get();
+      }
+
+      if (!a_set && !b_set) {
+        return true;
+      }
+
+      return false;
+    }
+
     [[nodiscard]] constexpr auto operator==(Null) const -> bool { return !isset(); }
     [[nodiscard]] constexpr auto operator==(nullptr_t) const -> bool { return !isset(); }
 
