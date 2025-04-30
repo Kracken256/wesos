@@ -14,51 +14,43 @@
 namespace wesos::types {
   template <typename ElementGeneric>
   class View {
-    using Ptr = NullableRefPtr<ElementGeneric>;
+    using Pointer = NullableRefPtr<ElementGeneric>;
+    using ConstPointer = NullableRefPtr<const ElementGeneric>;
 
-    Ptr m_base;
+    Pointer m_base;
     usize m_size;
 
   public:
-    constexpr View() = default;
-    constexpr View(Ptr base, usize count) : m_base(base), m_size(count) {}
-    constexpr View(Ptr base, Ptr end) : m_base(base), m_size(end - base) {}
-    constexpr View(const View<ElementGeneric>& other) = default;
-    constexpr View(View<ElementGeneric>&& other) = default;
-    constexpr auto operator=(const View<ElementGeneric>& other) -> View<ElementGeneric>& = default;
-    constexpr auto operator=(View<ElementGeneric>&& other) -> View<ElementGeneric>& = default;
+    constexpr View() : m_base(nullptr), m_size(0){};
+    constexpr View(Pointer base, usize count) : m_base(base), m_size(count) {}
+    constexpr View(Pointer base, Pointer end) : m_base(base), m_size(end - base) {}
+    constexpr View(const View<ElementGeneric>&) = default;
+    constexpr View(View<ElementGeneric>&&) = default;
+    constexpr auto operator=(const View<ElementGeneric>&) -> View<ElementGeneric>& = default;
+    constexpr auto operator=(View<ElementGeneric>&&) -> View<ElementGeneric>& = default;
+    constexpr ~View() = default;
 
-    constexpr auto operator<=>(const View<ElementGeneric>& other) const {
-      /// FIXME: Ensure this is correct
-
-      const usize min_size = m_size < other.m_size ? m_size : other.m_size;
+    constexpr auto operator<=>(const View<ElementGeneric>& o) const {
+      const usize min_size = size() < o.size() ? size() : o.size();
 
       for (usize i = 0; i < min_size; ++i) {
-        if (auto cmp = get_unchecked(i) <=> other.get_unchecked(i); cmp != 0) {
+        if (auto cmp = get_unchecked(i) <=> o.get_unchecked(i); cmp != 0) {
           return cmp;
         }
       }
 
-      return m_size <=> other.m_size;
-    }
-
-    constexpr ~View() = default;
-
-    [[nodiscard]] constexpr auto begin() -> Ptr { return m_base; }
-    [[nodiscard]] constexpr auto end() -> Ptr { return m_base.add(m_size); }
-    [[nodiscard]] constexpr auto cbegin() const -> NullableRefPtr<const ElementGeneric> {
-      return m_base;
-    }
-    [[nodiscard]] constexpr auto cend() const -> NullableRefPtr<const ElementGeneric> {
-      return m_base.add(m_size);
-    }
-
-    [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<ElementGeneric> {
-      return m_base;
+      return size() <=> o.size();
     }
 
     [[nodiscard]] constexpr auto size() const -> usize { return m_size; }
-    [[nodiscard]] constexpr auto empty() const -> bool { return m_size == 0; }
+    [[nodiscard]] constexpr auto empty() const -> bool { return size() == 0; }
+
+    [[nodiscard]] constexpr auto begin() -> Pointer { return m_base; }
+    [[nodiscard]] constexpr auto end() -> Pointer { return m_base.add(size()); }
+    [[nodiscard]] constexpr auto cbegin() const -> ConstPointer { return m_base; }
+    [[nodiscard]] constexpr auto cend() const -> ConstPointer { return m_base.add(size()); }
+
+    [[nodiscard]] constexpr auto into_ptr() const { return m_base; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
       always_assert(i < size());
@@ -80,43 +72,43 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View<const ElementGeneric> {
       always_assert(i <= size() && count <= size() - i);
-      return View<ElementGeneric>(m_base.add(i), count);
+      return {m_base.add(i), count};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) const
         -> View<const ElementGeneric> {
       assert_invariant(i <= size() && count <= size() - i);
-      return View<ElementGeneric>(m_base.add(i), count);
+      return {m_base.add(i), count};
     }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) -> View<ElementGeneric> {
       always_assert(i <= size() && count <= size() - i);
-      return View<ElementGeneric>(m_base.add(i), count);
+      return {m_base.add(i), count};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) -> View<ElementGeneric> {
       assert_invariant(i <= size() && count <= size() - i);
-      return View<ElementGeneric>(m_base.add(i), count);
+      return {m_base.add(i), count};
     }
 
     [[nodiscard]] constexpr auto subview(usize i) const -> View<const ElementGeneric> {
       always_assert(i <= size());
-      return View<ElementGeneric>(m_base.add(i), size() - i);
+      return {m_base.add(i), size() - i};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i) const -> View<const ElementGeneric> {
       assert_invariant(i <= size());
-      return View<ElementGeneric>(m_base.add(i), size() - i);
+      return {m_base.add(i), size() - i};
     }
 
     [[nodiscard]] constexpr auto subview(usize i) -> View<ElementGeneric> {
       always_assert(i <= size());
-      return View<ElementGeneric>(m_base.add(i), size() - i);
+      return {m_base.add(i), size() - i};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i) -> View<ElementGeneric> {
       assert_invariant(i <= size());
-      return View<ElementGeneric>(m_base.add(i), size() - i);
+      return {m_base.add(i), size() - i};
     }
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
