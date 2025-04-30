@@ -20,7 +20,7 @@ SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, PowerOfTwo<u
   auto slice_opt = virt_allocate(size, align);
 
   if (slice_opt.isset() && zero_memory) {
-    memset(slice_opt.unwrap().into_ptr().unwrap(), 0, size);
+    memset(slice_opt.unwrap_unchecked().into_ptr().unwrap(), 0, size);
   }
 
   return slice_opt;
@@ -28,7 +28,7 @@ SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, PowerOfTwo<u
 
 SYM_EXPORT void HeapProtocol::deallocate_nosync(Nullable<View<u8>> ptr) {
   if (ptr.isset()) [[likely]] {
-    virt_deallocate(ptr.unwrap());
+    virt_deallocate(ptr.unwrap_unchecked());
   }
 }
 
