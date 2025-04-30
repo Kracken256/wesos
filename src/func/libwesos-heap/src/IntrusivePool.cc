@@ -63,6 +63,12 @@ SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
 }
 
 SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
+  if (pool.empty()) [[unlikely]] {
+    LeftoverMemory unused;
+    unused.first() = pool;
+    return unused;
+  }
+
   View<u8> window = pool;
 
   {
