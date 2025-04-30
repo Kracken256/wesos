@@ -12,9 +12,9 @@ using namespace wesos;
 using namespace wesos::heap;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size,
-                                        PowerOfTwo<usize> object_align, View<u8> initial_pool)
+                                        PowerOfTwo<usize> object_align, View<u8> pool)
     : m_object_size(object_size), m_object_align(object_align) {
-  virt_utilize(initial_pool);
+  virt_utilize(pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -62,8 +62,8 @@ SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
   m_freelist_head = free_node;
 }
 
-SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMemory {
-  View<u8> window = extra_memory;
+SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
+  View<u8> window = pool;
 
   {
     usize unusable_amount;
@@ -90,11 +90,9 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMe
     };
   }
 
-  const auto initial_unusable_prefix = extra_memory.into_ptr()
-                                           .align_pow2(m_object_align)
-                                           .sub(extra_memory.into_ptr().into_uptr())
-                                           .into_uptr();
-  const auto beginning_unused = extra_memory.subview_unchecked(0, initial_unusable_prefix);
+  const auto initial_unusable_prefix =
+      pool.into_ptr().align_pow2(m_object_align).sub(pool.into_ptr().into_uptr()).into_uptr();
+  const auto beginning_unused = pool.subview_unchecked(0, initial_unusable_prefix);
   const auto end_unused = window;
 
   LeftoverMemory unused;

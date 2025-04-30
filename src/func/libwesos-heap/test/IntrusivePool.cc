@@ -17,9 +17,9 @@ TEST(IntrusivePool, CreatePool) {
   constexpr auto buffer_size = 4096;
 
   std::vector<u8> buf(buffer_size);
-  View<u8> initial_pool(buf.data(), buf.size());
+  View<u8> pool(buf.data(), buf.size());
 
-  auto heap = heap::IntrusivePool(sizeof(int), alignof(int), initial_pool);
+  auto heap = heap::IntrusivePool(sizeof(int), alignof(int), pool);
 }
 
 TEST(IntrusivePool, Allocate) {

@@ -31,7 +31,7 @@ namespace wesos::heap {
 
     void deallocate_nosync(Nullable<View<u8>> ptr);
 
-    auto utilize_nosync(View<u8> extra_memory) -> LeftoverMemory;
+    auto utilize_nosync(View<u8> pool) -> LeftoverMemory;
 
     ///===========================================================================================
     /// INTERNALLY LOCKED THREAD-SAFE ACCESS
@@ -42,7 +42,7 @@ namespace wesos::heap {
 
     void deallocate(Nullable<View<u8>> ptr);
 
-    auto utilize(View<u8> extra_memory) -> LeftoverMemory;
+    auto utilize(View<u8> pool) -> LeftoverMemory;
 
   protected:
     [[nodiscard, gnu::pure]] virtual auto virt_allocate(
@@ -50,6 +50,6 @@ namespace wesos::heap {
 
     virtual void virt_deallocate(View<u8> ptr) = 0;
 
-    virtual auto virt_utilize(View<u8> extra_memory) -> LeftoverMemory = 0;
+    virtual auto virt_utilize(View<u8> pool) -> LeftoverMemory = 0;
   };
 }  // namespace wesos::heap

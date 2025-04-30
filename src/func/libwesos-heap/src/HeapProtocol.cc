@@ -32,8 +32,8 @@ SYM_EXPORT void HeapProtocol::deallocate_nosync(Nullable<View<u8>> ptr) {
   }
 }
 
-SYM_EXPORT auto HeapProtocol::utilize_nosync(View<u8> extra_memory) -> LeftoverMemory {
-  return virt_utilize(extra_memory);
+SYM_EXPORT auto HeapProtocol::utilize_nosync(View<u8> pool) -> LeftoverMemory {
+  return virt_utilize(pool);
 }
 
 SYM_EXPORT auto HeapProtocol::allocate(Least<usize, 0> size, PowerOfTwo<usize> align,
@@ -45,6 +45,6 @@ SYM_EXPORT void HeapProtocol::deallocate(Nullable<View<u8>> ptr) {
   return m_mutex.critical_section([&] { return deallocate_nosync(ptr); });
 }
 
-SYM_EXPORT auto HeapProtocol::utilize(View<u8> extra_memory) -> LeftoverMemory {
-  return m_mutex.critical_section([&] { return utilize_nosync(extra_memory); });
+SYM_EXPORT auto HeapProtocol::utilize(View<u8> pool) -> LeftoverMemory {
+  return m_mutex.critical_section([&] { return utilize_nosync(pool); });
 }

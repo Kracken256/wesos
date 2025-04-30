@@ -29,11 +29,11 @@ namespace wesos::heap {
 
     void virt_deallocate(View<u8> ptr) override;
 
-    auto virt_utilize(View<u8> extra_memory) -> LeftoverMemory override;
+    auto virt_utilize(View<u8> pool) -> LeftoverMemory override;
 
   public:
     IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size, PowerOfTwo<usize> object_align,
-                  View<u8> initial_pool = View<u8>::create_empty());
+                  View<u8> pool = View<u8>::create_empty());
     IntrusivePool(const IntrusivePool&) = delete;
     IntrusivePool(IntrusivePool&&);
     auto operator=(const IntrusivePool&) -> IntrusivePool& = delete;
