@@ -53,8 +53,7 @@ namespace wesos::types {
       return m_base.add(m_size);
     }
 
-    [[nodiscard]] constexpr auto into_ptr() -> NullableRefPtr<ElementGeneric> { return m_base; }
-    [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<const ElementGeneric> {
+    [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<ElementGeneric> {
       return m_base;
     }
 
