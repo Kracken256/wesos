@@ -7,16 +7,58 @@
 
 #include "UnifiedBenchmark.hh"
 
-void wesos::heap::testing::synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
-  auto ptr = mm.allocate(options.m_alloc_min, options.m_align_min, false);
-  mm.deallocate(ptr);
+namespace wesos::heap::testing {
+  namespace detail {
+    template <class ClassGeneric, class MethodGeneric>
+    class MemberLambda final {
+      ClassGeneric& m_base;
+      MethodGeneric m_method;
 
-  /// TODO: Implement benchmark
-}
+    public:
+      MemberLambda(ClassGeneric& base, MethodGeneric method) : m_base(base), m_method(method) {}
 
-void wesos::heap::testing::unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
-  auto ptr = mm.allocate_nosync(options.m_alloc_min, options.m_align_min, false);
-  mm.deallocate_nosync(ptr);
+      template <typename... ArgsGeneric>
+      auto operator()(ArgsGeneric... args) const {
+        return (m_base.*m_method)(args...);
+      }
+    };
+  }  // namespace detail
 
-  /// TODO: Implement benchmark
-}
+  using AllocateFunc = detail::MemberLambda<HeapProtocol, decltype(&HeapProtocol::allocate)>;
+  using DeallocateFunc = detail::MemberLambda<HeapProtocol, decltype(&HeapProtocol::deallocate)>;
+
+  static auto is_pool_allocator(const BenchmarkOptions& options) -> bool {
+    return options.m_size_min == options.m_size_max;
+  }
+
+  static void benchmark_pool_allocator(const AllocateFunc& allocate,
+                                       const DeallocateFunc& deallocate, usize size,
+                                       PowerOfTwo<usize> align) {
+    auto ptr = allocate(size, align, false);
+    deallocate(ptr);
+  }
+
+  static void benchmark(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
+                        BenchmarkOptions options) {
+    if (is_pool_allocator(options)) {
+      benchmark_pool_allocator(allocate, deallocate, options.m_size_max, options.m_align_max);
+      return;
+    }
+
+    /// TODO: Implement general allocator benchmarks
+  }
+
+  void synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
+    const AllocateFunc allocate(mm, &HeapProtocol::allocate);
+    const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate);
+
+    benchmark(allocate, deallocate, options);
+  }
+
+  void unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
+    const AllocateFunc allocate(mm, &HeapProtocol::allocate_nosync);
+    const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate_nosync);
+
+    benchmark(allocate, deallocate, options);
+  }
+}  // namespace wesos::heap::testing

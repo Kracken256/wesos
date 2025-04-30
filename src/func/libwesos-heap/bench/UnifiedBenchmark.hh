@@ -11,14 +11,12 @@
 
 namespace wesos::heap::testing {
   struct BenchmarkOptions {
-    usize m_alloc_min;
-    usize m_alloc_max;
-    usize m_align_min;
-    usize m_align_max;
+    usize m_size_min, m_size_max;
+    PowerOfTwo<usize> m_align_min, m_align_max;
 
-    constexpr BenchmarkOptions(usize alloc_min, usize alloc_max, usize align_min, usize align_max)
-        : m_alloc_min(alloc_min),
-          m_alloc_max(alloc_max),
+    constexpr BenchmarkOptions(auto size_min, auto size_max, auto align_min, auto align_max)
+        : m_size_min(size_min),
+          m_size_max(size_max),
           m_align_min(align_min),
           m_align_max(align_max) {}
   };
