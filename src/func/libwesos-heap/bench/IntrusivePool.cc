@@ -18,7 +18,7 @@ using namespace wesos::heap::testing;
 
 using ClampedAlign = ClampMost<PowerOfTwo<usize>, 4096ULL>;
 
-static void BM_IntrusivePool_Creation(benchmark::State& state) {
+static void BM_IntrusivePool_Evo_Creation(benchmark::State& state) {
   assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
@@ -38,7 +38,7 @@ static void BM_IntrusivePool_Creation(benchmark::State& state) {
   }
 }
 
-static void BM_IntrusivePool_Synchronized(benchmark::State& state) {
+static void BM_IntrusivePool_Evo_Synchronized(benchmark::State& state) {
   assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
@@ -61,7 +61,7 @@ static void BM_IntrusivePool_Synchronized(benchmark::State& state) {
   }
 }
 
-static void BM_IntrusivePool_Unsynchronized(benchmark::State& state) {
+static void BM_IntrusivePool_Evo_Unsynchronized(benchmark::State& state) {
   assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
@@ -84,6 +84,6 @@ static void BM_IntrusivePool_Unsynchronized(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_IntrusivePool_Creation);
-BENCHMARK(BM_IntrusivePool_Synchronized);
-BENCHMARK(BM_IntrusivePool_Unsynchronized);
+BENCHMARK(BM_IntrusivePool_Evo_Creation);
+BENCHMARK(BM_IntrusivePool_Evo_Synchronized);
+BENCHMARK(BM_IntrusivePool_Evo_Unsynchronized);
