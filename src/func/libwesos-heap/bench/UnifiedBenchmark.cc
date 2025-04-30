@@ -33,34 +33,38 @@ namespace wesos::heap::testing {
     return options.m_size_min == options.m_size_max;
   }
 
-  static void benchmark_pool_allocator(const AllocateFunc& allocate,
+  static auto benchmark_pool_allocator(const AllocateFunc& allocate,
                                        const DeallocateFunc& deallocate, usize size,
-                                       PowerOfTwo<usize> align) {
+                                       PowerOfTwo<usize> align) -> bool {
     auto ptr = allocate(size, align, false);
     deallocate(ptr);
+
+    return ptr.isset();
   }
 
-  static void benchmark(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
-                        BenchmarkOptions options) {
+  static auto benchmark(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
+                        BenchmarkOptions options) -> bool {
     if (is_pool_allocator(options)) {
-      benchmark_pool_allocator(allocate, deallocate, options.m_size_max, options.m_align_max);
-      return;
+      return benchmark_pool_allocator(allocate, deallocate, options.m_size_max,
+                                      options.m_align_max);
     }
 
     /// TODO: Implement general allocator benchmarks
+
+    return false;
   }
 
-  void synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
+  auto synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) -> bool {
     const AllocateFunc allocate(mm, &HeapProtocol::allocate);
     const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate);
 
-    benchmark(allocate, deallocate, options);
+    return benchmark(allocate, deallocate, options);
   }
 
-  void unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) {
+  auto unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) -> bool {
     const AllocateFunc allocate(mm, &HeapProtocol::allocate_nosync);
     const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate_nosync);
 
-    benchmark(allocate, deallocate, options);
+    return benchmark(allocate, deallocate, options);
   }
 }  // namespace wesos::heap::testing
