@@ -35,13 +35,13 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto is_aligned(usize x) -> bool { return into_uptr() % x == 0; }
 
-    [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) -> DerivedGeneric {
+    [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) const -> DerivedGeneric {
       const auto ptr = into_uptr();
       const auto align_ptr = (ptr + x - 1) & -x;
       return reinterpret_cast<PointeeGeneric*>(align_ptr);
     }
 
-    [[nodiscard]] constexpr auto align(usize x) -> DerivedGeneric {
+    [[nodiscard]] constexpr auto align(usize x) const -> DerivedGeneric {
       assert_invariant(x != 0);
 
       const auto ptr = into_uptr();
