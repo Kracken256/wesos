@@ -36,33 +36,59 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
     -> Nullable<View<u8>> {
   for (NullableRefPtr<Chunk> node = m_front, prev = m_front; node.isset();
        prev = node, node = node->m_next) {
-    const auto chunk_size = node->m_size;
-    const auto chunk_ptr = RefPtr(reinterpret_cast<u8*>(node.unwrap()));
-    const auto aligned_chunk_ptr = chunk_ptr.align_pow2(align);
-    const auto unused_amount = aligned_chunk_ptr.sub(chunk_ptr.into_uptr()).into_uptr();
+    const auto whole_chunk_range = [&]() {
+      auto* unaligned_ptr = reinterpret_cast<u8*>(node.unwrap());
+      auto range = View<u8>(unaligned_ptr, node->m_size);
+      assert_invariant(!range.empty());
 
-    if (chunk_size < size + unused_amount) {
+      auto padding = range.into_ptr()
+                         .align_pow2(align)  //
+                         .sub(range.into_ptr().into_uptr())
+                         .into_uptr();
+
+      if (range.size() < padding) {
+        return View<u8>::create_empty();
+      }
+
+      range = range.subview_unchecked(padding);
+      assert_invariant(range.into_ptr().is_aligned(align));
+
+      return range;
+    }();
+
+    if (size > whole_chunk_range.size()) {
       continue;
     }
 
-    auto chunk_subview = View<u8>(aligned_chunk_ptr.unwrap(), chunk_size - unused_amount);
-    auto object_subview = chunk_subview.subview_unchecked(0, size.unwrap());
-    auto partition_subview = chunk_subview.subview_unchecked(size.unwrap());
+    const auto new_adjacent_chunk = [&]() -> NullableRefPtr<Chunk> {
+      auto range = whole_chunk_range.subview_unchecked(size.unwrap());
+      auto padding = range.into_ptr()
+                         .align_pow2(alignof(Chunk))  //
+                         .sub(range.into_ptr().into_uptr())
+                         .into_uptr();
 
-    if (partition_subview.size() >= sizeof(Chunk)) {
-      const RefPtr partition_ptr = reinterpret_cast<Chunk*>(partition_subview.into_ptr().unwrap());
+      if (range.size() < padding + sizeof(Chunk)) {
+        return nullptr;
+      }
 
-      partition_ptr->m_next = node->m_next;
-      partition_ptr->m_size = partition_subview.size();
+      auto chunk_range = range.subview_unchecked(padding);
+      assert_invariant(chunk_range.into_ptr().is_aligned(alignof(Chunk)));
 
-      node->m_next = partition_ptr;
+      return reinterpret_cast<Chunk*>(chunk_range.into_ptr().unwrap());
+    }();
+
+    if (new_adjacent_chunk.isset()) {
+      // partition_ptr->m_next = node->m_next;
+      // partition_ptr->m_size = partition_range.size();
+
+      // node->m_next = partition_ptr;
 
       /// TODO: Handle chunk splitting
     }
 
-    prev->m_next = node->m_next;
+    // prev->m_next = node->m_next;
 
-    return object_subview;
+    return whole_chunk_range.subview_unchecked(0, size.unwrap());
   }
 
   return null;
