@@ -127,5 +127,12 @@ namespace wesos::types {
       *m_base.add(i) = move(x);
       return *this;
     }
+
+    constexpr auto fill(const ElementGeneric& x) -> View& {
+      for (auto& ele : *this) {
+        ele = x;
+      }
+      return *this;
+    }
   };
 }  // namespace wesos::types
