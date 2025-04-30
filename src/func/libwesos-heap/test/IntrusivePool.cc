@@ -47,12 +47,12 @@ TEST(IntrusivePool, Allocate) {
   for (usize size = sizeof(void*); size < prime_size_limit; size++) {
     for (usize align = 1; align < align_limit; align *= 2) {
       const auto space_per_object = ((size + align - 1) & -align);
-      const auto buffer_size = space_per_object * alloc_limit;
+      const auto exact_buffer_size = space_per_object * alloc_limit;
 
-      u8* buf = reinterpret_cast<u8*>(service.allocate_bytes(buffer_size, align));
+      u8* buf = reinterpret_cast<u8*>(service.allocate_bytes(exact_buffer_size, align));
       ASSERT_NE(buf, nullptr);
 
-      auto buf_view = View<u8>(buf, buffer_size);
+      auto buf_view = View<u8>(buf, exact_buffer_size);
       auto heap = heap::IntrusivePool(size, align, buf_view);
 
       {  // Use all avaiable memory in pool
@@ -68,6 +68,8 @@ TEST(IntrusivePool, Allocate) {
           pointers.insert(the_alloc_ptr);
         }
       }
+
+      auto expected_objects = pointers;
 
       // Release all allocated pool objects
       for (const auto& ptr : pointers) {
@@ -86,6 +88,8 @@ TEST(IntrusivePool, Allocate) {
           EXPECT_FALSE(pointers.contains(the_alloc_ptr));
           pointers.insert(the_alloc_ptr);
         }
+
+        EXPECT_EQ(pointers, expected_objects);
       }
 
       // Release all allocated pool objects
@@ -105,9 +109,11 @@ TEST(IntrusivePool, Allocate) {
           EXPECT_FALSE(pointers.contains(the_alloc_ptr));
           pointers.insert(the_alloc_ptr);
         }
+
+        EXPECT_EQ(pointers, expected_objects);
       }
 
-      service.deallocate_bytes(buf, buffer_size);
+      service.deallocate_bytes(buf, exact_buffer_size);
     }
   }
 }
