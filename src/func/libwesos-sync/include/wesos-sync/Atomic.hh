@@ -27,6 +27,8 @@ namespace wesos::sync {
     constexpr Atomic() = default;
     constexpr explicit Atomic(AtomGeneric value) : m_value(value) {}
 
+    [[nodiscard]] constexpr auto operator<=>(const Atomic& o) const { return load() <=> o.load(); };
+
     void store(AtomGeneric desired, MemoryOrder order = memory_order_seq_cst) {
       detail::atomic::arch::store(&m_value, desired, order);
     }

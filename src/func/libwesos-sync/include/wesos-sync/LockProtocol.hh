@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wesos-types/StrongOrdering.hh>
+
 namespace wesos::sync {
   class LockProtocol {
   protected:
@@ -15,6 +17,8 @@ namespace wesos::sync {
     virtual auto virt_unlock() -> void = 0;
 
   public:
+    [[nodiscard]] constexpr auto operator<=>(const LockProtocol&) const = default;
+
     class LockLease final {
       friend class LockProtocol;
       LockProtocol& m_parent;
