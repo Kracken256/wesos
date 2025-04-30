@@ -9,6 +9,8 @@
 
 #include <wesos-types/Array.hh>
 #include <wesos-types/Group.hh>
+#include <wesos-types/Least.hh>
+#include <wesos-types/Most.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>
 #include <wesos-types/NullableOwnPtr.hh>
@@ -35,21 +37,23 @@ namespace wesos {
   using types::u8;
   using types::usize;
 
+  using types::null;
+
   using types::Array;
   using types::Nullable;
   using types::Pair;
   using types::Quadlet;
   using types::Triplet;
+  using types::Untrusted;
 
-  using types::null;
   using types::NullableOwnPtr;
   using types::NullableRefPtr;
   using types::OwnPtr;
   using types::RefPtr;
-
   using types::View;
 
-  using types::Untrusted;
+  using types::Least;
+  using types::Most;
 
   using types::operator""_u8;
   using types::operator""_u16;
