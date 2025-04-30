@@ -49,7 +49,7 @@ namespace wesos::types {
     }
     constexpr ~Nullable() { unset(); }
 
-    [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::partial_ordering {
+    [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::strong_ordering {
       const bool a_set = isset();
       const bool b_set = o.isset();
 
@@ -58,10 +58,10 @@ namespace wesos::types {
       }
 
       if (!a_set && !b_set) {
-        return std::partial_ordering::equivalent;
+        return std::strong_ordering::equal;
       }
 
-      return a_set ? std::partial_ordering::greater : std::partial_ordering::less;
+      return a_set ? std::strong_ordering::greater : std::strong_ordering::less;
     };
 
     [[nodiscard]] constexpr auto operator==(Null) const -> bool { return !isset(); }
