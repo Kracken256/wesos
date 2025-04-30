@@ -8,6 +8,7 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-builtin/Move.hh>
 #include <wesos-types/NullableRefPtr.hh>
 #include <wesos-types/Numeric.hh>
 
@@ -112,5 +113,19 @@ namespace wesos::types {
     }
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
+
+    ///========================================================================================
+
+    constexpr auto set(usize i, ElementGeneric x) -> View& {
+      always_assert(i <= size());
+      *m_base.add(i) = move(x);
+      return *this;
+    }
+
+    constexpr auto set_unchecked(usize i, ElementGeneric x) -> View& {
+      assert_invariant(i <= size());
+      *m_base.add(i) = move(x);
+      return *this;
+    }
   };
 }  // namespace wesos::types
