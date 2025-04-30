@@ -18,6 +18,6 @@ add_dependencies(test-wesos-heap wesos-heap)
 
 file(GLOB_RECURSE BENCHMARK_FILES "bench/*.cc")
 add_executable(bench-wesos-heap ${BENCHMARK_FILES})
-target_link_libraries(bench-wesos-heap wesos-heap benchmark benchmark_main)
+target_link_libraries(bench-wesos-heap wesos-heap benchmark::benchmark benchmark::benchmark_main)
 install(TARGETS bench-wesos-heap)
 add_dependencies(bench-wesos-heap wesos-heap)
