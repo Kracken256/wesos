@@ -39,6 +39,7 @@ namespace wesos {
   using types::u32;
   using types::u64;
   using types::u8;
+  using types::uptr;
   using types::usize;
 
   using types::max;

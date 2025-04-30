@@ -37,6 +37,7 @@ namespace wesos::types {
       static_assert(is_same_v<i8, i8>, "Pointer size is not supported");
     }
   }());
+  using uptr = usize;
 
   // NOLINTEND(readability-identifier-naming)
 
