@@ -29,19 +29,6 @@ namespace wesos::heap::testing {
   using DeallocateFunc =
       detail::ZeroCostDelegate<HeapProtocol, decltype(&HeapProtocol::deallocate)>;
 
-  static auto is_pool_allocator(const BenchmarkOptions& options) -> bool {
-    return options.m_size_min == options.m_size_max;
-  }
-
-  static void benchmark_pool_allocator(const AllocateFunc& allocate,
-                                       const DeallocateFunc& deallocate, usize size,
-                                       PowerOfTwo<usize> align, usize& alloc_count) {
-    auto ptr = allocate(size, align, false);
-    deallocate(ptr);
-
-    alloc_count += ptr.isset();
-  }
-
   static void benchmark_crunch(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
                                const BenchmarkOptions& options, usize& alloc_count) {
     (void)options;
@@ -49,7 +36,7 @@ namespace wesos::heap::testing {
     /// TODO: Do many allocations
     /// TODO: Implement realistic allocation patterns
 
-    auto ptr = allocate(options.m_size_min, options.m_align_min, false);
+    auto ptr = allocate(options.m_size_max, options.m_align_max, false);
     deallocate(ptr);
 
     alloc_count += ptr.isset();
@@ -74,12 +61,6 @@ void wesos::heap::testing::allocator_benchmark(HeapProtocol& mm, bool sync,
       return DeallocateFunc(mm, &HeapProtocol::deallocate_nosync);
     }
   }();
-
-  if (is_pool_allocator(options)) {
-    benchmark_pool_allocator(allocate, deallocate, options.m_size_max, options.m_align_max,
-                             alloc_count);
-    return;
-  }
 
   benchmark_crunch(allocate, deallocate, options, alloc_count);
 }
