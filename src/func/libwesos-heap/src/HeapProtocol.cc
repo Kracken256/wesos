@@ -13,12 +13,12 @@
 
 using namespace wesos::heap;
 
-SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, Least<usize, 1> align,
+SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, PowerOfTwo<usize> align,
                                               bool zero_memory) -> Nullable<View<u8>> {
   auto slice_opt = virt_allocate(size, align);
 
   if (slice_opt.isset() && zero_memory) {
-    memset(slice_opt.unwrap().into_ptr().into_raw(), 0, size.unwrap().unwrap());
+    memset(slice_opt.unwrap().into_ptr().into_raw(), 0, size);
   }
 
   return slice_opt;
@@ -30,9 +30,11 @@ SYM_EXPORT void HeapProtocol::deallocate_nosync(Nullable<View<u8>> ptr) {
   }
 }
 
-SYM_EXPORT void HeapProtocol::utilize_nosync(View<u8> extra_memory) { virt_utilize(extra_memory); }
+SYM_EXPORT auto HeapProtocol::utilize_nosync(View<u8> extra_memory) -> LeftoverMemory {
+  return virt_utilize(extra_memory);
+}
 
-SYM_EXPORT auto HeapProtocol::allocate(Least<usize, 0> size, Least<usize, 1> align,
+SYM_EXPORT auto HeapProtocol::allocate(Least<usize, 0> size, PowerOfTwo<usize> align,
                                        bool zero_memory) -> Nullable<View<u8>> {
   return m_mutex.critical_section([&] { return allocate_nosync(size, align, zero_memory); });
 }
@@ -41,6 +43,6 @@ SYM_EXPORT void HeapProtocol::deallocate(Nullable<View<u8>> ptr) {
   return m_mutex.critical_section([&] { return deallocate_nosync(ptr); });
 }
 
-SYM_EXPORT void HeapProtocol::utilize(View<u8> extra_memory) {
+SYM_EXPORT auto HeapProtocol::utilize(View<u8> extra_memory) -> LeftoverMemory {
   return m_mutex.critical_section([&] { return utilize_nosync(extra_memory); });
 }
