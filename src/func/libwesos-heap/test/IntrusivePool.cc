@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <memory_resource>
+#include <unordered_set>
 #include <wesos-heap/IntrusivePool.hh>
 
 TEST(IntrusivePool, CreatePool) {
@@ -25,21 +26,26 @@ TEST(IntrusivePool, CreatePool) {
 TEST(IntrusivePool, Allocate) {
   using namespace wesos;
 
+  struct Hash {
+    constexpr auto operator()(const Nullable<View<u8>>& x) const -> size_t {
+      auto v = x.value_or({});
+      return v.into_ptr().into_uptr() ^ v.size();
+    }
+  };
+
   wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
 
-  constexpr auto prime_size_limit = 0x9527;
-  constexpr auto align_limit = 256;
-  constexpr auto alloc_limit = 31;
+  constexpr auto prime_size_limit = 8193;
+  constexpr auto align_limit = 129;
+  constexpr auto alloc_limit = 9;
 
   std::pmr::polymorphic_allocator<u8> service;
-  std::vector<Nullable<View<u8>>> pointers;
+  std::unordered_set<Nullable<View<u8>>, Hash> pointers;
 
   for (usize size = sizeof(void*); size < prime_size_limit; size++) {
     for (usize align = 1; align < align_limit; align *= 2) {
-      pointers.clear();
-
       const auto space_per_object = ((size + align - 1) & -align);
       const auto buffer_size = space_per_object * alloc_limit;
 
@@ -50,44 +56,54 @@ TEST(IntrusivePool, Allocate) {
       auto heap = heap::IntrusivePool(size, align, buf_view);
 
       {  // Use all avaiable memory in pool
+        pointers.clear();
+
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
-          pointers.push_back(the_alloc_ptr);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
+
+          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          pointers.insert(the_alloc_ptr);
         }
       }
 
-      {  // Release all allocated pool objects
-        for (const auto& ptr : pointers) {
-          heap.deallocate_nosync(ptr);
-        }
+      // Release all allocated pool objects
+      for (const auto& ptr : pointers) {
+        heap.deallocate(ptr);  // try mixing dealloc functions
       }
 
       {  // We expect to be able to get back all the memory that was freed
+        pointers.clear();
+
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
-          pointers.push_back(the_alloc_ptr);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
+
+          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          pointers.insert(the_alloc_ptr);
         }
       }
 
-      {  // It shouldn't matter if we mix deallocate() and deallocate_nosync()
-        for (const auto& ptr : pointers) {
-          heap.deallocate(ptr);
-        }
+      // Release all allocated pool objects
+      for (const auto& ptr : pointers) {
+        heap.deallocate_nosync(ptr);
       }
 
       {  // We expect to be able to get back all the memory that was freed
+        pointers.clear();
+
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
-          pointers.push_back(the_alloc_ptr);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
+
+          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          pointers.insert(the_alloc_ptr);
         }
       }
 
