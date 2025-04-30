@@ -34,9 +34,12 @@ TEST(IntrusivePool, Allocate) {
   constexpr auto alloc_limit = 31;
 
   std::pmr::polymorphic_allocator<u8> service;
+  std::vector<Nullable<View<u8>>> pointers;
 
   for (usize size = sizeof(void*); size < prime_size_limit; size++) {
     for (usize align = 1; align < align_limit; align *= 2) {
+      pointers.clear();
+
       const auto space_per_object = ((size + align - 1) & -align);
       const auto buffer_size = space_per_object * alloc_limit;
 
@@ -46,9 +49,46 @@ TEST(IntrusivePool, Allocate) {
       auto buf_view = View<u8>(buf, buffer_size);
       auto heap = heap::IntrusivePool(size, align, buf_view);
 
-      for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-        EXPECT_NE(heap.allocate_nosync(size, align, false), null)
-            << "Failed on size(" << size << "), " << "align(" << align << ")";
+      {  // Use all avaiable memory in pool
+        for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
+          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          pointers.push_back(the_alloc_ptr);
+
+          EXPECT_NE(the_alloc_ptr, null)
+              << "Failed on size(" << size << "), " << "align(" << align << ")";
+        }
+      }
+
+      {  // Release all allocated pool objects
+        for (const auto& ptr : pointers) {
+          heap.deallocate_nosync(ptr);
+        }
+      }
+
+      {  // We expect to be able to get back all the memory that was freed
+        for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
+          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          pointers.push_back(the_alloc_ptr);
+
+          EXPECT_NE(the_alloc_ptr, null)
+              << "Failed on size(" << size << "), " << "align(" << align << ")";
+        }
+      }
+
+      {  // It shouldn't matter if we mix deallocate() and deallocate_nosync()
+        for (const auto& ptr : pointers) {
+          heap.deallocate(ptr);
+        }
+      }
+
+      {  // We expect to be able to get back all the memory that was freed
+        for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
+          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          pointers.push_back(the_alloc_ptr);
+
+          EXPECT_NE(the_alloc_ptr, null)
+              << "Failed on size(" << size << "), " << "align(" << align << ")";
+        }
       }
 
       service.deallocate_bytes(buf, buffer_size);
