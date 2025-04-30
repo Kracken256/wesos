@@ -24,6 +24,8 @@ namespace wesos::heap {
 
     virtual void virt_deallocate(View<u8> ptr) = 0;
 
+    virtual void virt_utilize(View<u8> extra_memory) = 0;
+
   public:
     [[nodiscard]] constexpr auto operator<=>(const HeapProtocol&) const = default;
 
@@ -39,6 +41,8 @@ namespace wesos::heap {
 
     void deallocate_nosync(Nullable<View<u8>> ptr);
 
+    void utilize_nosync(View<u8> extra_memory);
+
     ///===========================================================================================
     /// INTERNALLY LOCKED THREAD-SAFE ACCESS
     ///===========================================================================================
@@ -48,6 +52,8 @@ namespace wesos::heap {
                                            bool zero_memory = true) -> Nullable<View<u8>>;
 
     void deallocate(Nullable<View<u8>> ptr);
+
+    void utilize(View<u8> extra_memory);
 
     static constexpr usize DEFAULT_ALIGNMENT_GLOBAL = 16;
   };
