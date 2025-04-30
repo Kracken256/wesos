@@ -11,29 +11,31 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::heap {
-  class ElementaryIntrusiveHeap : public HeapProtocol {
+  class IntrusivePool : public HeapProtocol {
     struct FreeNode {
-      usize m_size;
       NullableRefPtr<FreeNode> m_next;
     };
 
     NullableRefPtr<FreeNode> m_freelist_head;
+    Least<usize, 1> m_object_size;
+    Least<usize, 1> m_object_align;
 
   protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate(usize n_bytes,
-                                                usize align) -> Nullable<View<u8>> override;
+    [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, Least<usize, 1> align)
+        -> Nullable<View<u8>> override;
 
     void virt_deallocate(View<u8> ptr) override;
 
   public:
-    ElementaryIntrusiveHeap(View<u8> chunk);
-    ElementaryIntrusiveHeap(View<View<u8>> chunks);
-    ElementaryIntrusiveHeap(const ElementaryIntrusiveHeap&) = delete;
-    ElementaryIntrusiveHeap(ElementaryIntrusiveHeap&&) = delete;
-    auto operator=(const ElementaryIntrusiveHeap&) -> ElementaryIntrusiveHeap& = delete;
-    auto operator=(ElementaryIntrusiveHeap&&) -> ElementaryIntrusiveHeap& = delete;
-    auto operator<=>(const ElementaryIntrusiveHeap&) const = delete;
-    ~ElementaryIntrusiveHeap() override = default;
+    IntrusivePool(Least<usize, 1> object_size, Least<usize, 1> object_align,
+                  View<u8> initial_pool = View<u8>::create_empty());
+    IntrusivePool(const IntrusivePool&) = delete;
+    IntrusivePool(IntrusivePool&&);
+    auto operator=(const IntrusivePool&) -> IntrusivePool& = delete;
+    auto operator=(IntrusivePool&&) -> IntrusivePool&;
+    ~IntrusivePool() override = default;
+
+    [[nodiscard]] constexpr auto operator<=>(const IntrusivePool&) const = default;
 
     void utilize_memory(View<u8> chunk);
   };
