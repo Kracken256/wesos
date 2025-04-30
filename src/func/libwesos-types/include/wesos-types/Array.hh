@@ -14,9 +14,9 @@
 #include <wesos-types/View.hh>
 
 namespace wesos::types {
-  template <class ElementGeneric, auto CountGeneric>
+  template <class ElementGeneric, auto Count>
   class Array {
-    ElementGeneric m_data[CountGeneric];  // NOLINT(modernize-avoid-c-arrays)
+    ElementGeneric m_data[Count];  // NOLINT(modernize-avoid-c-arrays)
 
   public:
     constexpr Array() { clear(); };
@@ -27,7 +27,7 @@ namespace wesos::types {
     constexpr ~Array() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const Array&) const = default;
-    [[nodiscard]] constexpr auto length() const -> usize { return CountGeneric; }
+    [[nodiscard]] constexpr auto length() const -> usize { return Count; }
     [[nodiscard]] constexpr auto empty() const -> bool { return length() == 0; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
