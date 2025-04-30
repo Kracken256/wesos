@@ -95,5 +95,3 @@ TEST(IntrusivePool, Allocate) {
     }
   }
 }
-
-/// TODO: Write more tests
