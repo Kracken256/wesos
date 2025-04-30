@@ -31,15 +31,19 @@ namespace wesos::heap::testing {
 
   static void benchmark_crunch(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
                                const BenchmarkOptions& options, usize& alloc_count) {
-    (void)options;
-
-    /// TODO: Do many allocations
     /// TODO: Implement realistic allocation patterns
 
-    auto ptr = allocate(options.m_size_max, options.m_align_max, false);
-    deallocate(ptr);
+    const auto [min_size, max_size, min_align, max_align] = options;
 
-    alloc_count += ptr.isset();
+    for (usize size = min_size; size <= max_size; size++) {
+      for (auto align = min_align; align <= max_align; align = align.next()) {
+        auto ptr = allocate(size, align, false);
+
+        alloc_count += ptr.isset();
+
+        deallocate(ptr);
+      }
+    }
   }
 
 }  // namespace wesos::heap::testing
