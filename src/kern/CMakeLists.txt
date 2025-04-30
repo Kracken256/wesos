@@ -20,6 +20,7 @@ target_link_options(wesos-kernel PRIVATE
   -Wl,--build-id=none
   -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/kernel.map
   -Wl,--fatal-warnings
+  -Wl,--no-warn-rwx-segments
 )
 
 foreach(dep ${WESOS_KERN_DEPENDENCIES})
