@@ -14,7 +14,7 @@ using namespace wesos::heap;
 SYM_EXPORT IntrusivePool::IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size,
                                         PowerOfTwo<usize> object_align, View<u8> initial_pool)
     : m_object_size(object_size), m_object_align(object_align) {
-  utilize(initial_pool);
+  utilize_nosync(initial_pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -63,16 +63,43 @@ SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
 }
 
 SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMemory {
-  const auto prefix_unused = extra_memory.into_ptr().into_uptr() & (m_object_align.unwrap() - 1);
+  View<u8> window = extra_memory;
 
-  if (extra_memory.size() < sizeof(FreeNode)) [[unlikely]] {
-    return {};
+  {
+    usize unusable_amount;
+
+    while (true) {
+      unusable_amount = window.into_ptr()
+                            .next_aligned_pow2(m_object_align)
+                            .sub(window.into_ptr().into_uptr())
+                            .into_uptr();
+      if (window.size() < unusable_amount + m_object_size) {
+        break;
+      }
+
+      window = window.subview_unchecked(unusable_amount);
+      assert_invariant(window.into_ptr().is_aligned(m_object_align));
+      assert_invariant(window.size() >= m_object_size);
+
+      auto object_mem = window.subview_unchecked(0, m_object_size);
+
+      // Wierd, but it works..
+      deallocate_nosync(object_mem);
+
+      window = window.subview_unchecked(m_object_size);
+    };
   }
 
-  /// TODO: Utilize supplied memory
+  const auto initial_unusable_prefix = extra_memory.into_ptr()
+                                           .next_aligned_pow2(m_object_align)
+                                           .sub(extra_memory.into_ptr().into_uptr())
+                                           .into_uptr();
+  const auto beginning_unused = extra_memory.subview_unchecked(0, initial_unusable_prefix);
+  const auto end_unused = window;
 
-  // Wierd, but it works..
-  deallocate(extra_memory);
+  LeftoverMemory unused;
+  unused.first() = beginning_unused;
+  unused.second() = end_unused;
 
-  return {};
+  return unused;
 }
