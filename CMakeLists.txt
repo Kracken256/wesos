@@ -21,6 +21,7 @@ include(check_build_mode)
 ################################################################################
 # PERFORM BUILD
 ################################################################################
+add_subdirectory(third_party)
 add_subdirectory(src/func)
 add_subdirectory(src/boot)
 add_subdirectory(src/kern)
