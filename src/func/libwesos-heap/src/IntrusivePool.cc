@@ -11,8 +11,8 @@
 using namespace wesos;
 using namespace wesos::heap;
 
-SYM_EXPORT IntrusivePool::IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size,
-                                        PowerOfTwo<usize> object_align, View<u8> pool)
+SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
+                                        View<u8> pool)
     : m_object_size(object_size), m_object_align(object_align) {
   virt_utilize(pool);
 }

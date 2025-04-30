@@ -16,8 +16,12 @@ namespace wesos::heap {
       NullableRefPtr<FreeNode> m_next;
     };
 
+  public:
+    using ObjectSize = ClampLeast<usize, sizeof(FreeNode)>;
+
+  private:
     NullableRefPtr<FreeNode> m_freelist_head;
-    ClampLeast<usize, sizeof(FreeNode)> m_object_size;
+    ObjectSize m_object_size;
     PowerOfTwo<usize> m_object_align;
 
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
@@ -32,7 +36,7 @@ namespace wesos::heap {
     auto virt_utilize(View<u8> pool) -> LeftoverMemory override;
 
   public:
-    IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size, PowerOfTwo<usize> object_align,
+    IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
                   View<u8> pool = View<u8>::create_empty());
     IntrusivePool(const IntrusivePool&) = delete;
     IntrusivePool(IntrusivePool&&);
