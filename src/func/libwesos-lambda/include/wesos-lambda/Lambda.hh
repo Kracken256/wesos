@@ -9,7 +9,7 @@
 
 #include <wesos-types/Null.hh>
 
-namespace wesos::types {
+namespace wesos::lambda {
   template <typename FuncGeneric>
   class Lambda;
 
@@ -42,7 +42,7 @@ namespace wesos::types {
 
     constexpr Lambda() : m_callable(nullptr) {}
 
-    constexpr Lambda(Null) : m_callable(nullptr) {}
+    constexpr Lambda(types::Null) : m_callable(nullptr) {}
 
     constexpr auto operator<=>(const Lambda& other) const = default;
 
@@ -73,7 +73,7 @@ namespace wesos::types {
       return *this;
     }
 
-    auto operator=(Null) -> Lambda& {
+    auto operator=(types::Null) -> Lambda& {
       delete m_callable;
       m_callable = nullptr;
       return *this;
@@ -91,4 +91,8 @@ namespace wesos::types {
   private:
     CallableBaseProtocol* m_callable;
   };
-}  // namespace wesos::types
+}  // namespace wesos::lambda
+
+namespace wesos {
+  using lambda::Lambda;
+}

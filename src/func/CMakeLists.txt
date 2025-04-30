@@ -5,6 +5,7 @@ set(PROJECT_WIDE_LIBRARIES
   libwesos-sync
   libwesos-assert
   libwesos-types
+  libwesos-lambda
   libwesos-heap
 )
 

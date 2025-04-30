@@ -9,7 +9,6 @@
 
 #include <wesos-types/Array.hh>
 #include <wesos-types/Group.hh>
-#include <wesos-types/Lambda.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>
 #include <wesos-types/NullableOwnPtr.hh>
@@ -37,7 +36,6 @@ namespace wesos {
   using types::usize;
 
   using types::Array;
-  using types::Lambda;
   using types::Nullable;
   using types::Pair;
   using types::Quadlet;
