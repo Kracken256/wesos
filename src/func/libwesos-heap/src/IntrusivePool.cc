@@ -70,7 +70,7 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMe
 
     while (true) {
       unusable_amount = window.into_ptr()
-                            .next_aligned_pow2(m_object_align)
+                            .align_pow2(m_object_align)
                             .sub(window.into_ptr().into_uptr())
                             .into_uptr();
       if (window.size() < unusable_amount + m_object_size) {
@@ -91,7 +91,7 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMe
   }
 
   const auto initial_unusable_prefix = extra_memory.into_ptr()
-                                           .next_aligned_pow2(m_object_align)
+                                           .align_pow2(m_object_align)
                                            .sub(extra_memory.into_ptr().into_uptr())
                                            .into_uptr();
   const auto beginning_unused = extra_memory.subview_unchecked(0, initial_unusable_prefix);

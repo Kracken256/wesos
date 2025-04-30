@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
+#include <iostream>
+#include <memory_resource>
 #include <wesos-heap/IntrusivePool.hh>
-
-/// TODO:
 
 TEST(IntrusivePool, CreatePool) {
   using namespace wesos;
@@ -25,12 +25,34 @@ TEST(IntrusivePool, CreatePool) {
 TEST(IntrusivePool, Allocate) {
   using namespace wesos;
 
-  constexpr auto buffer_size = 4096;
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
+    std::cerr << "Assertion failed: " << message << std::endl;
+  });
 
-  std::vector<u8> buf(buffer_size);
-  View<u8> initial_pool(buf.data(), buf.size());
+  constexpr auto prime_size_limit = 0x9527;
+  constexpr auto align_limit = 256;
+  constexpr auto alloc_limit = 31;
 
-  auto heap = heap::IntrusivePool(sizeof(int), alignof(int), initial_pool);
+  for (usize size = sizeof(void*); size < prime_size_limit; size++) {
+    for (usize align = 1; align < align_limit; align *= 2) {
+      const auto space_per_object = ((size + align - 1) & -align);
+      const auto buffer_size = space_per_object * alloc_limit;
 
-  EXPECT_EQ(heap.allocate(sizeof(int)), null);
+      std::pmr::polymorphic_allocator<u8> service;
+      u8* buf = reinterpret_cast<u8*>(service.allocate_bytes(buffer_size, align));
+      ASSERT_NE(buf, nullptr);
+
+      auto buf_view = View<u8>(buf, buffer_size);
+      auto heap = heap::IntrusivePool(size, align, buf_view);
+
+      for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
+        EXPECT_NE(heap.allocate_nosync(size, align), null)
+            << "Failed on size(" << size << "), " << "align(" << align << ")";
+      }
+
+      service.deallocate_bytes(buf, buffer_size);
+    }
+  }
 }
+
+/// TODO: Write more tests

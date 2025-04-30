@@ -15,8 +15,6 @@ namespace wesos::heap {
     sync::SpinLock m_mutex;
 
   public:
-    static const inline PowerOfTwo<usize> DEFAULT_ALIGNMENT_GLOBAL = 16;
-
     using LeftoverMemoryView = Nullable<Unused<View<u8>>>;
     using LeftoverMemory = Pair<LeftoverMemoryView, LeftoverMemoryView>;
 
@@ -28,9 +26,8 @@ namespace wesos::heap {
     /// UNLOCKED THREAD-UNSAFE ACCESS
     ///===========================================================================================
 
-    [[nodiscard, gnu::pure]] auto allocate_nosync(
-        Least<usize, 0> size, PowerOfTwo<usize> align = DEFAULT_ALIGNMENT_GLOBAL,
-        bool zero_memory = true) -> Nullable<View<u8>>;
+    [[nodiscard, gnu::pure]] auto allocate_nosync(Least<usize, 0> size, PowerOfTwo<usize> align,
+                                                  bool zero_memory = true) -> Nullable<View<u8>>;
 
     void deallocate_nosync(Nullable<View<u8>> ptr);
 
@@ -40,8 +37,7 @@ namespace wesos::heap {
     /// INTERNALLY LOCKED THREAD-SAFE ACCESS
     ///===========================================================================================
 
-    [[nodiscard, gnu::pure]] auto allocate(Least<usize, 0> size,
-                                           PowerOfTwo<usize> align = DEFAULT_ALIGNMENT_GLOBAL,
+    [[nodiscard, gnu::pure]] auto allocate(Least<usize, 0> size, PowerOfTwo<usize> align,
                                            bool zero_memory = true) -> Nullable<View<u8>>;
 
     void deallocate(Nullable<View<u8>> ptr);
