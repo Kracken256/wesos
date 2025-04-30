@@ -27,11 +27,24 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto operator<=>(const NullablePtrBase&) const = default;
     [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr operator PointeeGeneric*() const { return m_ptr; }
     [[nodiscard]] constexpr auto into_uptr() const -> uptr {
       return reinterpret_cast<uptr>(unwrap());
     }
 
     [[nodiscard]] constexpr auto is_aligned(usize x) -> bool { return into_uptr() % x == 0; }
+
+    [[nodiscard]] constexpr auto next_aligned_pow2(usize x) -> ChildGeneric {
+      const auto ptr = into_uptr();
+      const auto aligned_ptr = (ptr + x - 1) & ~(x - 1);
+      return reinterpret_cast<PointeeGeneric*>(aligned_ptr);
+    }
+
+    [[nodiscard]] constexpr auto next_align(usize x) -> ChildGeneric {
+      const auto ptr = into_uptr();
+      const auto aligned_ptr = ptr + ((x - (ptr % x)) % x);
+      return reinterpret_cast<PointeeGeneric*>(aligned_ptr);
+    }
 
     [[nodiscard]] constexpr auto get() const -> UnwrappedGeneric {
       always_assert(isset(), "Unwrapping a null pointer");
