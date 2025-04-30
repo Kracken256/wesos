@@ -15,7 +15,7 @@ namespace wesos::types {
   class Least {
     ValueGeneric m_value;
 
-    constexpr Least() = default;
+    constexpr Least(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
     constexpr Least(ValueGeneric x) : m_value(move(x)) { assert_invariant(x >= MinimumValue); };
@@ -31,9 +31,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> Least {
       assert_invariant(x >= MinimumValue);
-      Least obj;
-      obj.m_value = move(x);
-      return obj;
+      return {move(x), true};
     }
   };
 }  // namespace wesos::types

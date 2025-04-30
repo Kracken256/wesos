@@ -15,7 +15,7 @@ namespace wesos::types {
   class Most {
     ValueGeneric m_value;
 
-    constexpr Most() = default;
+    constexpr Most(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
     constexpr Most(ValueGeneric x) : m_value(move(x)) { assert_invariant(x <= MaximumValue); };
@@ -32,9 +32,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> Most {
       assert_invariant(x <= MaximumValue);
-      Most obj;
-      obj.m_value = move(x);
-      return obj;
+      return {move(x), true};
     }
   };
 }  // namespace wesos::types
