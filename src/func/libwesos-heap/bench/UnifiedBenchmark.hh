@@ -21,6 +21,6 @@ namespace wesos::heap::testing {
           m_align_max(align_max) {}
   };
 
-  [[nodiscard]] bool synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options);
-  [[nodiscard]] bool unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options);
+  void allocator_benchmark(HeapProtocol& mm, bool sync, BenchmarkOptions options,
+                           usize& alloc_count);
 }  // namespace wesos::heap::testing

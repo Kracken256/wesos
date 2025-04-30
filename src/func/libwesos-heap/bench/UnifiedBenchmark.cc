@@ -33,38 +33,53 @@ namespace wesos::heap::testing {
     return options.m_size_min == options.m_size_max;
   }
 
-  static auto benchmark_pool_allocator(const AllocateFunc& allocate,
+  static void benchmark_pool_allocator(const AllocateFunc& allocate,
                                        const DeallocateFunc& deallocate, usize size,
-                                       PowerOfTwo<usize> align) -> bool {
+                                       PowerOfTwo<usize> align, usize& alloc_count) {
     auto ptr = allocate(size, align, false);
     deallocate(ptr);
 
-    return ptr.isset();
+    alloc_count += ptr.isset();
   }
 
-  static auto benchmark(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
-                        BenchmarkOptions options) -> bool {
-    if (is_pool_allocator(options)) {
-      return benchmark_pool_allocator(allocate, deallocate, options.m_size_max,
-                                      options.m_align_max);
-    }
+  static void benchmark_crunch(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
+                               const BenchmarkOptions& options, usize& alloc_count) {
+    (void)options;
 
-    /// TODO: Implement general allocator benchmarks
+    /// TODO: Do many allocations
+    /// TODO: Implement realistic allocation patterns
 
-    return false;
+    auto ptr = allocate(options.m_size_min, options.m_align_min, false);
+    deallocate(ptr);
+
+    alloc_count += ptr.isset();
   }
 
-  auto synchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) -> bool {
-    const AllocateFunc allocate(mm, &HeapProtocol::allocate);
-    const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate);
-
-    return benchmark(allocate, deallocate, options);
-  }
-
-  auto unsynchronized_benchmark(HeapProtocol& mm, BenchmarkOptions options) -> bool {
-    const AllocateFunc allocate(mm, &HeapProtocol::allocate_nosync);
-    const DeallocateFunc deallocate(mm, &HeapProtocol::deallocate_nosync);
-
-    return benchmark(allocate, deallocate, options);
-  }
 }  // namespace wesos::heap::testing
+
+void wesos::heap::testing::allocator_benchmark(HeapProtocol& mm, bool sync,
+                                               BenchmarkOptions options, usize& alloc_count) {
+  const auto allocate = [&]() {
+    if (sync) {
+      return AllocateFunc(mm, &HeapProtocol::allocate);
+    } else {
+      return AllocateFunc(mm, &HeapProtocol::allocate_nosync);
+    }
+  }();
+
+  const auto deallocate = [&]() {
+    if (sync) {
+      return DeallocateFunc(mm, &HeapProtocol::deallocate);
+    } else {
+      return DeallocateFunc(mm, &HeapProtocol::deallocate_nosync);
+    }
+  }();
+
+  if (is_pool_allocator(options)) {
+    benchmark_pool_allocator(allocate, deallocate, options.m_size_max, options.m_align_max,
+                             alloc_count);
+    return;
+  }
+
+  benchmark_crunch(allocate, deallocate, options, alloc_count);
+}
