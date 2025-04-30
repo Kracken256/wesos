@@ -97,5 +97,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) -> View<ElementGeneric> {
       return View<ElementGeneric>(m_base.add(i), count);
     }
+
+    [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
   };
 }  // namespace wesos::types
