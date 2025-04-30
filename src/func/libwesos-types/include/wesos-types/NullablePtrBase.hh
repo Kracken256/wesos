@@ -27,6 +27,9 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto operator<=>(const NullablePtrBase&) const = default;
     [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
     [[nodiscard]] constexpr auto into_raw() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto into_uptr() const -> uptr {
+      return reinterpret_cast<uptr>(into_raw());
+    }
 
     [[nodiscard]] constexpr auto get() const -> UnwrappedGeneric {
       always_assert(isset(), "Unwrapping a null pointer");
