@@ -24,6 +24,9 @@ namespace wesos::types {
     constexpr NullableOwnPtr(PointeeGeneric* ptr)
         : NullablePtrBase<PointeeGeneric, NullableOwnPtr<PointeeGeneric>, OwnPtr<PointeeGeneric>>(
               ptr) {}
+    constexpr NullableOwnPtr(OwnPtr<PointeeGeneric> ptr)
+        : NullablePtrBase<PointeeGeneric, NullableOwnPtr<PointeeGeneric>, OwnPtr<PointeeGeneric>>(
+              ptr.unwrap()) {}
     constexpr NullableOwnPtr(const NullableOwnPtr&) = default;
     constexpr NullableOwnPtr(NullableOwnPtr&&) = default;
     constexpr auto operator=(const NullableOwnPtr&) -> NullableOwnPtr& = default;
