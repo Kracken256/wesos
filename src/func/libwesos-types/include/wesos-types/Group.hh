@@ -7,27 +7,30 @@
 
 #pragma once
 
+#include <wesos-builtin/Move.hh>
 #include <wesos-types/Numeric.hh>
 
 namespace wesos::types {
   template <class TypeAGeneric, class TypeBGeneric>
   class Pair {
-    TypeAGeneric m_a;
-    TypeBGeneric m_b;
+    TypeAGeneric m_a{};
+    TypeBGeneric m_b{};
 
   public:
     constexpr Pair() = default;
-    constexpr Pair(TypeAGeneric a, TypeBGeneric b) : m_a(a), m_b(b) {}
-    constexpr Pair(const Pair& other) = default;
-    constexpr Pair(Pair&& other) = default;
-    constexpr auto operator=(const Pair& other) -> Pair& = default;
-    constexpr auto operator=(Pair&& other) -> Pair& = default;
-    constexpr auto operator<=>(const Pair& other) const = default;
+    constexpr Pair(TypeAGeneric a, TypeBGeneric b) : m_a(move(a)), m_b(move(b)) {}
+    constexpr Pair(const Pair&) = default;
+    constexpr Pair(Pair&&) = default;
+    constexpr auto operator=(const Pair&) -> Pair& = default;
+    constexpr auto operator=(Pair&&) -> Pair& = default;
+    constexpr ~Pair() = default;
 
-    constexpr auto first() const -> const TypeAGeneric& { return m_a; }
-    constexpr auto first() -> TypeAGeneric& { return m_a; }
-    constexpr auto second() const -> const TypeBGeneric& { return m_b; }
-    constexpr auto second() -> TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto operator<=>(const Pair&) const = default;
+
+    [[nodiscard]] constexpr auto first() const -> const TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto first() -> TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto second() const -> const TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto second() -> TypeBGeneric& { return m_b; }
 
     constexpr void anew() {
       m_a = TypeAGeneric();
@@ -37,25 +40,28 @@ namespace wesos::types {
 
   template <class TypeAGeneric, class TypeBGeneric, class TypeCGeneric>
   class Triplet {
-    TypeAGeneric m_a;
-    TypeBGeneric m_b;
-    TypeCGeneric m_c;
+    TypeAGeneric m_a{};
+    TypeBGeneric m_b{};
+    TypeCGeneric m_c{};
 
   public:
     constexpr Triplet() = default;
-    constexpr Triplet(TypeAGeneric a, TypeBGeneric b, TypeCGeneric c) : m_a(a), m_b(b), m_c(c) {}
-    constexpr Triplet(const Triplet& other) = default;
-    constexpr Triplet(Triplet&& other) = default;
-    constexpr auto operator=(const Triplet& other) -> Triplet& = default;
-    constexpr auto operator=(Triplet&& other) -> Triplet& = default;
-    constexpr auto operator<=>(const Triplet& other) const = default;
+    constexpr Triplet(TypeAGeneric a, TypeBGeneric b, TypeCGeneric c)
+        : m_a(move(a)), m_b(move(b)), m_c(move(c)) {}
+    constexpr Triplet(const Triplet&) = default;
+    constexpr Triplet(Triplet&&) = default;
+    constexpr auto operator=(const Triplet&) -> Triplet& = default;
+    constexpr auto operator=(Triplet&&) -> Triplet& = default;
+    constexpr ~Triplet() = default;
 
-    constexpr auto first() const -> const TypeAGeneric& { return m_a; }
-    constexpr auto second() const -> const TypeBGeneric& { return m_b; }
-    constexpr auto third() const -> const TypeCGeneric& { return m_c; }
-    constexpr auto first() -> TypeAGeneric& { return m_a; }
-    constexpr auto second() -> TypeBGeneric& { return m_b; }
-    constexpr auto third() -> TypeCGeneric& { return m_c; }
+    [[nodiscard]] constexpr auto operator<=>(const Triplet&) const = default;
+
+    [[nodiscard]] constexpr auto first() const -> const TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto first() -> TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto second() const -> const TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto second() -> TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto third() const -> const TypeCGeneric& { return m_c; }
+    [[nodiscard]] constexpr auto third() -> TypeCGeneric& { return m_c; }
 
     constexpr void anew() {
       m_a = TypeAGeneric();
@@ -66,29 +72,31 @@ namespace wesos::types {
 
   template <class TypeAGeneric, class TypeBGeneric, class TypeCGeneric, class TypeDGeneric>
   class Quadlet {
-    TypeAGeneric m_a;
-    TypeBGeneric m_b;
-    TypeCGeneric m_c;
-    TypeDGeneric m_d;
+    TypeAGeneric m_a{};
+    TypeBGeneric m_b{};
+    TypeCGeneric m_c{};
+    TypeDGeneric m_d{};
 
   public:
     constexpr Quadlet() = default;
     constexpr Quadlet(TypeAGeneric a, TypeBGeneric b, TypeCGeneric c, TypeDGeneric d)
-        : m_a(a), m_b(b), m_c(c), m_d(d) {}
-    constexpr Quadlet(const Quadlet& other) = default;
-    constexpr Quadlet(Quadlet&& other) = default;
-    constexpr auto operator=(const Quadlet& other) -> Quadlet& = default;
-    constexpr auto operator=(Quadlet&& other) -> Quadlet& = default;
-    constexpr auto operator<=>(const Quadlet& other) const = default;
+        : m_a(move(a)), m_b(move(b)), m_c(move(c)), m_d(move(d)) {}
+    constexpr Quadlet(const Quadlet&) = default;
+    constexpr Quadlet(Quadlet&&) = default;
+    constexpr auto operator=(const Quadlet&) -> Quadlet& = default;
+    constexpr auto operator=(Quadlet&&) -> Quadlet& = default;
+    constexpr ~Quadlet() = default;
 
-    constexpr auto first() const -> const TypeAGeneric& { return m_a; }
-    constexpr auto second() const -> const TypeBGeneric& { return m_b; }
-    constexpr auto third() const -> const TypeCGeneric& { return m_c; }
-    constexpr auto fourth() const -> const TypeDGeneric& { return m_d; }
-    constexpr auto first() -> TypeAGeneric& { return m_a; }
-    constexpr auto second() -> TypeBGeneric& { return m_b; }
-    constexpr auto third() -> TypeCGeneric& { return m_c; }
-    constexpr auto fourth() -> TypeDGeneric& { return m_d; }
+    [[nodiscard]] constexpr auto operator<=>(const Quadlet&) const = default;
+
+    [[nodiscard]] constexpr auto first() const -> const TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto first() -> TypeAGeneric& { return m_a; }
+    [[nodiscard]] constexpr auto second() const -> const TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto second() -> TypeBGeneric& { return m_b; }
+    [[nodiscard]] constexpr auto third() const -> const TypeCGeneric& { return m_c; }
+    [[nodiscard]] constexpr auto third() -> TypeCGeneric& { return m_c; }
+    [[nodiscard]] constexpr auto fourth() const -> const TypeDGeneric& { return m_d; }
+    [[nodiscard]] constexpr auto fourth() -> TypeDGeneric& { return m_d; }
 
     constexpr void anew() {
       m_a = TypeAGeneric();
