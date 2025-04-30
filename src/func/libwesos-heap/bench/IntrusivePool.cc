@@ -18,72 +18,117 @@ using namespace wesos::heap::testing;
 
 using ClampedAlign = ClampMost<PowerOfTwo<usize>, 4096ULL>;
 
-static void BM_IntrusivePool_Evo_Creation(benchmark::State& state) {
+static void deps_setup() {
   assert::register_output_callback(nullptr, [](void*, const char* message) {
     std::cerr << "Assertion failed: " << message << std::endl;
   });
+}
 
-  usize object_size = 0;
+static void BM_IntrusivePool_Evo_Creation(benchmark::State& state) {
+  deps_setup();
+
+  IntrusivePool::ObjectSize object_size = 1;
   ClampedAlign object_align = PowerOfTwo(1ULL);
-
-  const auto storage_size = 1'000'000;
-  std::vector<u8> storage(storage_size);
-  auto storage_view = View<u8>(storage.data(), storage.capacity());
+  std::vector<u8> storage;
 
   for (auto x : state) {
+    storage.resize(object_size + object_align->unwrap());
+    auto storage_view = View<u8>(storage.data(), storage.size());
+
     auto mm = IntrusivePool(object_size, object_align, storage_view);
 
-    object_size++;
+    object_size = object_size + 1;
     object_align = object_align->next();
   }
 }
 
 static void BM_IntrusivePool_Evo_Synchronized(benchmark::State& state) {
-  assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  deps_setup();
 
-  usize object_size = 0;
+  IntrusivePool::ObjectSize object_size = 1;
   ClampedAlign object_align = PowerOfTwo(1ULL);
-
-  const auto storage_size = 1'000'000;
-  std::vector<u8> storage(storage_size);
-  auto storage_view = View<u8>(storage.data(), storage.capacity());
+  std::vector<u8> storage;
 
   for (auto x : state) {
-    auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+    const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+
+    storage.resize(object_size + object_align->unwrap());
+    auto storage_view = View<u8>(storage.data(), storage.size());
 
     auto mm = IntrusivePool(object_size, object_align, storage_view);
-    synchronized_benchmark(mm, options);
+    always_assert(synchronized_benchmark(mm, options), "failed to allocate in benchmark");
 
-    object_size++;
+    object_size = object_size + 1;
     object_align = object_align->next();
   }
 }
 
 static void BM_IntrusivePool_Evo_Unsynchronized(benchmark::State& state) {
-  assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  deps_setup();
 
-  usize object_size = 0;
+  IntrusivePool::ObjectSize object_size = 1;
   ClampedAlign object_align = PowerOfTwo(1ULL);
-
-  const auto storage_size = 1'000'000;
-  std::vector<u8> storage(storage_size);
-  auto storage_view = View<u8>(storage.data(), storage.capacity());
+  std::vector<u8> storage;
 
   for (auto x : state) {
-    auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+    const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+
+    storage.resize(object_size + object_align->unwrap());
+    auto storage_view = View<u8>(storage.data(), storage.size());
 
     auto mm = IntrusivePool(object_size, object_align, storage_view);
-    unsynchronized_benchmark(mm, options);
+    always_assert(unsynchronized_benchmark(mm, options), "failed to allocate in benchmark");
 
-    object_size++;
+    object_size = object_size + 1;
     object_align = object_align->next();
+  }
+}
+
+static void BM_IntrusivePool_Mono_Creation(benchmark::State& state) {
+  deps_setup();
+
+  constexpr IntrusivePool::ObjectSize object_size = sizeof(int);
+  constexpr usize object_align = alignof(int);
+  [[gnu::aligned(object_align)]] Array<u8, object_size.unwrap()> storage;
+
+  for (auto x : state) {
+    auto mm = IntrusivePool(object_size, object_align, storage.as_view());
+  }
+}
+
+static void BM_IntrusivePool_Mono_Synchronized(benchmark::State& state) {
+  deps_setup();
+
+  constexpr IntrusivePool::ObjectSize object_size = sizeof(int);
+  constexpr usize object_align = alignof(int);
+  [[gnu::aligned(object_align)]] Array<u8, object_size.unwrap()> storage;
+
+  const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+  auto mm = IntrusivePool(object_size, object_align, storage.as_view());
+
+  for (auto x : state) {
+    always_assert(synchronized_benchmark(mm, options), "failed to allocate in benchmark");
+  }
+}
+
+static void BM_IntrusivePool_Mono_Unsynchronized(benchmark::State& state) {
+  deps_setup();
+
+  constexpr IntrusivePool::ObjectSize object_size = sizeof(int);
+  constexpr usize object_align = alignof(int);
+  [[gnu::aligned(object_align)]] Array<u8, object_size.unwrap()> storage;
+
+  const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
+  auto mm = IntrusivePool(object_size, object_align, storage.as_view());
+
+  for (auto x : state) {
+    always_assert(unsynchronized_benchmark(mm, options), "failed to allocate in benchmark");
   }
 }
 
 BENCHMARK(BM_IntrusivePool_Evo_Creation);
 BENCHMARK(BM_IntrusivePool_Evo_Synchronized);
 BENCHMARK(BM_IntrusivePool_Evo_Unsynchronized);
+BENCHMARK(BM_IntrusivePool_Mono_Creation);
+BENCHMARK(BM_IntrusivePool_Mono_Synchronized);
+BENCHMARK(BM_IntrusivePool_Mono_Unsynchronized);
