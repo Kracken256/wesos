@@ -9,6 +9,7 @@
 
 #include <wesos-assert/Assert.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/PowerOfTwo.hh>
 
 namespace wesos::types {
   template <class PointeeGeneric, class ChildGeneric, class UnwrappedGeneric>
@@ -34,13 +35,15 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto is_aligned(usize x) -> bool { return into_uptr() % x == 0; }
 
-    [[nodiscard]] constexpr auto next_aligned_pow2(usize x) -> ChildGeneric {
+    [[nodiscard]] constexpr auto next_aligned_pow2(PowerOfTwo<usize> x) -> ChildGeneric {
       const auto ptr = into_uptr();
       const auto aligned_ptr = (ptr + x - 1) & ~(x - 1);
       return reinterpret_cast<PointeeGeneric*>(aligned_ptr);
     }
 
     [[nodiscard]] constexpr auto next_align(usize x) -> ChildGeneric {
+      assert_invariant(x != 0);
+
       const auto ptr = into_uptr();
       const auto aligned_ptr = ptr + ((x - (ptr % x)) % x);
       return reinterpret_cast<PointeeGeneric*>(aligned_ptr);
