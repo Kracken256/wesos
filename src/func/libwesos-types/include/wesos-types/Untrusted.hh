@@ -7,21 +7,27 @@
 
 #pragma once
 
+#include <wesos-builtin/Move.hh>
+
 namespace wesos::types {
   template <class ValueGeneric>
   class Untrusted {
     ValueGeneric m_value;
 
   public:
-    constexpr Untrusted(const ValueGeneric& value) : m_value(value) {}
+    constexpr Untrusted() = default;
+    constexpr Untrusted(ValueGeneric value) : m_value(move(value)) {}
     constexpr Untrusted(const Untrusted&) = default;
     constexpr Untrusted(Untrusted&&) = default;
     constexpr auto operator=(const Untrusted&) -> Untrusted& = default;
     constexpr auto operator=(Untrusted&&) -> Untrusted& = default;
-    constexpr auto operator<=>(const Untrusted&) const = default;
     constexpr ~Untrusted() = default;
 
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto unwrap() -> ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr auto operator<=>(const Untrusted&) const = default;
+
+    [[nodiscard]] constexpr auto trust_and_unwrap() const -> const ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr auto trust_and_unwrap() -> ValueGeneric& { return m_value; }
+
+    constexpr void ensure_safe(auto verify) const { always_assert(verify(m_value)); }
   };
 }  // namespace wesos::types
