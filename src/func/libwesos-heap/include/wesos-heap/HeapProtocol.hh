@@ -25,6 +25,8 @@ namespace wesos::heap {
     virtual void virt_deallocate(View<u8> ptr) = 0;
 
   public:
+    [[nodiscard]] constexpr auto operator<=>(const HeapProtocol&) const = default;
+
     virtual ~HeapProtocol() = 0;
 
     ///===========================================================================================
