@@ -19,6 +19,7 @@
 #include <wesos-types/NullableRefPtr.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/OwnPtr.hh>
+#include <wesos-types/PowerOfTwo.hh>
 #include <wesos-types/Primitive.hh>
 #include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
@@ -58,6 +59,7 @@ namespace wesos {
   using types::ClampMost;
   using types::Least;
   using types::Most;
+  using types::PowerOfTwo;
 
   using types::operator""_u8;
   using types::operator""_u16;
