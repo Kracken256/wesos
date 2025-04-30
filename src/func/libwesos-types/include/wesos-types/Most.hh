@@ -25,8 +25,7 @@ namespace wesos::types {
     constexpr auto operator=(Most&&) -> Most& = default;
     constexpr ~Most() = default;
 
-    template <class RGeneric, auto OtherMaximum>
-    [[nodiscard]] constexpr auto operator<=>(const Most<RGeneric, OtherMaximum>& o) const {
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const {
       return unwrap() <=> o.unwrap();
     }
 

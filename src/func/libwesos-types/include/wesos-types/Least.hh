@@ -25,8 +25,7 @@ namespace wesos::types {
     constexpr auto operator=(Least&&) -> Least& = default;
     constexpr ~Least() = default;
 
-    template <class RGeneric, auto RMinimum>
-    [[nodiscard]] constexpr auto operator<=>(const Least<RGeneric, RMinimum>& o) const {
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const {
       return unwrap() <=> o.unwrap();
     }
 
