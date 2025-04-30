@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <wesos-assert/Assert.hh>
 #include <wesos-types/Null.hh>
-#include <wesos-types/Numeric.hh>
+#include <wesos-types/NullablePtrBase.hh>
 #include <wesos-types/RefPtr.hh>
 
 namespace wesos::types {
@@ -17,55 +16,22 @@ namespace wesos::types {
   class NullableOwnPtr;
 
   template <typename PointeeGeneric>
-  class NullableRefPtr {
-    PointeeGeneric* m_ptr;
-
+  class NullableRefPtr : public NullablePtrBase<PointeeGeneric, NullableRefPtr<PointeeGeneric>,
+                                                RefPtr<PointeeGeneric>> {
   public:
-    constexpr NullableRefPtr() : m_ptr(nullptr) {}
-    constexpr NullableRefPtr(Null) : m_ptr(nullptr) {}
-    constexpr NullableRefPtr(PointeeGeneric* ptr) : m_ptr(ptr) {}
+    constexpr NullableRefPtr() = default;
+    constexpr NullableRefPtr(Null) {}
+    constexpr NullableRefPtr(PointeeGeneric* ptr)
+        : NullablePtrBase<PointeeGeneric, NullableRefPtr<PointeeGeneric>, RefPtr<PointeeGeneric>>(
+              ptr) {}
     constexpr NullableRefPtr(const NullableRefPtr&) = default;
-    constexpr NullableRefPtr(NullableRefPtr&& other) = default;
+    constexpr NullableRefPtr(NullableRefPtr&&) = default;
     constexpr auto operator=(const NullableRefPtr&) -> NullableRefPtr& = default;
-    constexpr auto operator=(NullableRefPtr&& other) -> NullableRefPtr& = default;
-    constexpr auto operator<=>(const NullableRefPtr& other) const = default;
+    constexpr auto operator=(NullableRefPtr&&) -> NullableRefPtr& = default;
+    constexpr auto operator<=>(const NullableRefPtr&) const = default;
     constexpr ~NullableRefPtr() = default;
 
-    [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
-
-    [[nodiscard]] constexpr auto into_raw() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto get_unchecked() const -> RefPtr<PointeeGeneric> { return m_ptr; }
-    [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {
-      always_assert(isset(), "Unwrapping a null pointer");
-      return m_ptr;
-    }
-
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* {
-      assert_invariant(isset(), "Dereferencing a null pointer");
-      return m_ptr;
-    }
-
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& {
-      assert_invariant(isset(), "Dereferencing a null pointer");
-      return *m_ptr;
-    }
-
-    [[nodiscard]] constexpr auto add(usize i) const {
-      assert_invariant(isset(), "Adding to a null pointer");
-      return NullableRefPtr(into_raw() + i.unwrap());
-    }
-
-    [[nodiscard]] constexpr auto sub(usize i) const {
-      assert_invariant(isset(), "Subtracting from a null pointer");
-      return NullableRefPtr(into_raw() - i.unwrap());
-    }
-
-    constexpr auto operator++() const -> NullableRefPtr { return {into_raw() + 1}; }
-    constexpr auto operator--() const -> NullableRefPtr { return {into_raw() - 1}; }
-    constexpr auto operator++(int) const -> NullableRefPtr { return {into_raw() + 1}; }
-    constexpr auto operator--(int) const -> NullableRefPtr { return {into_raw() - 1}; }
-
-    [[nodiscard]] constexpr auto take_own() const { return NullableOwnPtr(into_raw()); }
+    [[nodiscard]] constexpr auto take_own() const { return NullableOwnPtr(this->into_raw()); }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),
