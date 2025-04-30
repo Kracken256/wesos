@@ -23,6 +23,7 @@ namespace wesos::heap {
     NullableRefPtr<FreeNode> m_freelist_head;
     ObjectSize m_object_size;
     PowerOfTwo<usize> m_object_align;
+    View<u8> m_initial_pool;
 
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
@@ -34,6 +35,8 @@ namespace wesos::heap {
     void virt_deallocate(View<u8> ptr) override;
 
     auto virt_utilize(View<u8> pool) -> LeftoverMemory override;
+
+    void virt_anew() override;
 
   public:
     IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,

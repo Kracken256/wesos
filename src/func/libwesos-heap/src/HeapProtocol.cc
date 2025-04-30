@@ -48,3 +48,7 @@ SYM_EXPORT void HeapProtocol::deallocate(Nullable<View<u8>> ptr) {
 SYM_EXPORT auto HeapProtocol::utilize(View<u8> pool) -> LeftoverMemory {
   return m_mutex.critical_section([&] { return utilize_nosync(pool); });
 }
+
+SYM_EXPORT void HeapProtocol::anew() {
+  m_mutex.critical_section([&] { virt_anew(); });
+}

@@ -11,7 +11,9 @@
 using namespace wesos;
 using namespace wesos::heap;
 
-SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) { virt_utilize(pool); }
+SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) : m_initial_pool(pool) {
+  virt_utilize(pool);
+}
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(IntrusiveChainFirstFit&& o)
     : m_front(o.m_front) {
@@ -39,7 +41,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
     const auto aligned_chunk_ptr = chunk_ptr.align_pow2(align);
     const auto unused_amount = aligned_chunk_ptr.sub(chunk_ptr.into_uptr()).into_uptr();
 
-    if (size > unused_amount + chunk_size) {
+    if (chunk_size < size + unused_amount) {
       continue;
     }
 
@@ -70,6 +72,15 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_utilize(View<u8> pool) -> LeftoverMemory {
+  if (pool.size() < sizeof(Chunk)) [[unlikely]] {
+    return {{pool}, {}};
+  }
+
   virt_deallocate(pool);
   return {};
+}
+
+SYM_EXPORT void IntrusiveChainFirstFit::virt_anew() {
+  m_front = null;
+  virt_utilize(m_initial_pool);
 }

@@ -72,9 +72,7 @@ TEST(IntrusivePool, Allocate) {
       auto expected_objects = pointers;
 
       // Release all allocated pool objects
-      for (const auto& ptr : pointers) {
-        heap.deallocate(ptr);  // try mixing dealloc functions
-      }
+      heap.anew();
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
@@ -94,7 +92,8 @@ TEST(IntrusivePool, Allocate) {
 
       // Release all allocated pool objects
       for (const auto& ptr : pointers) {
-        heap.deallocate_nosync(ptr);
+        // we should be able to mix sync and nosync methods
+        heap.deallocate(ptr);
       }
 
       {  // We expect to be able to get back all the memory that was freed

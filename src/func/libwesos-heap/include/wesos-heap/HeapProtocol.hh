@@ -44,6 +44,8 @@ namespace wesos::heap {
 
     auto utilize(View<u8> pool) -> LeftoverMemory;
 
+    void anew();
+
   protected:
     [[nodiscard, gnu::pure]] virtual auto virt_allocate(
         Least<usize, 0> size, PowerOfTwo<usize> align) -> Nullable<View<u8>> = 0;
@@ -51,5 +53,7 @@ namespace wesos::heap {
     virtual void virt_deallocate(View<u8> ptr) = 0;
 
     virtual auto virt_utilize(View<u8> pool) -> LeftoverMemory = 0;
+
+    virtual void virt_anew() = 0;
   };
 }  // namespace wesos::heap

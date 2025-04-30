@@ -13,7 +13,7 @@ using namespace wesos::heap;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
                                         View<u8> pool)
-    : m_object_size(object_size), m_object_align(object_align) {
+    : m_object_size(object_size), m_object_align(object_align), m_initial_pool(pool) {
   virt_utilize(pool);
 }
 
@@ -106,4 +106,9 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
   unused.second() = end_unused;
 
   return unused;
+}
+
+SYM_EXPORT void IntrusivePool::virt_anew() {
+  m_freelist_head = null;
+  virt_utilize(m_initial_pool);
 }

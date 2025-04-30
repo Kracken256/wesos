@@ -18,6 +18,7 @@ namespace wesos::heap {
     };
 
     NullableRefPtr<Chunk> m_front;
+    View<u8> m_initial_pool;
 
   protected:
     [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
@@ -26,6 +27,8 @@ namespace wesos::heap {
     void virt_deallocate(View<u8> ptr) override;
 
     auto virt_utilize(View<u8> pool) -> LeftoverMemory override;
+
+    void virt_anew() override;
 
   public:
     IntrusiveChainBestFit(View<u8> pool = View<u8>::create_empty());
