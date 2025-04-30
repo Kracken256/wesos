@@ -36,6 +36,9 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
 
+    [[nodiscard]] constexpr auto next() const -> PowerOfTwo { return unwrap() * ValueGeneric(2); }
+    [[nodiscard]] constexpr auto prev() const -> PowerOfTwo { return unwrap() / ValueGeneric(2); }
+
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> PowerOfTwo {
       assert_invariant(is_power_of_two(x));
       return PowerOfTwo(move(x), true);
