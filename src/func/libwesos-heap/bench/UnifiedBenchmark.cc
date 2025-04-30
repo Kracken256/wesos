@@ -10,22 +10,24 @@
 namespace wesos::heap::testing {
   namespace detail {
     template <class ClassGeneric, class MethodGeneric>
-    class MemberLambda final {
+    class ZeroCostDelegate final {
       ClassGeneric& m_base;
       MethodGeneric m_method;
 
     public:
-      MemberLambda(ClassGeneric& base, MethodGeneric method) : m_base(base), m_method(method) {}
+      constexpr ZeroCostDelegate(ClassGeneric& base, MethodGeneric method)
+          : m_base(base), m_method(method) {}
 
       template <typename... ArgsGeneric>
-      auto operator()(ArgsGeneric... args) const {
+      constexpr auto operator()(ArgsGeneric... args) const {
         return (m_base.*m_method)(args...);
       }
     };
   }  // namespace detail
 
-  using AllocateFunc = detail::MemberLambda<HeapProtocol, decltype(&HeapProtocol::allocate)>;
-  using DeallocateFunc = detail::MemberLambda<HeapProtocol, decltype(&HeapProtocol::deallocate)>;
+  using AllocateFunc = detail::ZeroCostDelegate<HeapProtocol, decltype(&HeapProtocol::allocate)>;
+  using DeallocateFunc =
+      detail::ZeroCostDelegate<HeapProtocol, decltype(&HeapProtocol::deallocate)>;
 
   static auto is_pool_allocator(const BenchmarkOptions& options) -> bool {
     return options.m_size_min == options.m_size_max;
