@@ -31,6 +31,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> ClampMost {

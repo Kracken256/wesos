@@ -25,6 +25,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto operator<=>(const Unused& o) const = default;
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
   };
 }  // namespace wesos::types
