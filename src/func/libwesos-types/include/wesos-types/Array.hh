@@ -8,7 +8,9 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-builtin/Move.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/RefPtr.hh>
 #include <wesos-types/View.hh>
 
 namespace wesos::types {
@@ -18,15 +20,75 @@ namespace wesos::types {
 
   public:
     constexpr Array() { clear(); };
-    constexpr Array(const Array& other) = default;
-    constexpr Array(Array&& other) = default;
-    constexpr auto operator=(const Array& other) -> Array& = default;
-    constexpr auto operator=(Array&& other) -> Array& = default;
-    constexpr auto operator<=>(const Array& other) const = default;
+    constexpr Array(const Array&) = default;
+    constexpr Array(Array&&) = default;
+    constexpr auto operator=(const Array&) -> Array& = default;
+    constexpr auto operator=(Array&&) -> Array& = default;
     constexpr ~Array() = default;
 
+    [[nodiscard]] constexpr auto operator<=>(const Array&) const = default;
     [[nodiscard]] constexpr auto length() const -> usize { return CountGeneric; }
     [[nodiscard]] constexpr auto empty() const -> bool { return length() == 0; }
+
+    [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
+      always_assert(i < length(), "out of bounds");
+      return m_data[i];
+    }
+
+    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
+      assert_invariant(i < length(), "out of bounds");
+      return m_data[i];
+    }
+
+    [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
+      always_assert(i < length(), "out of bounds");
+      return m_data[i];
+    }
+
+    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& {
+      assert_invariant(i < length(), "out of bounds");
+      return m_data[i];
+    }
+
+    [[nodiscard]] constexpr auto front() const -> const ElementGeneric& {
+      static_assert(length() > 0, "Cannot access front of an empty array");
+      return m_data[0];
+    }
+
+    [[nodiscard]] constexpr auto front() -> ElementGeneric& {
+      static_assert(length() > 0, "Cannot access front of an empty array");
+      return m_data[0];
+    }
+
+    [[nodiscard]] constexpr auto back() const -> const ElementGeneric& {
+      static_assert(length() > 0, "Cannot access back of an empty array");
+      return m_data[length() - 1];
+    }
+
+    [[nodiscard]] constexpr auto back() -> ElementGeneric& {
+      static_assert(length() > 0, "Cannot access back of an empty array");
+      return m_data[length() - 1];
+    }
+
+    [[nodiscard]] constexpr auto cbegin() const -> const ElementGeneric* { return m_data; }
+    [[nodiscard]] constexpr auto cend() const -> const ElementGeneric* { return m_data + length(); }
+    [[nodiscard]] constexpr auto begin() -> ElementGeneric* { return m_data; }
+    [[nodiscard]] constexpr auto end() -> ElementGeneric* { return m_data + length(); }
+
+    [[nodiscard]] constexpr auto into_ptr() -> RefPtr<ElementGeneric> { return m_data; }
+    [[nodiscard]] constexpr auto as_view() { return View<ElementGeneric>(into_ptr(), length()); }
+
+    ///=========================================================================
+
+    constexpr void set(usize i, ElementGeneric value) {
+      always_assert(i < length(), "out of bounds");
+      m_data[i] = move(value);
+    }
+
+    constexpr void set_unchecked(usize i, ElementGeneric value) {
+      assert_invariant(i < length(), "out of bounds");
+      m_data[i] = move(value);
+    }
 
     constexpr void clear() {
       for (auto& element : m_data) {
@@ -39,57 +101,5 @@ namespace wesos::types {
         element = value;
       }
     }
-
-    [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
-      always_assert(i < length());
-      return m_data[i];
-    }
-
-    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
-      return m_data[i];
-    }
-
-    [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
-      always_assert(i < length());
-      return m_data[i];
-    }
-
-    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return m_data[i]; }
-
-    constexpr void set(usize i, const ElementGeneric& value) {
-      always_assert(i < length());
-      m_data[i] = value;
-    }
-
-    constexpr void set_unchecked(usize i, const ElementGeneric& value) { m_data[i] = value; }
-
-    constexpr auto front() const -> const ElementGeneric& {
-      static_assert(CountGeneric > 0, "Cannot access front of an empty array");
-      return m_data[0];
-    }
-
-    constexpr auto front() -> ElementGeneric& {
-      static_assert(CountGeneric > 0, "Cannot access front of an empty array");
-      return m_data[0];
-    }
-
-    constexpr auto back() const -> const ElementGeneric& {
-      static_assert(CountGeneric > 0, "Cannot access back of an empty array");
-      return m_data[CountGeneric - 1];
-    }
-
-    constexpr auto back() -> ElementGeneric& {
-      static_assert(CountGeneric > 0, "Cannot access back of an empty array");
-      return m_data[CountGeneric - 1];
-    }
-
-    constexpr auto cbegin() const -> const ElementGeneric* { return m_data; }
-    constexpr auto cend() const -> const ElementGeneric* { return m_data + CountGeneric; }
-    constexpr auto begin() -> ElementGeneric* { return m_data; }
-    constexpr auto end() -> ElementGeneric* { return m_data + CountGeneric; }
-
-    constexpr auto into_pointer() -> ElementGeneric* { return m_data; }
-
-    constexpr auto as_view() { return View<ElementGeneric>(begin(), length()); }
   };
 }  // namespace wesos::types
