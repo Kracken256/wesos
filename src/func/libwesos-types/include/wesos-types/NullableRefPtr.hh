@@ -31,7 +31,7 @@ namespace wesos::types {
     constexpr auto operator<=>(const NullableRefPtr&) const = default;
     constexpr ~NullableRefPtr() = default;
 
-    [[nodiscard]] constexpr auto take_own() const { return NullableOwnPtr(this->into_raw()); }
+    [[nodiscard]] constexpr auto take_own() const { return NullableOwnPtr(this->unwrap()); }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),

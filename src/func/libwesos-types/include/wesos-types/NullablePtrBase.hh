@@ -26,9 +26,9 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto operator<=>(const NullablePtrBase&) const = default;
     [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
-    [[nodiscard]] constexpr auto into_raw() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
     [[nodiscard]] constexpr auto into_uptr() const -> uptr {
-      return reinterpret_cast<uptr>(into_raw());
+      return reinterpret_cast<uptr>(unwrap());
     }
 
     [[nodiscard]] constexpr auto get() const -> UnwrappedGeneric {
@@ -53,32 +53,32 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto add(usize i) const -> ChildGeneric {
       assert_invariant(isset(), "Adding to a null pointer");
-      return into_raw() + i;
+      return unwrap() + i;
     }
 
     [[nodiscard]] constexpr auto sub(usize i) const -> ChildGeneric {
       assert_invariant(isset(), "Subtracting from a null pointer");
-      return into_raw() - i;
+      return unwrap() - i;
     }
 
     [[nodiscard]] constexpr auto operator++() const -> ChildGeneric {
       assert_invariant(isset(), "Incrementing a null pointer");
-      return into_raw() + 1;
+      return unwrap() + 1;
     }
 
     [[nodiscard]] constexpr auto operator--() const -> ChildGeneric {
       assert_invariant(isset(), "Decrementing a null pointer");
-      return into_raw() - 1;
+      return unwrap() - 1;
     }
 
     [[nodiscard]] constexpr auto operator++(int) const -> ChildGeneric {
       assert_invariant(isset(), "Incrementing a null pointer");
-      return into_raw() + 1;
+      return unwrap() + 1;
     }
 
     [[nodiscard]] constexpr auto operator--(int) const -> ChildGeneric {
       assert_invariant(isset(), "Decrementing a null pointer");
-      return into_raw() - 1;
+      return unwrap() - 1;
     }
   };
 }  // namespace wesos::types
