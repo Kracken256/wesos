@@ -44,6 +44,7 @@ namespace wesos::types {
       } else {
         unset();
       }
+      return *this;
     }
     constexpr ~Nullable() { unset(); }
 
