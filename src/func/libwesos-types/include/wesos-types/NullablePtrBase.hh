@@ -50,12 +50,12 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto add(usize i) const -> ChildGeneric {
       assert_invariant(isset(), "Adding to a null pointer");
-      return into_raw() + i.unwrap();
+      return into_raw() + i;
     }
 
     [[nodiscard]] constexpr auto sub(usize i) const -> ChildGeneric {
       assert_invariant(isset(), "Subtracting from a null pointer");
-      return into_raw() - i.unwrap();
+      return into_raw() - i;
     }
 
     [[nodiscard]] constexpr auto operator++() const -> ChildGeneric {

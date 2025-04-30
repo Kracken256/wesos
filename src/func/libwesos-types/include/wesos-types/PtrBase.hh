@@ -29,13 +29,8 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* { return m_ptr; }
     [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& { return *m_ptr; }
 
-    [[nodiscard]] constexpr auto add(usize i) const -> DerivedGeneric {
-      return unwrap() + i.unwrap();
-    }
-
-    [[nodiscard]] constexpr auto sub(usize i) const -> DerivedGeneric {
-      return unwrap() - i.unwrap();
-    }
+    [[nodiscard]] constexpr auto add(usize i) const -> DerivedGeneric { return unwrap() + i; }
+    [[nodiscard]] constexpr auto sub(usize i) const -> DerivedGeneric { return unwrap() - i; }
 
     [[nodiscard]] constexpr auto operator++() const -> DerivedGeneric { return unwrap() + 1; }
     [[nodiscard]] constexpr auto operator--() const -> DerivedGeneric { return unwrap() - 1; }

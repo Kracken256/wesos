@@ -100,16 +100,14 @@ namespace wesos::types {
   [[nodiscard]] static constexpr auto max() -> u64 {
     using namespace detail;
 
-    enum {
-      u8_max = 0xff,
-      u16_max = 0xffff,
-      u32_max = 0xffffffff,
-      u64_max = 0xffffffffffffffff,
-      i8_max = 0x7f,
-      i16_max = 0x7fff,
-      i32_max = 0x7fffffff,
-      i64_max = 0x7fffffffffffffff,
-    };
+    constexpr u64 u8_max = 0xff;
+    constexpr u64 u16_max = 0xffff;
+    constexpr u64 u32_max = 0xffffffff;
+    constexpr u64 u64_max = 0xffffffffffffffff;
+    constexpr u64 i8_max = 0x7f;
+    constexpr u64 i16_max = 0x7fff;
+    constexpr u64 i32_max = 0x7fffffff;
+    constexpr u64 i64_max = 0x7fffffffffffffff;
 
     if constexpr (is_same_v<ValueGeneric, __u8>) {
       return u8_max;
@@ -136,16 +134,14 @@ namespace wesos::types {
   [[nodiscard]] static constexpr auto min() -> i64 {
     using namespace detail;
 
-    enum {
-      u8_min = 0,
-      u16_min = 0,
-      u32_min = 0,
-      u64_min = 0,
-      i8_min = -0x80,
-      i16_min = -0x8000,
-      i32_min = -0x80000000,
-      i64_min = -0x8000000000000000,
-    };
+    constexpr i64 u8_min = 0;
+    constexpr i64 u16_min = 0;
+    constexpr i64 u32_min = 0;
+    constexpr i64 u64_min = 0;
+    constexpr i64 i8_min = -0x80LL;                                   // -128
+    constexpr i64 i16_min = -0x8000LL;                                // -32768
+    constexpr i64 i32_min = -0x80000000LL;                            // -2147483648
+    constexpr i64 i64_min = static_cast<i64>(0x8000000000000000ULL);  // -9223372036854775808
 
     if constexpr (is_same_v<ValueGeneric, __u8>) {
       return u8_min;

@@ -25,12 +25,8 @@ namespace wesos::types {
     constexpr auto operator=(Least&&) -> Least& = default;
     constexpr ~Least() = default;
 
-    [[nodiscard]] constexpr auto operator<=>(const auto& o) const {
-      return unwrap() <=> o.unwrap();
-    }
-
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> Least {

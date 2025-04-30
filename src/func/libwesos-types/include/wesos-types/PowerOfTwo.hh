@@ -17,7 +17,10 @@ namespace wesos::types {
 
     constexpr PowerOfTwo() = default;
 
-    static constexpr auto is_power_of_two(auto x) { return x > 0 && ((x & (x - 1)) == 0); }
+    static constexpr auto is_power_of_two(auto x) {
+      return x > static_cast<ValueGeneric>(0) &&
+             ((x & (x - static_cast<ValueGeneric>(1))) == static_cast<ValueGeneric>(0));
+    }
 
   public:
     constexpr PowerOfTwo(ValueGeneric x) : m_value(move(x)) {
@@ -29,12 +32,8 @@ namespace wesos::types {
     constexpr auto operator=(PowerOfTwo&&) -> PowerOfTwo& = default;
     constexpr ~PowerOfTwo() = default;
 
-    [[nodiscard]] constexpr auto operator<=>(const auto& o) const {
-      return unwrap() <=> o.unwrap();
-    }
-
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
 
     [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> PowerOfTwo {

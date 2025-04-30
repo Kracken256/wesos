@@ -25,11 +25,7 @@ namespace wesos::types {
     constexpr auto operator=(Most&&) -> Most& = default;
     constexpr ~Most() = default;
 
-    [[nodiscard]] constexpr auto operator<=>(const auto& o) const {
-      return unwrap() <=> o.unwrap();
-    }
-
-    [[nodiscard]] constexpr auto operator<=>(const Most&) const = default;
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
 
     [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }

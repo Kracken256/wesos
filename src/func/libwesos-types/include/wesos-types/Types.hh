@@ -40,6 +40,9 @@ namespace wesos {
   using types::u8;
   using types::usize;
 
+  using types::max;
+  using types::min;
+
   using types::null;
 
   using types::Array;
