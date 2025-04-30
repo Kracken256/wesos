@@ -31,6 +31,8 @@ namespace wesos::types {
       return reinterpret_cast<uptr>(unwrap());
     }
 
+    [[nodiscard]] constexpr auto is_aligned(usize x) -> bool { return into_uptr() % x == 0; }
+
     [[nodiscard]] constexpr auto get() const -> UnwrappedGeneric {
       always_assert(isset(), "Unwrapping a null pointer");
       return m_ptr;

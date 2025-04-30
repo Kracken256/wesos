@@ -32,6 +32,8 @@ namespace wesos::types {
       return reinterpret_cast<uptr>(unwrap());
     }
 
+    [[nodiscard]] constexpr auto is_aligned(usize x) -> bool { return into_uptr() % x == 0; }
+
     [[nodiscard]] constexpr auto add(usize i) const -> DerivedGeneric { return unwrap() + i; }
     [[nodiscard]] constexpr auto sub(usize i) const -> DerivedGeneric { return unwrap() - i; }
 
