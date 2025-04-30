@@ -11,9 +11,6 @@
 
 namespace wesos::types {
   template <typename PointeeGeneric>
-  class OwnPtr;
-
-  template <typename PointeeGeneric>
   class OwnPtr : public PtrBase<PointeeGeneric, OwnPtr<PointeeGeneric>> {
   public:
     constexpr OwnPtr(PointeeGeneric* ptr) : PtrBase<PointeeGeneric, OwnPtr<PointeeGeneric>>(ptr) {}

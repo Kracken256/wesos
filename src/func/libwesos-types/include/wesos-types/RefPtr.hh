@@ -11,9 +11,6 @@
 
 namespace wesos::types {
   template <typename PointeeGeneric>
-  class RefPtr;
-
-  template <typename PointeeGeneric>
   class RefPtr : public PtrBase<PointeeGeneric, RefPtr<PointeeGeneric>> {
   public:
     constexpr RefPtr(PointeeGeneric* ptr) : PtrBase<PointeeGeneric, RefPtr<PointeeGeneric>>(ptr) {}
