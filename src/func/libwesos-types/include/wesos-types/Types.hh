@@ -8,6 +8,8 @@
 #pragma once
 
 #include <wesos-types/Array.hh>
+#include <wesos-types/ClampLeast.hh>
+#include <wesos-types/ClampMost.hh>
 #include <wesos-types/Group.hh>
 #include <wesos-types/Least.hh>
 #include <wesos-types/Most.hh>
@@ -52,6 +54,8 @@ namespace wesos {
   using types::RefPtr;
   using types::View;
 
+  using types::ClampLeast;
+  using types::ClampMost;
   using types::Least;
   using types::Most;
 
