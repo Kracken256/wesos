@@ -11,7 +11,7 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::heap {
-  class IntrusivePool : public HeapProtocol {
+  class IntrusivePool final : public HeapProtocol {
     struct FreeNode {
       NullableRefPtr<FreeNode> m_next;
     };

@@ -13,6 +13,8 @@
 
 using namespace wesos::heap;
 
+SYM_EXPORT HeapProtocol::~HeapProtocol() = default;
+
 SYM_EXPORT auto HeapProtocol::allocate_nosync(Least<usize, 0> size, PowerOfTwo<usize> align,
                                               bool zero_memory) -> Nullable<View<u8>> {
   auto slice_opt = virt_allocate(size, align);
