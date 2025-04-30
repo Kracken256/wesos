@@ -1,0 +1,30 @@
+/**
+ * This file is part of the WesOS project.
+ *
+ * WesOS is public domain software: you can redistribute it and/or modify
+ * it under the terms of the Unlicense(https://unlicense.org/).
+ */
+
+#pragma once
+
+#include <wesos-builtin/Move.hh>
+
+namespace wesos::types {
+  template <class ValueGeneric>
+  class Unused {
+    ValueGeneric m_value;
+
+  public:
+    constexpr Unused() = default;
+    constexpr Unused(ValueGeneric x) : m_value(move(x)){};
+    constexpr Unused(const Unused&) = default;
+    constexpr Unused(Unused&&) = default;
+    constexpr auto operator=(const Unused&) -> Unused& = default;
+    constexpr auto operator=(Unused&&) -> Unused& = default;
+    constexpr ~Unused() = default;
+
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
+    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
+  };
+}  // namespace wesos::types

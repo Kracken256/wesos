@@ -25,6 +25,7 @@
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
 #include <wesos-types/Untrusted.hh>
+#include <wesos-types/Unused.hh>
 #include <wesos-types/View.hh>
 
 namespace wesos {
@@ -63,6 +64,8 @@ namespace wesos {
   using types::Least;
   using types::Most;
   using types::PowerOfTwo;
+
+  using types::Unused;
 
   using types::operator""_u8;
   using types::operator""_u16;
