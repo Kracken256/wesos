@@ -14,7 +14,7 @@ using namespace wesos::heap;
 SYM_EXPORT IntrusivePool::IntrusivePool(ClampLeast<usize, sizeof(FreeNode)> object_size,
                                         PowerOfTwo<usize> object_align, View<u8> initial_pool)
     : m_object_size(object_size), m_object_align(object_align) {
-  utilize_nosync(initial_pool);
+  virt_utilize(initial_pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -84,7 +84,7 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> extra_memory) -> LeftoverMe
       auto object_mem = window.subview_unchecked(0, m_object_size);
 
       // Wierd, but it works..
-      deallocate_nosync(object_mem);
+      virt_deallocate(object_mem);
 
       window = window.subview_unchecked(m_object_size);
     };
