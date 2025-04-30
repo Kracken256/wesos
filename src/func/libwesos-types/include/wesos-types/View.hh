@@ -25,23 +25,11 @@ namespace wesos::types {
     constexpr View() : m_base(nullptr), m_size(0){};
     constexpr View(Pointer base, usize count) : m_base(base), m_size(count) {}
     constexpr View(Pointer base, Pointer end) : m_base(base), m_size(end - base) {}
-    constexpr View(const View<ElementGeneric>&) = default;
-    constexpr View(View<ElementGeneric>&&) = default;
-    constexpr auto operator=(const View<ElementGeneric>&) -> View<ElementGeneric>& = default;
-    constexpr auto operator=(View<ElementGeneric>&&) -> View<ElementGeneric>& = default;
+    constexpr View(const View&) = default;
+    constexpr View(View&&) = default;
+    constexpr auto operator=(const View&) -> View& = default;
+    constexpr auto operator=(View&&) -> View& = default;
     constexpr ~View() = default;
-
-    constexpr auto operator<=>(const View<ElementGeneric>& o) const {
-      const usize min_size = size() < o.size() ? size() : o.size();
-
-      for (usize i = 0; i < min_size; ++i) {
-        if (auto cmp = get_unchecked(i) <=> o.get_unchecked(i); cmp != 0) {
-          return cmp;
-        }
-      }
-
-      return size() <=> o.size();
-    }
 
     [[nodiscard]] constexpr auto size() const -> usize { return m_size; }
     [[nodiscard]] constexpr auto empty() const -> bool { return size() == 0; }
@@ -82,12 +70,12 @@ namespace wesos::types {
       return {m_base.add(i), count};
     }
 
-    [[nodiscard]] constexpr auto subview(usize i, usize count) -> View<ElementGeneric> {
+    [[nodiscard]] constexpr auto subview(usize i, usize count) -> View {
       always_assert(i <= size() && count <= size() - i);
       return {m_base.add(i), count};
     }
 
-    [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) -> View<ElementGeneric> {
+    [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) -> View {
       assert_invariant(i <= size() && count <= size() - i);
       return {m_base.add(i), count};
     }
@@ -102,17 +90,31 @@ namespace wesos::types {
       return {m_base.add(i), size() - i};
     }
 
-    [[nodiscard]] constexpr auto subview(usize i) -> View<ElementGeneric> {
+    [[nodiscard]] constexpr auto subview(usize i) -> View {
       always_assert(i <= size());
       return {m_base.add(i), size() - i};
     }
 
-    [[nodiscard]] constexpr auto subview_unchecked(usize i) -> View<ElementGeneric> {
+    [[nodiscard]] constexpr auto subview_unchecked(usize i) -> View {
       assert_invariant(i <= size());
       return {m_base.add(i), size() - i};
     }
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
+
+    constexpr auto operator<=>(const View& o) const -> std::strong_ordering
+      requires requires { get(0) <=> o.get(0); }
+    {
+      const usize min_size = size() < o.size() ? size() : o.size();
+
+      for (usize i = 0; i < min_size; ++i) {
+        if (auto cmp = get_unchecked(i) <=> o.get_unchecked(i); cmp != 0) {
+          return cmp;
+        }
+      }
+
+      return size() <=> o.size();
+    }
 
     ///========================================================================================
 

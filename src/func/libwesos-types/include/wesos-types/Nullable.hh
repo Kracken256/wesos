@@ -49,7 +49,9 @@ namespace wesos::types {
     }
     constexpr ~Nullable() { unset(); }
 
-    [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::strong_ordering {
+    [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::strong_ordering
+      requires requires { get() <=> o.get(); }
+    {
       const bool a_set = isset();
       const bool b_set = o.isset();
 
