@@ -3,26 +3,26 @@ cmake_minimum_required(VERSION 3.15)
 ################################################################################
 # VALIDATE BUILD MODE
 ################################################################################
-if(NOT BUILD_MODE)
-  message(FATAL_ERROR "BUILD_MODE variable not set.       \
-  Please set the BUILD_MODE variable to '--rapid', '--debug', or '--release'")
-elseif(NOT BUILD_MODE STREQUAL "--rapid" AND NOT BUILD_MODE STREQUAL "--debug" AND NOT BUILD_MODE STREQUAL "--release")
-  message(FATAL_ERROR "Unknown build mode: ${BUILD_MODE}. \
-  Valid options are '--rapid', '--debug', '--release'")
+if(NOT CMAKE_BUILD_TYPE)
+  message(FATAL_ERROR "CMAKE_BUILD_TYPE variable not set.       \
+  Please set the CMAKE_BUILD_TYPE variable to 'Rapid', 'Debug', or 'Release'")
+elseif(NOT CMAKE_BUILD_TYPE STREQUAL "Rapid" AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+  message(FATAL_ERROR "Unknown build mode: ${CMAKE_BUILD_TYPE}. \
+  Valid options are 'Rapid', 'Debug', 'Release'")
 endif()
 
 ################################################################################
 # SET BUILD DEFAULT CONFIGURATION
 ################################################################################
-if(BUILD_MODE STREQUAL "--rapid")
+if(CMAKE_BUILD_TYPE STREQUAL "Rapid")
   message(STATUS "Rapid build mode selected")
   include(clang-global/rapid-mode)
-elseif(BUILD_MODE STREQUAL "--debug")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
   message(STATUS "Debug build mode selected")
   include(clang-global/debug-mode)
-elseif(BUILD_MODE STREQUAL "--release")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
   message(STATUS "Release build mode selected")
   include(clang-global/release-mode)
 else()
-  message(FATAL_ERROR "Unknown build mode: ${BUILD_MODE}.")
+  message(FATAL_ERROR "Unknown build mode: ${CMAKE_BUILD_TYPE}.")
 endif()
