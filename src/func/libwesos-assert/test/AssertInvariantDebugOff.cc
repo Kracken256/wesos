@@ -5,9 +5,11 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#undef NDEBUG
+#define NDEBUG
+
 #include <gtest/gtest.h>
 
-#define NDEBUG
 #include <wesos-assert/Assert.hh>
 
 TEST(assert_invariant, no_ndebug) {
