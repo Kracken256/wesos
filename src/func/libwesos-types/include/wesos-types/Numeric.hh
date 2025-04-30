@@ -37,6 +37,19 @@ namespace wesos::types {
       static_assert(is_same_v<i8, i8>, "Pointer size is not supported");
     }
   }());
+  using isize = decltype([]() {
+    if constexpr (sizeof(void*) == sizeof(i8)) {
+      return i8{};
+    } else if constexpr (sizeof(void*) == sizeof(i16)) {
+      return i16{};
+    } else if constexpr (sizeof(void*) == sizeof(i32)) {
+      return i32{};
+    } else if constexpr (sizeof(void*) == sizeof(i64)) {
+      return i64{};
+    } else {
+      static_assert(is_same_v<i8, i8>, "Pointer size is not supported");
+    }
+  }());
   using uptr = usize;
 
   // NOLINTEND(readability-identifier-naming)

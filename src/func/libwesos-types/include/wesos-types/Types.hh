@@ -35,6 +35,7 @@ namespace wesos {
   using types::i32;
   using types::i64;
   using types::i8;
+  using types::isize;
   using types::u16;
   using types::u32;
   using types::u64;
