@@ -16,7 +16,7 @@ namespace wesos::types {
     ValueGeneric m_value;
 
   public:
-    constexpr Most(ValueGeneric x) : m_value(move(x)) { always_assert(x <= MaximumValue); };
+    constexpr Most(ValueGeneric x) : m_value(move(x)) { assert_invariant(x <= MaximumValue); };
     constexpr Most(const Most&) = default;
     constexpr Most(Most&&) = default;
     constexpr auto operator=(const Most&) -> Most& = default;

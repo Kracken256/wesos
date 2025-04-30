@@ -16,7 +16,7 @@ namespace wesos::types {
     ValueGeneric m_value;
 
   public:
-    constexpr Least(ValueGeneric x) : m_value(move(x)) { always_assert(x >= MinimumValue); };
+    constexpr Least(ValueGeneric x) : m_value(move(x)) { assert_invariant(x >= MinimumValue); };
     constexpr Least(const Least&) = default;
     constexpr Least(Least&&) = default;
     constexpr auto operator=(const Least&) -> Least& = default;
