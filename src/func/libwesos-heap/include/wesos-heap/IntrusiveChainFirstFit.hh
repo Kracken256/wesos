@@ -15,9 +15,10 @@ namespace wesos::heap {
     struct Chunk {
       Least<usize, 1> m_size;
       NullableRefPtr<Chunk> m_next;
+      NullableRefPtr<Chunk> m_prev;
     };
 
-    NullableRefPtr<Chunk> m_front;
+    NullableRefPtr<Chunk> m_some;
     View<u8> m_initial_pool;
 
   protected:

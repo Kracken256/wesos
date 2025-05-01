@@ -16,27 +16,46 @@ SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) : m_ini
 }
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(IntrusiveChainFirstFit&& o)
-    : m_front(o.m_front) {
+    : m_some(o.m_some) {
   // Any allocations from the source will fail after a move.
 
-  o.m_front = nullptr;
+  o.m_some = null;
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
     -> IntrusiveChainFirstFit& {
   // Any allocations from the source will fail after a move.
 
-  m_front = o.m_front;
-  o.m_front = nullptr;
+  m_some = o.m_some;
+  o.m_some = null;
 
   return *this;
 }
 
+extern "C" {
+struct FILE;
+
+auto printf(const char*, ...) -> int;
+auto fflush(FILE*) -> int;
+
+extern FILE* stdout;
+}
+
+static void debug_s(const char* func, int line) {
+  printf("[%s]: %d\n", func, line);
+  fflush(stdout);
+}
+
+#define W_DEBUG() debug_s(__func__, __LINE__)
+
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
     -> Nullable<View<u8>> {
-  for (NullableRefPtr<Chunk> node = m_front, prev = m_front; node.isset();
-       prev = node, node = node->m_next) {
+  W_DEBUG();
+
+  for (NullableRefPtr<Chunk> node = m_some; node.isset(); node = node->m_next) {
     const auto whole_chunk_range = [&]() {
+      W_DEBUG();
+
       auto* unaligned_ptr = reinterpret_cast<u8*>(node.unwrap());
       auto range = View<u8>(unaligned_ptr, node->m_size);
       assert_invariant(!range.empty());
@@ -47,20 +66,30 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
                          .into_uptr();
 
       if (range.size() < padding) {
+        W_DEBUG();
         return View<u8>::create_empty();
       }
+
+      W_DEBUG();
 
       range = range.subview_unchecked(padding);
       assert_invariant(range.into_ptr().is_aligned(align));
 
+      W_DEBUG();
+
       return range;
     }();
 
+    W_DEBUG();
+
     if (size > whole_chunk_range.size()) {
+      W_DEBUG();
       continue;
     }
 
-    const auto new_adjacent_chunk = [&]() -> NullableRefPtr<Chunk> {
+    W_DEBUG();
+
+    const auto split_chunk = [&]() -> NullableRefPtr<Chunk> {
       auto range = whole_chunk_range.subview_unchecked(size.unwrap());
       auto padding = range.into_ptr()
                          .align_pow2(alignof(Chunk))  //
@@ -68,39 +97,117 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
                          .into_uptr();
 
       if (range.size() < padding + sizeof(Chunk)) {
-        return nullptr;
+        W_DEBUG();
+        return null;
       }
+
+      W_DEBUG();
 
       auto chunk_range = range.subview_unchecked(padding);
       assert_invariant(chunk_range.into_ptr().is_aligned(alignof(Chunk)));
 
-      return reinterpret_cast<Chunk*>(chunk_range.into_ptr().unwrap());
+      W_DEBUG();
+
+      auto* chunk = reinterpret_cast<Chunk*>(chunk_range.into_ptr().unwrap());
+
+      chunk->m_size = chunk_range.size();
+      chunk->m_next = null;
+      chunk->m_prev = null;
+
+      W_DEBUG();
+
+      return chunk;
     }();
 
-    if (new_adjacent_chunk.isset()) {
-      // partition_ptr->m_next = node->m_next;
-      // partition_ptr->m_size = partition_range.size();
+    W_DEBUG();
 
-      // node->m_next = partition_ptr;
+    if (split_chunk.isset()) {
+      W_DEBUG();
 
-      /// TODO: Handle chunk splitting
+      if (node->m_prev.isset()) {
+        W_DEBUG();
+        node->m_prev->m_next = split_chunk;
+      }
+
+      if (node->m_next.isset()) {
+        W_DEBUG();
+        node->m_next->m_prev = split_chunk;
+      }
+
+      split_chunk->m_prev = node->m_prev;
+      split_chunk->m_next = node->m_next;
+
+      W_DEBUG();
     }
 
-    // prev->m_next = node->m_next;
+    W_DEBUG();
 
-    return whole_chunk_range.subview_unchecked(0, size.unwrap());
+    if (node->m_prev.isset()) {
+      W_DEBUG();
+      node->m_prev->m_next = node->m_next;
+    }
+
+    if (node->m_next.isset()) {
+      W_DEBUG();
+      node->m_next->m_prev = node->m_prev;
+    }
+
+    W_DEBUG();
+
+    /// TODO: Handle chunk splitting
+
+    auto object_range = whole_chunk_range.subview_unchecked(0, size.unwrap());
+    assert_invariant(object_range.into_ptr().is_aligned(align) && object_range.size() >= size);
+
+    W_DEBUG();
+
+    return object_range;
   }
+
+  W_DEBUG();
 
   return null;
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
-  auto free_node_view = ptr.subview_unchecked(0, sizeof(Chunk));
-  auto* free_node = reinterpret_cast<Chunk*>(free_node_view.into_ptr().unwrap());
+  W_DEBUG();
 
-  free_node->m_next = m_front;
-  free_node->m_size = ptr.size();
-  m_front = free_node;
+  auto chunk_range = ptr.subview_unchecked(0, sizeof(Chunk));
+  assert_invariant(ptr.into_ptr().is_aligned(alignof(Chunk)));
+  W_DEBUG();
+
+  auto* chunk = reinterpret_cast<Chunk*>(chunk_range.into_ptr().unwrap());
+
+  W_DEBUG();
+
+  if (m_some.isset()) {
+    W_DEBUG();
+
+    if (m_some->m_prev.isset()) {
+      W_DEBUG();
+      m_some->m_prev->m_next = chunk;
+    }
+
+    if (m_some->m_next.isset()) {
+      W_DEBUG();
+      m_some->m_next->m_prev = chunk;
+    }
+
+    W_DEBUG();
+
+    chunk->m_size = ptr.size();
+    chunk->m_prev = m_some;
+  } else {
+    W_DEBUG();
+
+    chunk->m_size = ptr.size();
+    chunk->m_prev = null;
+    chunk->m_next = null;
+
+    m_some = chunk;
+  }
+
+  W_DEBUG();
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_utilize(View<u8> pool) -> LeftoverMemory {
@@ -109,10 +216,11 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_utilize(View<u8> pool) -> LeftoverM
   }
 
   virt_deallocate(pool);
+
   return {};
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_anew() {
-  m_front = null;
+  m_some = null;
   virt_utilize(m_initial_pool);
 }
