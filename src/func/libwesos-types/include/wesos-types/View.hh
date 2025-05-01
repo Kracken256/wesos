@@ -129,5 +129,10 @@ namespace wesos::types {
       }
       return *this;
     }
+
+    constexpr auto clear() -> View& {
+      m_size = 0;
+      return *this;
+    }
   };
 }  // namespace wesos::types
