@@ -24,6 +24,7 @@
 #include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
+#include <wesos-types/ThreadSafe.hh>
 #include <wesos-types/Untrusted.hh>
 #include <wesos-types/Unused.hh>
 #include <wesos-types/View.hh>
@@ -52,8 +53,10 @@ namespace wesos {
   using types::Nullable;
   using types::Pair;
   using types::Quadlet;
+  using types::ThreadSafe;
   using types::Triplet;
   using types::Untrusted;
+  using types::Unused;
 
   using types::NullableOwnPtr;
   using types::NullableRefPtr;
@@ -66,8 +69,6 @@ namespace wesos {
   using types::Least;
   using types::Most;
   using types::PowerOfTwo;
-
-  using types::Unused;
 
   using types::operator""_u8;
   using types::operator""_u16;
