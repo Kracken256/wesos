@@ -27,6 +27,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto operator<=>(const NullablePtrBase&) const = default;
     [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr != nullptr; }
+    [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
     [[nodiscard]] constexpr operator PointeeGeneric*() const { return m_ptr; }
     [[nodiscard]] constexpr auto into_uptr() const -> uptr {

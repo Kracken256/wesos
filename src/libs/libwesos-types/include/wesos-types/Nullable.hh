@@ -86,6 +86,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto operator==(nullptr_t) const -> bool { return !isset(); }
 
     [[nodiscard]] constexpr auto isset() const -> bool { return m_isset; }
+    [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr operator bool() { return isset(); }
 
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& {
