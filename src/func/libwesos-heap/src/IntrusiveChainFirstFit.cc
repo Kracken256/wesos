@@ -11,6 +11,22 @@
 using namespace wesos;
 using namespace wesos::heap;
 
+extern "C" {  /// TODO: Remove section
+struct FILE;
+
+auto printf(const char*, ...) -> int;
+auto fflush(FILE*) -> int;
+
+extern FILE* stdout;  // NOLINT
+
+static void debug_s(const char* func, int line) {
+  printf("[%s]: %d\n", func, line);
+  fflush(stdout);
+}
+
+#define W_DEBUG() debug_s(__func__, __LINE__)
+}
+
 using Chunk = IntrusiveChainFirstFit::Chunk;
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) : m_initial_pool(pool) {
@@ -34,23 +50,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
   return *this;
 }
 
-extern "C" {
-struct FILE;
-
-auto printf(const char*, ...) -> int;
-auto fflush(FILE*) -> int;
-
-extern FILE* stdout;
-}
-
-static void debug_s(const char* func, int line) {
-  printf("[%s]: %d\n", func, line);
-  fflush(stdout);
-}
-
-#define W_DEBUG() debug_s(__func__, __LINE__)
-
-static auto as_unaligned_range(NullableRefPtr<Chunk> node) -> View<u8> {
+static auto get_unaligned_range(NullableRefPtr<Chunk> node) -> View<u8> {
   W_DEBUG();
 
   auto* unaligned_ptr = reinterpret_cast<u8*>(node.unwrap());
@@ -62,7 +62,7 @@ static auto as_unaligned_range(NullableRefPtr<Chunk> node) -> View<u8> {
   return range;
 }
 
-static auto as_aligned_range(View<u8> unaligned_range, usize align) -> View<u8> {
+static auto get_aligned_range(View<u8> unaligned_range, usize align) -> View<u8> {
   W_DEBUG();
 
   auto padding = unaligned_range.into_ptr().align_pow2(align).into_uptr() -
@@ -113,60 +113,51 @@ static auto seperate_range(View<u8> aligned_range, usize size) -> NullableRefPtr
   return chunk;
 }
 
+static void splice_and_remove_chunk(NullableRefPtr<Chunk> dst, NullableRefPtr<Chunk> src) {
+  if (src.isset()) {
+    W_DEBUG();
+
+    if (dst->m_prev.isset()) {
+      W_DEBUG();
+      printf("dst->m_prev = %p\n", (void*)dst->m_prev.unwrap());
+      dst->m_prev->m_next = src;
+    }
+
+    if (dst->m_next.isset()) {
+      W_DEBUG();
+      dst->m_next->m_prev = src;
+    }
+
+    src->m_prev = dst->m_prev;
+    src->m_next = dst->m_next;
+
+    W_DEBUG();
+  }
+
+  /// TODO: Handle chunk splicing
+}
+
+static void insert_chunk(NullableRefPtr<Chunk> list, NullableRefPtr<Chunk> new_node) {
+  /// TODO:
+}
+
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
     -> Nullable<View<u8>> {
   W_DEBUG();
 
   for (NullableRefPtr<Chunk> node = m_some; node.isset(); node = node->m_next) {
-    const auto unaligned_range = as_unaligned_range(node);
-    const auto aligned_range = as_aligned_range(unaligned_range, align);
+    const auto unaligned_range = get_unaligned_range(node);
+    const auto aligned_range = get_aligned_range(unaligned_range, align);
     if (size > aligned_range.size()) {
       W_DEBUG();
       continue;
     }
 
-    const auto adjecent_range = seperate_range(aligned_range, size.unwrap());
-
-    if (adjecent_range.isset()) {
-      W_DEBUG();
-
-      if (node->m_prev.isset()) {
-        W_DEBUG();
-        printf("node->m_prev = %p\n", (void*)node->m_prev.unwrap());
-        node->m_prev->m_next = adjecent_range;
-      }
-
-      if (node->m_next.isset()) {
-        W_DEBUG();
-        node->m_next->m_prev = adjecent_range;
-      }
-
-      adjecent_range->m_prev = node->m_prev;
-      adjecent_range->m_next = node->m_next;
-
-      W_DEBUG();
-    }
-
-    W_DEBUG();
-
-    if (node->m_prev.isset()) {
-      W_DEBUG();
-      node->m_prev->m_next = node->m_next;
-    }
-
-    if (node->m_next.isset()) {
-      W_DEBUG();
-      node->m_next->m_prev = node->m_prev;
-    }
-
-    W_DEBUG();
-
-    /// TODO: Handle chunk splitting
+    const auto new_chunk = seperate_range(aligned_range, size.unwrap());
+    splice_and_remove_chunk(node, new_chunk);
 
     auto object_range = aligned_range.subview_unchecked(0, size.unwrap());
     assert_invariant(object_range.into_ptr().is_aligned(align) && object_range.size() >= size);
-
-    W_DEBUG();
 
     return object_range;
   }
@@ -177,19 +168,17 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
-  W_DEBUG();
-
-  auto chunk_range = ptr.subview_unchecked(0, sizeof(Chunk));
+  const auto aligned_range = ptr.subview_unchecked(0, sizeof(Chunk));
   assert_invariant(ptr.into_ptr().is_aligned(alignof(Chunk)));
 
-  auto* chunk = reinterpret_cast<Chunk*>(chunk_range.into_ptr().unwrap());
+  auto* chunk = reinterpret_cast<Chunk*>(aligned_range.into_ptr().unwrap());
 
   if (m_some.isset()) {
     W_DEBUG();
 
-    always_assert(false && "Not implemented");
+    chunk->m_size = ptr.size();
+    insert_chunk(m_some, chunk);
 
-    /// TODO: Insert node
   } else {
     W_DEBUG();
 
