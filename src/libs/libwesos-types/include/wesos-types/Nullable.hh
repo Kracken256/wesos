@@ -19,6 +19,7 @@ namespace wesos::types {
       ValueGeneric m_obj;
 
       constexpr Payload() : m_placeholder{} {}
+      constexpr ~Payload(){};
     } m_value;
     bool m_isset = false;
 
