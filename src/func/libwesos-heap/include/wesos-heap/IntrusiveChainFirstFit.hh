@@ -12,12 +12,14 @@
 
 namespace wesos::heap {
   class IntrusiveChainFirstFit final : public HeapProtocol {
+  public:
     struct Chunk {
       Least<usize, 1> m_size;
       NullableRefPtr<Chunk> m_next;
       NullableRefPtr<Chunk> m_prev;
     };
 
+  private:
     NullableRefPtr<Chunk> m_some;
     View<u8> m_initial_pool;
 
