@@ -29,12 +29,12 @@ namespace wesos::mem {
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
 
   protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
+    [[nodiscard, gnu::pure]] auto virt_allocate_bytes(Least<usize, 0> size, PowerOfTwo<usize> align)
         -> Nullable<View<u8>> override;
 
-    void virt_deallocate(View<u8> ptr) override;
+    void virt_deallocate_bytes(View<u8> ptr) override;
 
-    auto virt_utilize(View<u8> pool) -> LeftoverMemory override;
+    auto virt_utilize_bytes(View<u8> pool) -> LeftoverMemory override;
 
     void virt_anew() override;
 

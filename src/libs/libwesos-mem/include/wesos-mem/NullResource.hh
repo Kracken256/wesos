@@ -13,16 +13,16 @@
 namespace wesos::mem {
   class NullResource final : public MemoryResourceProtocol {
   protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
+    [[nodiscard, gnu::pure]] auto virt_allocate_bytes(Least<usize, 0> size, PowerOfTwo<usize> align)
         -> Nullable<View<u8>> override {
       (void)size;
       (void)align;
       return nullptr;
     };
 
-    void virt_deallocate(View<u8> ptr) override { (void)ptr; };
+    void virt_deallocate_bytes(View<u8> ptr) override { (void)ptr; };
 
-    auto virt_utilize(View<u8> pool) -> LeftoverMemory override { return {{pool}, {}}; };
+    auto virt_utilize_bytes(View<u8> pool) -> LeftoverMemory override { return {{pool}, {}}; };
 
     void virt_anew() override {}
 

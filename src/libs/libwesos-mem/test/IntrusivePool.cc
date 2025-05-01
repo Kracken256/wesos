@@ -71,7 +71,7 @@ TEST(IntrusivePool, Allocate) {
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -90,7 +90,7 @@ TEST(IntrusivePool, Allocate) {
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -105,14 +105,14 @@ TEST(IntrusivePool, Allocate) {
       // Release all allocated pool objects
       for (const auto& ptr : pointers) {
         // we should be able to mix sync and nosync methods
-        mm.deallocate(ptr);
+        mm.deallocate_bytes(ptr);
       }
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";

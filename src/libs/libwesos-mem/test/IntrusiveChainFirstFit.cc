@@ -66,7 +66,7 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = mm.allocate_nosync(size, align);
+        auto ptr = mm.allocate_bytes_nosync(size, align);
         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
         EXPECT_FALSE(first_unique_ptr_set.contains(ptr));
@@ -81,7 +81,7 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = mm.allocate_nosync(size, align);
+        auto ptr = mm.allocate_bytes_nosync(size, align);
         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
         EXPECT_FALSE(second_unique_ptr_set.contains(ptr));

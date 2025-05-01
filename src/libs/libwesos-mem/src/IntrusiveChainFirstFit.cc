@@ -31,7 +31,7 @@ using Chunk = IntrusiveChainFirstFit::Chunk;
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool)
     : m_some(nullptr), m_initial_pool(pool) {
-  virt_utilize(pool);
+  virt_utilize_bytes(pool);
 }
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(IntrusiveChainFirstFit&& o)
@@ -152,8 +152,8 @@ static void insert_chunk(NullableRefPtr<Chunk> list, NullableRefPtr<Chunk> new_n
   /// TODO: Develop
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
-    -> Nullable<View<u8>> {
+SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate_bytes(
+    Least<usize, 0> size, PowerOfTwo<usize> align) -> Nullable<View<u8>> {
   /// TODO: Audit code
 
   W_DEBUG();
@@ -180,7 +180,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
   return nullptr;
 }
 
-SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
+SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate_bytes(View<u8> ptr) {
   /// TODO: Audit code
 
   /// TODO: Merge adjacent blocks
@@ -208,17 +208,17 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
   W_DEBUG();
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::virt_utilize(View<u8> pool) -> LeftoverMemory {
+SYM_EXPORT auto IntrusiveChainFirstFit::virt_utilize_bytes(View<u8> pool) -> LeftoverMemory {
   if (pool.size() < sizeof(Chunk)) [[unlikely]] {
     return {{pool}, {}};
   }
 
-  virt_deallocate(pool);
+  virt_deallocate_bytes(pool);
 
   return {};
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_anew() {
   m_some = nullptr;
-  virt_utilize(m_initial_pool);
+  virt_utilize_bytes(m_initial_pool);
 }

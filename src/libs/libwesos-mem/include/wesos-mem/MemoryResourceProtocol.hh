@@ -26,33 +26,34 @@ namespace wesos::mem {
     /// UNLOCKED THREAD-UNSAFE ACCESS
     ///===========================================================================================
 
-    [[nodiscard, gnu::pure]] auto allocate_nosync(Least<usize, 0> size, PowerOfTwo<usize> align,
-                                                  bool zero_memory = true) -> Nullable<View<u8>>;
+    [[nodiscard, gnu::pure]] auto allocate_bytes_nosync(
+        Least<usize, 0> size, PowerOfTwo<usize> align,
+        bool zero_memory = true) -> Nullable<View<u8>>;
 
-    void deallocate_nosync(Nullable<View<u8>> ptr);
+    void deallocate_bytes_nosync(Nullable<View<u8>> ptr);
 
-    auto utilize_nosync(View<u8> pool) -> LeftoverMemory;
+    auto utilize_bytes_nosync(View<u8> pool) -> LeftoverMemory;
 
     ///===========================================================================================
     /// INTERNALLY LOCKED THREAD-SAFE ACCESS
     ///===========================================================================================
 
-    [[nodiscard, gnu::pure]] auto allocate(Least<usize, 0> size, PowerOfTwo<usize> align,
-                                           bool zero_memory = true) -> Nullable<View<u8>>;
+    [[nodiscard, gnu::pure]] auto allocate_bytes(Least<usize, 0> size, PowerOfTwo<usize> align,
+                                                 bool zero_memory = true) -> Nullable<View<u8>>;
 
-    void deallocate(Nullable<View<u8>> ptr);
+    void deallocate_bytes(Nullable<View<u8>> ptr);
 
-    auto utilize(View<u8> pool) -> LeftoverMemory;
+    auto utilize_bytes(View<u8> pool) -> LeftoverMemory;
 
     void anew();
 
   protected:
-    [[nodiscard, gnu::pure]] virtual auto virt_allocate(
+    [[nodiscard, gnu::pure]] virtual auto virt_allocate_bytes(
         Least<usize, 0> size, PowerOfTwo<usize> align) -> Nullable<View<u8>> = 0;
 
-    virtual void virt_deallocate(View<u8> ptr) = 0;
+    virtual void virt_deallocate_bytes(View<u8> ptr) = 0;
 
-    virtual auto virt_utilize(View<u8> pool) -> LeftoverMemory = 0;
+    virtual auto virt_utilize_bytes(View<u8> pool) -> LeftoverMemory = 0;
 
     virtual void virt_anew() = 0;
   };

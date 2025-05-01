@@ -25,10 +25,11 @@ namespace wesos::mem::testing {
     };
   }  // namespace detail
 
-  using AllocateFunc =
-      detail::ZeroCostDelegate<MemoryResourceProtocol, decltype(&MemoryResourceProtocol::allocate)>;
-  using DeallocateFunc = detail::ZeroCostDelegate<MemoryResourceProtocol,
-                                                  decltype(&MemoryResourceProtocol::deallocate)>;
+  using AllocateFunc = detail::ZeroCostDelegate<MemoryResourceProtocol,
+                                                decltype(&MemoryResourceProtocol::allocate_bytes)>;
+  using DeallocateFunc =
+      detail::ZeroCostDelegate<MemoryResourceProtocol,
+                               decltype(&MemoryResourceProtocol::deallocate_bytes)>;
 
   static void benchmark_crunch(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
                                const BenchmarkOptions& options, usize& alloc_count) {
@@ -51,17 +52,17 @@ void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool s
                                               BenchmarkOptions options, usize& alloc_count) {
   const auto allocate = [&]() {
     if (sync) {
-      return AllocateFunc(mm, &MemoryResourceProtocol::allocate);
+      return AllocateFunc(mm, &MemoryResourceProtocol::allocate_bytes);
     } else {
-      return AllocateFunc(mm, &MemoryResourceProtocol::allocate_nosync);
+      return AllocateFunc(mm, &MemoryResourceProtocol::allocate_bytes_nosync);
     }
   }();
 
   const auto deallocate = [&]() {
     if (sync) {
-      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate);
+      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_bytes);
     } else {
-      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_nosync);
+      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_bytes_nosync);
     }
   }();
 

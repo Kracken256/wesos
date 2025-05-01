@@ -18,7 +18,7 @@ SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize
       m_object_size(object_size),
       m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
       m_initial_pool(pool) {
-  virt_utilize(pool);
+  virt_utilize_bytes(pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -45,8 +45,8 @@ SYM_EXPORT auto IntrusivePool::operator=(IntrusivePool&& o) -> IntrusivePool& {
   return *this;
 }
 
-SYM_EXPORT auto IntrusivePool::virt_allocate(Least<usize, 0> size,
-                                             PowerOfTwo<usize> align) -> Nullable<View<u8>> {
+SYM_EXPORT auto IntrusivePool::virt_allocate_bytes(Least<usize, 0> size,
+                                                   PowerOfTwo<usize> align) -> Nullable<View<u8>> {
   if (!m_front.isset() || size > object_size() || align > object_align()) [[unlikely]] {
     return nullptr;
   }
@@ -61,7 +61,7 @@ SYM_EXPORT auto IntrusivePool::virt_allocate(Least<usize, 0> size,
   return space_range;
 }
 
-SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
+SYM_EXPORT void IntrusivePool::virt_deallocate_bytes(View<u8> ptr) {
   assert_invariant(ptr.size() == object_size());
 
   const auto node_view = ptr.subview_unchecked(0, sizeof(FreeNode));
@@ -73,7 +73,7 @@ SYM_EXPORT void IntrusivePool::virt_deallocate(View<u8> ptr) {
   m_front = node;
 }
 
-SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
+SYM_EXPORT auto IntrusivePool::virt_utilize_bytes(View<u8> pool) -> LeftoverMemory {
   if (pool.empty()) [[unlikely]] {
     return {{pool}, {}};
   }
@@ -95,7 +95,7 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
       const auto object_range = remaining.subview_unchecked(0, object_size());
 
       // Wierd, but it works..
-      virt_deallocate(object_range);
+      virt_deallocate_bytes(object_range);
 
       remaining = remaining.subview_unchecked(object_size());
     };
@@ -111,5 +111,5 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
 
 SYM_EXPORT void IntrusivePool::virt_anew() {
   m_front = nullptr;
-  virt_utilize(m_initial_pool);
+  virt_utilize_bytes(m_initial_pool);
 }
