@@ -183,6 +183,8 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
 SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
   /// TODO: Audit code
 
+  /// TODO: Merge adjacent blocks
+
   const auto aligned_range = ptr.subview_unchecked(0, sizeof(Chunk));
   assert_invariant(ptr.into_ptr().is_aligned(alignof(Chunk)));
 
