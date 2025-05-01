@@ -29,28 +29,31 @@ static void debug_s(const char* func, int line) {
 
 using Chunk = IntrusiveChainFirstFit::Chunk;
 
-SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) : m_initial_pool(pool) {
+SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool)
+    : m_some(nullptr), m_initial_pool(pool) {
   virt_utilize(pool);
 }
 
 SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(IntrusiveChainFirstFit&& o)
-    : m_some(o.m_some) {
-  // Any allocations from the source will fail after a move.
-
+    : m_some(o.m_some), m_initial_pool(o.m_initial_pool) {
   o.m_some = nullptr;
+  o.m_initial_pool.clear();
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
     -> IntrusiveChainFirstFit& {
-  // Any allocations from the source will fail after a move.
-
   m_some = o.m_some;
+  m_initial_pool = o.m_initial_pool;
+
   o.m_some = nullptr;
+  o.m_initial_pool.clear();
 
   return *this;
 }
 
 static auto get_unaligned_range(NullableRefPtr<Chunk> node) -> View<u8> {
+  /// TODO: Audit code
+
   W_DEBUG();
 
   auto* unaligned_ptr = reinterpret_cast<u8*>(node.unwrap());
@@ -63,6 +66,8 @@ static auto get_unaligned_range(NullableRefPtr<Chunk> node) -> View<u8> {
 }
 
 static auto get_aligned_range(View<u8> unaligned_range, usize align) -> View<u8> {
+  /// TODO: Audit code
+
   W_DEBUG();
 
   auto padding = unaligned_range.into_ptr().align_pow2(align).into_uptr() -
@@ -84,6 +89,8 @@ static auto get_aligned_range(View<u8> unaligned_range, usize align) -> View<u8>
 }
 
 static auto seperate_range(View<u8> aligned_range, usize size) -> NullableRefPtr<Chunk> {
+  /// TODO: Audit code
+
   W_DEBUG();
 
   auto range = aligned_range.subview_unchecked(size);
@@ -114,6 +121,8 @@ static auto seperate_range(View<u8> aligned_range, usize size) -> NullableRefPtr
 }
 
 static void splice_and_remove_chunk(NullableRefPtr<Chunk> dst, NullableRefPtr<Chunk> src) {
+  /// TODO: Audit code
+
   if (src.isset()) {
     W_DEBUG();
 
@@ -138,11 +147,15 @@ static void splice_and_remove_chunk(NullableRefPtr<Chunk> dst, NullableRefPtr<Ch
 }
 
 static void insert_chunk(NullableRefPtr<Chunk> list, NullableRefPtr<Chunk> new_node) {
-  /// TODO:
+  /// TODO: Audit code
+
+  /// TODO: Develop
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, PowerOfTwo<usize> align)
     -> Nullable<View<u8>> {
+  /// TODO: Audit code
+
   W_DEBUG();
 
   for (NullableRefPtr<Chunk> node = m_some; node.isset(); node = node->m_next) {
@@ -168,6 +181,8 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_allocate(Least<usize, 0> size, Powe
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
+  /// TODO: Audit code
+
   const auto aligned_range = ptr.subview_unchecked(0, sizeof(Chunk));
   assert_invariant(ptr.into_ptr().is_aligned(alignof(Chunk)));
 
@@ -178,7 +193,6 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_deallocate(View<u8> ptr) {
 
     chunk->m_size = ptr.size();
     insert_chunk(m_some, chunk);
-
   } else {
     W_DEBUG();
 
