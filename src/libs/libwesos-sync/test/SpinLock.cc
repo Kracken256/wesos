@@ -9,6 +9,6 @@
 
 #include <wesos-sync/Atomic.hh>
 
-/// TODO: How the fuck am I going to test a spin lock?
-
-TEST(Something, Idk) {}
+TEST(SpinLock, NotATest) {
+  /// FIXME: Write SpinLock functional test
+}

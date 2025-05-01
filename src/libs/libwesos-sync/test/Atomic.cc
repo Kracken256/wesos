@@ -9,4 +9,6 @@
 
 #include <wesos-sync/Atomic.hh>
 
-/// TODO: How the fuck am I going to test an Atomic container?
+TEST(Atomic, NotATest) {
+  /// FIXME: Write Atomic<> functional test
+}
