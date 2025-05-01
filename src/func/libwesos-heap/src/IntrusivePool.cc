@@ -6,6 +6,7 @@
  */
 
 #include <wesos-builtin/Export.hh>
+#include <wesos-builtin/Range.hh>
 #include <wesos-heap/IntrusivePool.hh>
 
 using namespace wesos;
@@ -13,7 +14,9 @@ using namespace wesos::heap;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
                                         View<u8> pool)
-    : m_object_size(object_size), m_object_align(object_align), m_initial_pool(pool) {
+    : m_object_size(object_size),
+      m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
+      m_initial_pool(pool) {
   virt_utilize(pool);
 }
 
@@ -72,18 +75,16 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
   View<u8> window = pool;
 
   {
-    usize unusable_amount;
+    usize padding;
 
     while (true) {
-      unusable_amount = window.into_ptr()
-                            .align_pow2(m_object_align)
-                            .sub(window.into_ptr().into_uptr())
-                            .into_uptr();
-      if (window.size() < unusable_amount + m_object_size) {
+      padding = window.into_ptr().align_pow2(m_object_align).into_uptr() -  //
+                window.into_ptr().into_uptr();
+      if (window.size() < padding + m_object_size) {
         break;
       }
 
-      window = window.subview_unchecked(unusable_amount);
+      window = window.subview_unchecked(padding);
       assert_invariant(window.into_ptr().is_aligned(m_object_align));
       assert_invariant(window.size() >= m_object_size);
 
@@ -96,9 +97,9 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> LeftoverMemory {
     };
   }
 
-  const auto initial_unusable_prefix =
-      pool.into_ptr().align_pow2(m_object_align).sub(pool.into_ptr().into_uptr()).into_uptr();
-  const auto beginning_unused = pool.subview_unchecked(0, initial_unusable_prefix);
+  const auto initial_padding = pool.into_ptr().align_pow2(m_object_align).into_uptr() -  //
+                               pool.into_ptr().into_uptr();
+  const auto beginning_unused = pool.subview_unchecked(0, initial_padding);
   const auto end_unused = window;
 
   LeftoverMemory unused;

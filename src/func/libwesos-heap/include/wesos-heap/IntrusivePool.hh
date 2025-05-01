@@ -48,5 +48,8 @@ namespace wesos::heap {
     ~IntrusivePool() override = default;
 
     [[nodiscard]] constexpr auto operator<=>(const IntrusivePool&) const = default;
+
+    [[nodiscard]] static constexpr auto minimum_size() { return sizeof(FreeNode); }
+    [[nodiscard]] static constexpr auto minimum_alignment() { return alignof(FreeNode); }
   };
 }  // namespace wesos::heap

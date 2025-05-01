@@ -46,15 +46,18 @@ TEST(IntrusivePool, Allocate) {
                   << std::endl;
       });
 
-  constexpr auto prime_size_limit = 8193;
-  constexpr auto align_limit = 129;
+  const auto min_size = 16;
+  const auto max_size = 257;
+  const PowerOfTwo<usize> min_align = heap::IntrusivePool::minimum_alignment();
+  const PowerOfTwo<usize> max_align = 64;
+
   constexpr auto alloc_limit = 9;
 
   std::pmr::polymorphic_allocator<u8> service;
   std::unordered_set<Nullable<View<u8>>, Hash> pointers;
 
-  for (usize size = sizeof(void*); size < prime_size_limit; size++) {
-    for (usize align = 1; align < align_limit; align *= 2) {
+  for (usize size = min_size; size < max_size; size++) {
+    for (usize align = min_align; align < max_align; align *= 2) {
       const auto space_per_object = ((size + align - 1) & -align);
       const auto exact_buffer_size = space_per_object * alloc_limit;
 
@@ -121,7 +124,7 @@ TEST(IntrusivePool, Allocate) {
         EXPECT_EQ(pointers, expected_objects);
       }
 
-      service.deallocate_bytes(buf, exact_buffer_size);
+      service.deallocate_bytes(buf, exact_buffer_size, align);
     }
   }
 }
