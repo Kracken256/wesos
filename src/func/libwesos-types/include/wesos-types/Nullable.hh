@@ -88,22 +88,22 @@ namespace wesos::types {
     [[nodiscard]] constexpr operator bool() { return isset(); }
 
     [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& {
-      always_assert(isset(), "nullable is null");
+      always_assert(isset());
       return get();
     }
 
     [[nodiscard]] constexpr auto unwrap_unchecked() const -> const ValueGeneric& {
-      assert_invariant(isset(), "nullable is null");
+      assert_invariant(isset());
       return get();
     }
 
     [[nodiscard]] constexpr auto unwrap() -> ValueGeneric& {
-      always_assert(isset(), "nullable is null");
+      always_assert(isset());
       return get();
     }
 
     [[nodiscard]] constexpr auto unwrap_unchecked() -> ValueGeneric& {
-      assert_invariant(isset(), "nullable is null");
+      assert_invariant(isset());
       return get();
     }
 

@@ -25,9 +25,18 @@ TEST(IntrusiveChainFirstFit, CreatePool) {
 TEST(IntrusiveChainFirstFit, Allocate) {
   using namespace wesos;
 
-  assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  wesos::assert::register_output_callback(
+      nullptr,
+      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+        std::cerr << "\n==========================================================================="
+                     "===========\n"
+                  << "| Assertion Failed: \"" << message << "\";\n"
+                  << "| Function: [" << func_name << "]: " << line << ";\n"
+                  << "| File: \"" << file_name << "\";\n"
+                  << "============================================================================="
+                     "=========\n"
+                  << std::endl;
+      });
 
   struct Hash {
     constexpr auto operator()(const Nullable<View<u8>>& x) const -> size_t {

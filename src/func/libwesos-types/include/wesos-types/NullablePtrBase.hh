@@ -50,52 +50,52 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto get() const -> UnwrappedGeneric {
-      always_assert(isset(), "Unwrapping a null pointer");
+      always_assert(isset());
       return m_ptr;
     }
 
     [[nodiscard]] constexpr auto get_unchecked() const -> UnwrappedGeneric {
-      assert_invariant(isset(), "Unwrapping a null pointer");
+      assert_invariant(isset());
       return m_ptr;
     }
 
     [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* {
-      assert_invariant(isset(), "Dereferencing a null pointer");
+      assert_invariant(isset());
       return m_ptr;
     }
 
     [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& {
-      assert_invariant(isset(), "Dereferencing a null pointer");
+      assert_invariant(isset());
       return *m_ptr;
     }
 
     [[nodiscard]] constexpr auto add(usize i) const -> ChildGeneric {
-      assert_invariant(isset(), "Adding to a null pointer");
+      assert_invariant(isset());
       return unwrap() + i;
     }
 
     [[nodiscard]] constexpr auto sub(usize i) const -> ChildGeneric {
-      assert_invariant(isset(), "Subtracting from a null pointer");
+      assert_invariant(isset());
       return unwrap() - i;
     }
 
     [[nodiscard]] constexpr auto operator++() const -> ChildGeneric {
-      assert_invariant(isset(), "Incrementing a null pointer");
+      assert_invariant(isset());
       return unwrap() + 1;
     }
 
     [[nodiscard]] constexpr auto operator--() const -> ChildGeneric {
-      assert_invariant(isset(), "Decrementing a null pointer");
+      assert_invariant(isset());
       return unwrap() - 1;
     }
 
     [[nodiscard]] constexpr auto operator++(int) const -> ChildGeneric {
-      assert_invariant(isset(), "Incrementing a null pointer");
+      assert_invariant(isset());
       return unwrap() + 1;
     }
 
     [[nodiscard]] constexpr auto operator--(int) const -> ChildGeneric {
-      assert_invariant(isset(), "Decrementing a null pointer");
+      assert_invariant(isset());
       return unwrap() - 1;
     }
   };

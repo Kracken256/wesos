@@ -31,22 +31,22 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto empty() const -> bool { return length() == 0; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
-      always_assert(i < length(), "out of bounds");
+      always_assert(i < length());
       return m_data[i];
     }
 
     [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
-      assert_invariant(i < length(), "out of bounds");
+      assert_invariant(i < length());
       return m_data[i];
     }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
-      always_assert(i < length(), "out of bounds");
+      always_assert(i < length());
       return m_data[i];
     }
 
     [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& {
-      assert_invariant(i < length(), "out of bounds");
+      assert_invariant(i < length());
       return m_data[i];
     }
 
@@ -83,12 +83,12 @@ namespace wesos::types {
     ///=========================================================================
 
     constexpr void set(usize i, ElementGeneric value) {
-      always_assert(i < length(), "out of bounds");
+      always_assert(i < length());
       m_data[i] = move(value);
     }
 
     constexpr void set_unchecked(usize i, ElementGeneric value) {
-      assert_invariant(i < length(), "out of bounds");
+      assert_invariant(i < length());
       m_data[i] = move(value);
     }
 

@@ -33,9 +33,18 @@ TEST(IntrusivePool, Allocate) {
     }
   };
 
-  wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  wesos::assert::register_output_callback(
+      nullptr,
+      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+        std::cerr << "\n==========================================================================="
+                     "===========\n"
+                  << "| Assertion Failed: \"" << message << "\";\n"
+                  << "| Function: [" << func_name << "]: " << line << ";\n"
+                  << "| File: \"" << file_name << "\";\n"
+                  << "============================================================================="
+                     "=========\n"
+                  << std::endl;
+      });
 
   constexpr auto prime_size_limit = 8193;
   constexpr auto align_limit = 129;

@@ -19,9 +19,18 @@ using namespace wesos::heap::testing;
 using ClampedAlign = ClampMost<PowerOfTwo<usize>, 16ULL>;
 
 static void deps_setup() {
-  assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  wesos::assert::register_output_callback(
+      nullptr,
+      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+        std::cerr << "\n==========================================================================="
+                     "===========\n"
+                  << "| Assertion Failed: \"" << message << "\";\n"
+                  << "| Function: [" << func_name << "]: " << line << ";\n"
+                  << "| File: \"" << file_name << "\";\n"
+                  << "============================================================================="
+                     "=========\n"
+                  << std::endl;
+      });
 }
 
 static void BM_IntrusiveChainFirstFit_Evo_Creation(benchmark::State& state) {

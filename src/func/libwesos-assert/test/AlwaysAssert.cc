@@ -10,13 +10,22 @@
 #include <wesos-assert/Assert.hh>
 
 TEST(always_assert, call) {
-  wesos::assert::register_output_callback(nullptr, [](void*, const char* message) {
-    std::cerr << "Assertion failed: " << message << std::endl;
-  });
+  wesos::assert::register_output_callback(
+      nullptr,
+      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+        std::cerr << "\n==========================================================================="
+                     "===========\n"
+                  << "| Assertion Failed: \"" << message << "\";\n"
+                  << "| Function: [" << func_name << "]: " << line << ";\n"
+                  << "| File: \"" << file_name << "\";\n"
+                  << "============================================================================="
+                     "=========\n"
+                  << std::endl;
+      });
 
   // Test that always_assert does not abort when the condition is true
-  EXPECT_NO_FATAL_FAILURE(wesos::always_assert(true, "This should not fail"));
+  EXPECT_NO_FATAL_FAILURE(always_assert(true && "This should not fail"));
 
   // Test that always_assert aborts when the condition is false
-  EXPECT_DEATH(wesos::always_assert(false, "This should fail"), "This should fail");
+  EXPECT_DEATH(always_assert(false && "This should fail"), "This should fail");
 }
