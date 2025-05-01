@@ -7,10 +7,10 @@
 
 #include <wesos-builtin/Export.hh>
 #include <wesos-builtin/Range.hh>
-#include <wesos-heap/IntrusivePool.hh>
+#include <wesos-mem/IntrusivePool.hh>
 
 using namespace wesos;
-using namespace wesos::heap;
+using namespace wesos::mem;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
                                         View<u8> pool)

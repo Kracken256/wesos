@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <wesos-heap/HeapProtocol.hh>
+#include <wesos-mem/MemoryResourceProtocol.hh>
 #include <wesos-types/Types.hh>
 
-namespace wesos::heap {
-  class IntrusiveChainBestFit final : public HeapProtocol {
+namespace wesos::mem {
+  class IntrusiveChainBestFit final : public MemoryResourceProtocol {
     struct Chunk {
       Least<usize, 1> m_size;
       NullableRefPtr<Chunk> m_next;
@@ -40,4 +40,4 @@ namespace wesos::heap {
 
     [[nodiscard]] constexpr auto operator<=>(const IntrusiveChainBestFit&) const = default;
   };
-}  // namespace wesos::heap
+}  // namespace wesos::mem

@@ -8,13 +8,13 @@
 #include <benchmark/benchmark.h>
 
 #include <iostream>
-#include <wesos-heap/IntrusivePool.hh>
+#include <wesos-mem/IntrusivePool.hh>
 
 #include "UnifiedBenchmark.hh"
 
 using namespace wesos;
-using namespace wesos::heap;
-using namespace wesos::heap::testing;
+using namespace wesos::mem;
+using namespace wesos::mem::testing;
 
 using ClampedAlign = ClampMost<PowerOfTwo<usize>, 4096ULL>;
 

@@ -10,7 +10,7 @@
 #include <iostream>
 #include <memory_resource>
 #include <unordered_set>
-#include <wesos-heap/IntrusivePool.hh>
+#include <wesos-mem/IntrusivePool.hh>
 
 TEST(IntrusivePool, CreatePool) {
   using namespace wesos;
@@ -20,7 +20,7 @@ TEST(IntrusivePool, CreatePool) {
   std::vector<u8> buf(buffer_size);
   View<u8> pool(buf.data(), buf.size());
 
-  auto heap = heap::IntrusivePool(sizeof(int), alignof(int), pool);
+  auto mm = mem::IntrusivePool(sizeof(int), alignof(int), pool);
 }
 
 TEST(IntrusivePool, Allocate) {
@@ -48,7 +48,7 @@ TEST(IntrusivePool, Allocate) {
 
   const auto min_size = 16;
   const auto max_size = 257;
-  const PowerOfTwo<usize> min_align = heap::IntrusivePool::minimum_alignment();
+  const PowerOfTwo<usize> min_align = mem::IntrusivePool::minimum_alignment();
   const PowerOfTwo<usize> max_align = 64;
 
   constexpr auto alloc_limit = 9;
@@ -65,13 +65,13 @@ TEST(IntrusivePool, Allocate) {
       ASSERT_NE(buf, nullptr);
 
       auto buf_view = View<u8>(buf, exact_buffer_size);
-      auto heap = heap::IntrusivePool(size, align, buf_view);
+      auto mm = mem::IntrusivePool(size, align, buf_view);
 
       {  // Use all avaiable memory in pool
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -84,13 +84,13 @@ TEST(IntrusivePool, Allocate) {
       auto expected_objects = pointers;
 
       // Release all allocated pool objects
-      heap.anew();
+      mm.anew();
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -105,14 +105,14 @@ TEST(IntrusivePool, Allocate) {
       // Release all allocated pool objects
       for (const auto& ptr : pointers) {
         // we should be able to mix sync and nosync methods
-        heap.deallocate(ptr);
+        mm.deallocate(ptr);
       }
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = heap.allocate_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_nosync(size, align, false);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";

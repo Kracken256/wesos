@@ -7,7 +7,7 @@
 
 #include "UnifiedBenchmark.hh"
 
-namespace wesos::heap::testing {
+namespace wesos::mem::testing {
   namespace detail {
     template <class ClassGeneric, class MethodGeneric>
     class ZeroCostDelegate final {
@@ -25,9 +25,10 @@ namespace wesos::heap::testing {
     };
   }  // namespace detail
 
-  using AllocateFunc = detail::ZeroCostDelegate<HeapProtocol, decltype(&HeapProtocol::allocate)>;
-  using DeallocateFunc =
-      detail::ZeroCostDelegate<HeapProtocol, decltype(&HeapProtocol::deallocate)>;
+  using AllocateFunc =
+      detail::ZeroCostDelegate<MemoryResourceProtocol, decltype(&MemoryResourceProtocol::allocate)>;
+  using DeallocateFunc = detail::ZeroCostDelegate<MemoryResourceProtocol,
+                                                  decltype(&MemoryResourceProtocol::deallocate)>;
 
   static void benchmark_crunch(const AllocateFunc& allocate, const DeallocateFunc& deallocate,
                                const BenchmarkOptions& options, usize& alloc_count) {
@@ -44,23 +45,23 @@ namespace wesos::heap::testing {
     }
   }
 
-}  // namespace wesos::heap::testing
+}  // namespace wesos::mem::testing
 
-void wesos::heap::testing::allocator_benchmark(HeapProtocol& mm, bool sync,
-                                               BenchmarkOptions options, usize& alloc_count) {
+void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool sync,
+                                              BenchmarkOptions options, usize& alloc_count) {
   const auto allocate = [&]() {
     if (sync) {
-      return AllocateFunc(mm, &HeapProtocol::allocate);
+      return AllocateFunc(mm, &MemoryResourceProtocol::allocate);
     } else {
-      return AllocateFunc(mm, &HeapProtocol::allocate_nosync);
+      return AllocateFunc(mm, &MemoryResourceProtocol::allocate_nosync);
     }
   }();
 
   const auto deallocate = [&]() {
     if (sync) {
-      return DeallocateFunc(mm, &HeapProtocol::deallocate);
+      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate);
     } else {
-      return DeallocateFunc(mm, &HeapProtocol::deallocate_nosync);
+      return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_nosync);
     }
   }();
 

@@ -6,7 +6,7 @@ set(PROJECT_WIDE_LIBRARIES
   libwesos-assert
   libwesos-types
   libwesos-lambda
-  libwesos-heap
+  libwesos-mem
 )
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})

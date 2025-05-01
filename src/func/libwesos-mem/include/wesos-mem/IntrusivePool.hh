@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include <wesos-heap/HeapProtocol.hh>
+#include <wesos-mem/MemoryResourceProtocol.hh>
 #include <wesos-types/Types.hh>
 
-namespace wesos::heap {
-  class IntrusivePool final : public HeapProtocol {
+namespace wesos::mem {
+  class IntrusivePool final : public MemoryResourceProtocol {
     struct FreeNode {
       NullableRefPtr<FreeNode> m_next;
     };
@@ -52,4 +52,4 @@ namespace wesos::heap {
     [[nodiscard]] static constexpr auto minimum_size() { return sizeof(FreeNode); }
     [[nodiscard]] static constexpr auto minimum_alignment() { return alignof(FreeNode); }
   };
-}  // namespace wesos::heap
+}  // namespace wesos::mem

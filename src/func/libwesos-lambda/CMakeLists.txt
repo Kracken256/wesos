@@ -5,7 +5,7 @@ file(GLOB_RECURSE SOURCE_FILES "src/*.cc")
 
 add_library(wesos-lambda STATIC ${SOURCE_FILES})
 target_include_directories(wesos-lambda PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(wesos-lambda wesos-types wesos-builtin wesos-assert wesos-heap)
+target_link_libraries(wesos-lambda wesos-types wesos-builtin wesos-assert wesos-mem)
 install(TARGETS wesos-lambda)
 install(DIRECTORY "include/" DESTINATION "include")
 

@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <unordered_set>
-#include <wesos-heap/IntrusiveChainFirstFit.hh>
+#include <wesos-mem/IntrusiveChainFirstFit.hh>
 
 TEST(IntrusiveChainFirstFit, CreatePool) {
   using namespace wesos;
@@ -19,7 +19,7 @@ TEST(IntrusiveChainFirstFit, CreatePool) {
   std::vector<u8> buf(buffer_size);
   View<u8> pool(buf.data(), buf.size());
 
-  auto heap = heap::IntrusiveChainFirstFit(pool);
+  auto mm = mem::IntrusiveChainFirstFit(pool);
 }
 
 TEST(IntrusiveChainFirstFit, Allocate) {
@@ -51,12 +51,12 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   const PowerOfTwo<usize> max_align = 64;
 
   const auto max_space_per_alloc = ((max_size + max_align - 1) & -max_align);
-  const auto heap_size = max_space_per_alloc * ((max_size - min_size) * (max_align - min_align));
+  const auto mm_size = max_space_per_alloc * ((max_size - min_size) * (max_align - min_align));
 
-  auto storage = std::vector<u8>(heap_size);
+  auto storage = std::vector<u8>(mm_size);
   auto storage_view = View<u8>(storage.data(), storage.size());
 
-  auto heap = heap::IntrusiveChainFirstFit(storage_view);
+  auto mm = mem::IntrusiveChainFirstFit(storage_view);
 
   std::unordered_set<Nullable<View<u8>>, Hash> first_unique_ptr_set;
   std::unordered_set<Nullable<View<u8>>, Hash> second_unique_ptr_set;
@@ -66,7 +66,7 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = heap.allocate_nosync(size, align);
+        auto ptr = mm.allocate_nosync(size, align);
         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
         EXPECT_FALSE(first_unique_ptr_set.contains(ptr));
@@ -75,13 +75,13 @@ TEST(IntrusiveChainFirstFit, Allocate) {
       }
     }
 
-    heap.anew();
+    mm.anew();
   }
 
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = heap.allocate_nosync(size, align);
+        auto ptr = mm.allocate_nosync(size, align);
         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
         EXPECT_FALSE(second_unique_ptr_set.contains(ptr));
@@ -90,7 +90,7 @@ TEST(IntrusiveChainFirstFit, Allocate) {
       }
     }
 
-    heap.anew();
+    mm.anew();
   }
 
   {  // Ensure this data structure is determinstic

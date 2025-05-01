@@ -10,17 +10,17 @@
 #include <wesos-sync/SpinLock.hh>
 #include <wesos-types/Types.hh>
 
-namespace wesos::heap {
-  class HeapProtocol {
+namespace wesos::mem {
+  class MemoryResourceProtocol {
     sync::SpinLock m_mutex;
 
   public:
     using LeftoverMemoryView = Nullable<Unused<View<u8>>>;
     using LeftoverMemory = Pair<LeftoverMemoryView, LeftoverMemoryView>;
 
-    [[nodiscard]] constexpr auto operator<=>(const HeapProtocol&) const = default;
+    [[nodiscard]] constexpr auto operator<=>(const MemoryResourceProtocol&) const = default;
 
-    virtual ~HeapProtocol() = 0;
+    virtual ~MemoryResourceProtocol() = 0;
 
     ///===========================================================================================
     /// UNLOCKED THREAD-UNSAFE ACCESS
@@ -56,4 +56,4 @@ namespace wesos::heap {
 
     virtual void virt_anew() = 0;
   };
-}  // namespace wesos::heap
+}  // namespace wesos::mem

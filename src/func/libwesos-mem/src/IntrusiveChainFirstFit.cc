@@ -6,10 +6,10 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-heap/IntrusiveChainFirstFit.hh>
+#include <wesos-mem/IntrusiveChainFirstFit.hh>
 
 using namespace wesos;
-using namespace wesos::heap;
+using namespace wesos::mem;
 
 extern "C" {  /// TODO: Remove section
 struct FILE;

@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <wesos-heap/HeapProtocol.hh>
+#include <wesos-mem/MemoryResourceProtocol.hh>
 
-namespace wesos::heap::testing {
+namespace wesos::mem::testing {
   struct BenchmarkOptions {
     usize m_size_min, m_size_max;
     PowerOfTwo<usize> m_align_min, m_align_max;
@@ -21,6 +21,6 @@ namespace wesos::heap::testing {
           m_align_max(align_max) {}
   };
 
-  void allocator_benchmark(HeapProtocol& mm, bool sync, BenchmarkOptions options,
+  void allocator_benchmark(MemoryResourceProtocol& mm, bool sync, BenchmarkOptions options,
                            usize& alloc_count);
-}  // namespace wesos::heap::testing
+}  // namespace wesos::mem::testing
