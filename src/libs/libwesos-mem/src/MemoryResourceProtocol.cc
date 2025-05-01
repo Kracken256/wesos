@@ -19,6 +19,7 @@ SYM_EXPORT auto MemoryResourceProtocol::allocate_nosync(Least<usize, 0> size,
                                                         PowerOfTwo<usize> align,
                                                         bool zero_memory) -> Nullable<View<u8>> {
   auto slice_opt = virt_allocate(size, align);
+  assert_invariant(slice_opt.is_null() || slice_opt.unwrap_unchecked().size() == sizeof(size));
 
   if (slice_opt.isset() && zero_memory) {
     memset(slice_opt.unwrap_unchecked().into_ptr().unwrap(), 0, size);
