@@ -20,7 +20,7 @@ namespace wesos::heap {
     using ObjectSize = ClampLeast<usize, sizeof(FreeNode)>;
 
   private:
-    NullableRefPtr<FreeNode> m_freelist_head;
+    NullableRefPtr<FreeNode> m_front;
     ObjectSize m_object_size;
     PowerOfTwo<usize> m_object_align;
     View<u8> m_initial_pool;
