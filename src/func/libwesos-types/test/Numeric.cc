@@ -21,14 +21,14 @@ TEST(Number, min) {
   constexpr i64 i32_min = -0x80000000LL;                            // -2147483648
   constexpr i64 i64_min = static_cast<i64>(0x8000000000000000ULL);  // -9223372036854775808
 
-  EXPECT_EQ(wesos::min<u8>(), u8_min);
-  EXPECT_EQ(wesos::min<u16>(), u16_min);
-  EXPECT_EQ(wesos::min<u32>(), u32_min);
-  EXPECT_EQ(wesos::min<u64>(), u64_min);
-  EXPECT_EQ(wesos::min<i8>(), i8_min);
-  EXPECT_EQ(wesos::min<i16>(), i16_min);
-  EXPECT_EQ(wesos::min<i32>(), i32_min);
-  EXPECT_EQ(wesos::min<i64>(), i64_min);
+  EXPECT_EQ(wesos::numeric_limit_min<u8>(), u8_min);
+  EXPECT_EQ(wesos::numeric_limit_min<u16>(), u16_min);
+  EXPECT_EQ(wesos::numeric_limit_min<u32>(), u32_min);
+  EXPECT_EQ(wesos::numeric_limit_min<u64>(), u64_min);
+  EXPECT_EQ(wesos::numeric_limit_min<i8>(), i8_min);
+  EXPECT_EQ(wesos::numeric_limit_min<i16>(), i16_min);
+  EXPECT_EQ(wesos::numeric_limit_min<i32>(), i32_min);
+  EXPECT_EQ(wesos::numeric_limit_min<i64>(), i64_min);
 }
 
 TEST(Number, max) {
@@ -43,12 +43,12 @@ TEST(Number, max) {
   constexpr u64 i32_max = 0x7fffffff;
   constexpr u64 i64_max = 0x7fffffffffffffff;
 
-  EXPECT_EQ(wesos::max<u8>(), u8_max);
-  EXPECT_EQ(wesos::max<u16>(), u16_max);
-  EXPECT_EQ(wesos::max<u32>(), u32_max);
-  EXPECT_EQ(wesos::max<u64>(), u64_max);
-  EXPECT_EQ(wesos::max<i8>(), i8_max);
-  EXPECT_EQ(wesos::max<i16>(), i16_max);
-  EXPECT_EQ(wesos::max<i32>(), i32_max);
-  EXPECT_EQ(wesos::max<i64>(), i64_max);
+  EXPECT_EQ(wesos::numeric_limit_max<u8>(), u8_max);
+  EXPECT_EQ(wesos::numeric_limit_max<u16>(), u16_max);
+  EXPECT_EQ(wesos::numeric_limit_max<u32>(), u32_max);
+  EXPECT_EQ(wesos::numeric_limit_max<u64>(), u64_max);
+  EXPECT_EQ(wesos::numeric_limit_max<i8>(), i8_max);
+  EXPECT_EQ(wesos::numeric_limit_max<i16>(), i16_max);
+  EXPECT_EQ(wesos::numeric_limit_max<i32>(), i32_max);
+  EXPECT_EQ(wesos::numeric_limit_max<i64>(), i64_max);
 }

@@ -43,8 +43,8 @@ namespace wesos {
   using types::uptr;
   using types::usize;
 
-  using types::max;
-  using types::min;
+  using types::numeric_limit_max;
+  using types::numeric_limit_min;
 
   using types::null;
 

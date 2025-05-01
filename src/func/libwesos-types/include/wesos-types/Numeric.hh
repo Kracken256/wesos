@@ -111,7 +111,7 @@ namespace wesos::types {
   }
 
   template <class ValueGeneric>
-  [[nodiscard]] static constexpr auto max() -> u64 {
+  [[nodiscard]] static constexpr auto numeric_limit_max() -> u64 {
     using namespace detail;
 
     constexpr u64 u8_max = 0xff;
@@ -145,7 +145,7 @@ namespace wesos::types {
   }
 
   template <class ValueGeneric>
-  [[nodiscard]] static constexpr auto min() -> i64 {
+  [[nodiscard]] static constexpr auto numeric_limit_min() -> i64 {
     using namespace detail;
 
     constexpr i64 u8_min = 0;
