@@ -7,6 +7,7 @@ set(PROJECT_WIDE_LIBRARIES
   libwesos-types
   libwesos-lambda
   libwesos-mem
+  libwesos-smartptr
 )
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})
