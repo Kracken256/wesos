@@ -75,41 +75,29 @@ namespace wesos::mem::detail {
   class ChunkHeaderFormat final {
   public:
     static constexpr auto MAX_U8 = 0xff;
-    static constexpr auto MAX_ALIGN = 16;
 
     static_assert(sizeof(Chunk) - 1 <= MAX_U8);
-    static_assert(MAX_ALIGN - 1 <= MAX_U8);
 
     using BytesBeforeCount = Most<usize, MAX_U8>;
     using BytesAfterCount = Most<usize, MAX_U8>;
 
-    ChunkHeaderFormat(BitHeader& header) : m_header(header) {
-      ASAN_UNPOISON_MEMORY_REGION(&m_header, sizeof(BitHeader));
+    ChunkHeaderFormat(BitHeader& header) : m_meta(header) {
+      ASAN_UNPOISON_MEMORY_REGION(&m_meta, sizeof(BitHeader));
     }
 
-    ~ChunkHeaderFormat() {
-      //
-      ASAN_POISON_MEMORY_REGION(&m_header, sizeof(BitHeader));
-    }
+    ~ChunkHeaderFormat() { ASAN_POISON_MEMORY_REGION(&m_meta, sizeof(BitHeader)); }
 
-    [[nodiscard]] constexpr auto get_bytes_before() -> BytesBeforeCount {
-      return m_header.m_before;
-    }
+    [[nodiscard]] constexpr auto get_bytes_before() -> BytesBeforeCount { return m_meta.m_before; }
+    [[nodiscard]] constexpr auto get_bytes_after() -> BytesAfterCount { return m_meta.m_after; }
 
-    [[nodiscard]] constexpr auto get_bytes_after() -> BytesAfterCount { return m_header.m_after; }
-
-    constexpr void set_bytes_before(BytesBeforeCount x) {
-      m_header.m_before = static_cast<u8>(x.unwrap());
-    }
-    constexpr void set_bytes_after(BytesAfterCount x) {
-      m_header.m_after = static_cast<u8>(x.unwrap());
-    }
+    void set_bytes_before(BytesBeforeCount x) { m_meta.m_before = static_cast<u8>(x.unwrap()); }
+    void set_bytes_after(BytesAfterCount x) { m_meta.m_after = static_cast<u8>(x.unwrap()); }
 
   private:
-    BitHeader& m_header;
+    BitHeader& m_meta;
   };
 
-  static auto get_dealigned_range(View<u8> zone) -> View<u8> {
+  static auto get_dealigned_range(View<u8> zone) -> View<u8> {  /// TODO: Struct code review
     auto zone_begin = zone.into_ptr().get_unchecked();
     auto zone_end = zone_begin.add(zone.size());
 
@@ -133,7 +121,7 @@ namespace wesos::mem::detail {
 }  // namespace wesos::mem::detail
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<usize> align)
-    -> NullableOwnPtr<u8> {
+    -> NullableOwnPtr<u8> {  /// TODO: Struct code review
   using namespace detail;
 
   if (align > max_alignment()) [[unlikely]] {
@@ -212,8 +200,9 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
   return nullptr;
 }
 
-SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
-                                                           PowerOfTwo<usize> align) {
+SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(
+    OwnPtr<u8> ptr, usize size,
+    PowerOfTwo<usize> align) {  /// TODO: Struct code review
   using namespace detail;
 
   assert_invariant(ptr.is_aligned_pow2(align));
@@ -272,7 +261,8 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
   detail::print_freelist(m_some);
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
+SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool)
+    -> LeftoverMemory {  /// TODO: Struct code review
   using namespace detail;
 
   auto window = pool;
