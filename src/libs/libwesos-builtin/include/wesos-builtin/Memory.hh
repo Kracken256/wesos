@@ -8,5 +8,6 @@
 #pragma once
 
 extern "C" {
-auto memset(void*, int, unsigned long) -> void*;
+/// NOLINTBEGIN(readability-identifier-naming)
+/// NOLINTEND(readability-identifier-naming)
 }

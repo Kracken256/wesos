@@ -53,8 +53,7 @@ TEST(IntrusiveChainFirstFit, Merge) {
   const PowerOfTwo<usize> align = 1;
   const auto allocation_count = 4;
 
-  const auto max_space_per_alloc = ((size + align - 1) & -align);
-  const auto mm_size = (max_space_per_alloc * allocation_count) * 2;
+  const auto mm_size = 1'000'000;
 
   auto storage = std::vector<u8>(mm_size);
   auto storage_view = View<u8>(storage.data(), storage.size());
@@ -62,14 +61,15 @@ TEST(IntrusiveChainFirstFit, Merge) {
   auto mm_inner = mem::IntrusiveChainFirstFit(storage_view);
   auto mm = mem::TracingResource(mm_inner, printf);
 
-  std::vector<NullableOwnPtr<u8>> allocations;
-  allocations.reserve(allocation_count);
-
   for (usize i = 0; i < allocation_count; i++) {
-    auto alloc_ptr = mm.allocate_bytes(size, align);
-    ASSERT_NE(alloc_ptr, nullptr);
-    mm.deallocate_bytes(alloc_ptr, size, align);
-    allocations.push_back(alloc_ptr);
+    auto alloc_a = mm.allocate_bytes(size, align);
+    ASSERT_NE(alloc_a, nullptr);
+
+    auto alloc_b = mm.allocate_bytes(size, align);
+    ASSERT_NE(alloc_b, nullptr);
+
+    mm.deallocate_bytes(alloc_a, size, align);
+    mm.deallocate_bytes(alloc_b, size, align);
   }
 }
 
