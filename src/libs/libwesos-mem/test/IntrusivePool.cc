@@ -12,27 +12,7 @@
 #include <unordered_set>
 #include <wesos-mem/IntrusivePool.hh>
 
-TEST(IntrusivePool, CreatePool) {
-  using namespace wesos;
-
-  constexpr auto buffer_size = 4096;
-
-  std::vector<u8> buf(buffer_size);
-  View<u8> pool(buf.data(), buf.size());
-
-  auto mm = mem::IntrusivePool(sizeof(int), alignof(int), pool);
-}
-
-TEST(IntrusivePool, Allocate) {
-  using namespace wesos;
-
-  struct Hash {
-    constexpr auto operator()(const Nullable<View<u8>>& x) const -> size_t {
-      auto v = x.value_or({});
-      return v.into_ptr().into_uptr() ^ v.size();
-    }
-  };
-
+static void deps_setup() {
   wesos::assert::register_output_callback(
       nullptr,
       [](void*, const char* message, const char* func_name, const char* file_name, int line) {
@@ -45,6 +25,29 @@ TEST(IntrusivePool, Allocate) {
                      "=========\n"
                   << std::endl;
       });
+}
+
+TEST(IntrusivePool, CreatePool) {
+  deps_setup();
+
+  using namespace wesos;
+
+  constexpr auto buffer_size = 4096;
+
+  std::vector<u8> buf(buffer_size);
+  View<u8> pool(buf.data(), buf.size());
+
+  auto mm = mem::IntrusivePool(sizeof(int), alignof(int), pool);
+}
+
+TEST(IntrusivePool, Allocate) {
+  deps_setup();
+
+  using namespace wesos;
+
+  struct Hash {
+    constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.into_uptr(); }
+  };
 
   const auto min_size = 16;
   const auto max_size = 257;
@@ -54,7 +57,7 @@ TEST(IntrusivePool, Allocate) {
   constexpr auto alloc_limit = 9;
 
   std::pmr::polymorphic_allocator<u8> service;
-  std::unordered_set<Nullable<View<u8>>, Hash> pointers;
+  std::unordered_set<NullableOwnPtr<u8>, Hash> pointers;
 
   for (usize size = min_size; size < max_size; size++) {
     for (usize align = min_align; align < max_align; align *= 2) {
@@ -71,7 +74,7 @@ TEST(IntrusivePool, Allocate) {
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -84,13 +87,16 @@ TEST(IntrusivePool, Allocate) {
       auto expected_objects = pointers;
 
       // Release all allocated pool objects
-      mm.anew();
+      for (const auto& ptr : pointers) {
+        // we should be able to mix sync and nosync methods
+        mm.deallocate_bytes(ptr, size, align);
+      }
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
@@ -105,14 +111,14 @@ TEST(IntrusivePool, Allocate) {
       // Release all allocated pool objects
       for (const auto& ptr : pointers) {
         // we should be able to mix sync and nosync methods
-        mm.deallocate_bytes(ptr);
+        mm.deallocate_bytes(ptr, size, align);
       }
 
       {  // We expect to be able to get back all the memory that was freed
         pointers.clear();
 
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
-          auto the_alloc_ptr = mm.allocate_bytes_nosync(size, align, false);
+          auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
           EXPECT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";

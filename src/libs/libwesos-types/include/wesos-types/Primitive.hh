@@ -36,7 +36,7 @@ namespace wesos::types::detail {
   using __u32 = unsigned int;
   static_assert(sizeof(__u32) == static_cast<int>(PrimitiveTypeSize::U32), "__u32 is not 4 bytes");
 
-  using __u64 = unsigned long long;
+  using __u64 = unsigned long;
   static_assert(sizeof(__u64) == static_cast<int>(PrimitiveTypeSize::U64), "__u64 is not 8 bytes");
 
   using __i8 = signed char;
@@ -48,7 +48,7 @@ namespace wesos::types::detail {
   using __i32 = signed int;
   static_assert(sizeof(__i32) == static_cast<int>(PrimitiveTypeSize::I32), "__i32 is not 4 bytes");
 
-  using __i64 = signed long long;
+  using __i64 = signed long;
   static_assert(sizeof(__i64) == static_cast<int>(PrimitiveTypeSize::I64), "__i64 is not 8 bytes");
 
   using __f32 = float;

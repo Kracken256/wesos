@@ -28,15 +28,9 @@ namespace wesos::mem {
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
 
-  protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate_bytes(Least<usize, 0> size, PowerOfTwo<usize> align)
-        -> Nullable<View<u8>> override;
-
-    void virt_deallocate_bytes(View<u8> ptr) override;
-
-    auto virt_utilize_bytes(View<u8> pool) -> LeftoverMemory override;
-
-    void virt_anew() override;
+    auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override;
+    auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void override;
+    auto virt_do_utilize(View<u8> pool) -> LeftoverMemory override;
 
   public:
     IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
@@ -45,7 +39,7 @@ namespace wesos::mem {
     IntrusivePool(IntrusivePool&&);
     auto operator=(const IntrusivePool&) -> IntrusivePool& = delete;
     auto operator=(IntrusivePool&&) -> IntrusivePool&;
-    ~IntrusivePool() override = default;
+    ~IntrusivePool() override;
 
     [[nodiscard]] constexpr auto operator<=>(const IntrusivePool&) const = default;
 

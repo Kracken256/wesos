@@ -1,82 +1,78 @@
-/**
- * This file is part of the WesOS project.
- *
- * WesOS is public domain software: you can redistribute it and/or modify
- * it under the terms of the Unlicense(https://unlicense.org/).
- */
+// /**
+//  * This file is part of the WesOS project.
+//  *
+//  * WesOS is public domain software: you can redistribute it and/or modify
+//  * it under the terms of the Unlicense(https://unlicense.org/).
+//  */
 
-#pragma once
+// #pragma once
 
-#include <wesos-mem/IntrusivePool.hh>  /// TODO: Remove me
-#include <wesos-mem/MemoryResourceProtocol.hh>
-#include <wesos-types/NullableOwnPtr.hh>
+// #include <wesos-mem/IntrusivePool.hh>  /// TODO: Remove me
+// #include <wesos-mem/MemoryResourceProtocol.hh>
+// #include <wesos-types/NullableOwnPtr.hh>
 
-namespace wesos::smartptr {
-  template <class PointeeGeneric>
-  class Rc {
-    NullableOwnPtr<PointeeGeneric> m_ptr;
-    usize& m_rc;
-    mem::MemoryResourceProtocol* m_pmr;
+// namespace wesos::smartptr {
+//   template <class PointeeGeneric>
+//   class Box {
+//     NullableOwnPtr<PointeeGeneric> m_ptr;
+//     mem::MemoryResourceProtocol* m_pmr;
 
-    Rc(OwnPtr<PointeeGeneric> ptr, usize& rc, mem::MemoryResourceProtocol& pmr)
-        : m_ptr(ptr), m_rc(rc), m_pmr(&pmr) {}
+//     Box(OwnPtr<PointeeGeneric> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(&pmr)
+//     {}
 
-  public:
-    constexpr Rc(const Rc& o) : m_ptr(o.m_ptr), m_rc(++o.m_rc), m_pmr(o.m_pmr){};
+//   public:
+//     constexpr Box(const Box& o) = delete;
+//     constexpr auto operator=(const Box& o) -> Box& = delete;
 
-    constexpr Rc(Rc&& o) : m_ptr(o.m_ptr), m_rc(o.m_rc), m_pmr(o.m_pmr) {
-      o.m_ptr = nullptr;
-      o.m_rc = 0;
-    };
+//     constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = nullptr; };
 
-    constexpr auto operator=(const Rc& o) -> Rc& {
-      m_ptr = o.m_ptr;
-      m_rc = ++o.m_rc;
-      m_pmr = o.m_pmr;
-    };
+//     constexpr auto operator=(Box&& o) -> Box& {
+//       if (this != &o) [[likely]] {
+//         m_ptr = o.m_ptr;
+//         o.m_ptr = nullptr;
+//       }
+//     };
 
-    constexpr auto operator=(Rc&& o) -> Rc& {
-      m_ptr = o.m_ptr;
-      m_rc = o.m_rc;
-      m_pmr = o.m_pmr;
+//     ~Box() {
+//       assert_invariant(m_pmr != nullptr);
 
-      o.m_ptr = nullptr;
-      o.m_rc = 0;
-    };
+//       auto* object_ptr = m_ptr.unwrap();
+//       const auto object_range = View<u8>(reinterpret_cast<u8*>(object_ptr),
+//       sizeof(PointeeGeneric));
 
-    ~Rc() {
-      if (--m_rc == 0) [[unlikely]] {
-        auto* object_ptr = m_ptr.unwrap();
-        const auto object_range =
-            View<u8>(reinterpret_cast<u8*>(object_ptr), sizeof(PointeeGeneric));
+//       object_ptr->~PointeeGeneric();
+//       m_pmr->deallocate_bytes(object_range, alignof(PointeeGeneric));
 
-        object_ptr->~PointeeGeneric();
-        m_pmr->deallocate_bytes(object_range);
+// #ifndef NDEBUG
+//       m_ptr = nullptr;
+// #endif
+//     };
 
-#ifndef NDEBUG
-        m_ptr = nullptr;
-#endif
-      }
-    };
+//     template <class... ArgsGeneric>
+//     [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr) {
+//       return [&pmr](ArgsGeneric... args) -> Nullable<Box> {
+//         auto object_ptr = pmr.allocate_bytes(sizeof(PointeeGeneric), alignof(PointeeGeneric));
+//         if (object_ptr.is_null()) [[unlikely]] {
+//           return null;
+//         }
 
-    template <class... ArgsGeneric>
-    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr) {
-      return [&pmr](ArgsGeneric... args) -> Nullable<Rc> {
-        (void)pmr;
-        return nullptr;
-        /// TODO:
-      };
-    }
+//         new (object_ptr.unwrap_unchecked().into_ptr()) PointeeGeneric(args...);
 
-    /// TODO:
-  };
+//         (void)pmr;
+//         return nullptr;
+//         /// TODO:
+//       };
+//     }
 
-  static void test() {  //
-    Array<u8, 4096> bytes;
-    mem::IntrusivePool pmr(sizeof(int), alignof(int), bytes.as_view());
+//     /// TODO:
+//   };
 
-    auto hello = Rc<int>::create(pmr)().unwrap();
+//   static void test() {  //
+//     Array<u8, 4096> bytes;
+//     mem::IntrusivePool pmr(sizeof(int), alignof(int), bytes.as_view());
 
-    constexpr auto sz = sizeof(hello);
-  }
-}  // namespace wesos::smartptr
+//     auto hello = Box<int>::create(pmr)().unwrap();
+
+//     constexpr auto sz = sizeof(hello);
+//   }
+// }  // namespace wesos::smartptr

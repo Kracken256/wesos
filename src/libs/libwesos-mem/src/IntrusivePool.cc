@@ -5,6 +5,8 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#include <sanitizer/asan_interface.h>
+
 #include <wesos-builtin/Export.hh>
 #include <wesos-builtin/Range.hh>
 #include <wesos-mem/IntrusivePool.hh>
@@ -18,7 +20,7 @@ SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize
       m_object_size(object_size),
       m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
       m_initial_pool(pool) {
-  virt_utilize_bytes(pool);
+  virt_do_utilize(pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -26,54 +28,63 @@ SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
       m_object_size(o.m_object_size),
       m_object_align(o.m_object_align),
       m_initial_pool(o.m_initial_pool) {
-  // Any allocations from the source will fail after a move.
-
   o.m_front = nullptr;
   o.m_initial_pool.clear();
 }
 
 SYM_EXPORT auto IntrusivePool::operator=(IntrusivePool&& o) -> IntrusivePool& {
-  m_object_size = o.m_object_size;
-  m_object_align = o.m_object_align;
-  m_front = o.m_front;
-  m_initial_pool = o.m_initial_pool;
+  if (this != &o) {
+    m_object_size = o.m_object_size;
+    m_object_align = o.m_object_align;
+    m_front = o.m_front;
+    m_initial_pool = o.m_initial_pool;
 
-  // Any allocations from the source will fail after a move.
-  o.m_front = nullptr;
-  o.m_initial_pool.clear();
+    o.m_front = nullptr;
+    o.m_initial_pool.clear();
+  }
 
   return *this;
 }
 
-SYM_EXPORT auto IntrusivePool::virt_allocate_bytes(Least<usize, 0> size,
-                                                   PowerOfTwo<usize> align) -> Nullable<View<u8>> {
+SYM_EXPORT IntrusivePool::~IntrusivePool() {
+  auto node = m_front;
+  while (node.isset()) {
+    ASAN_UNPOISON_MEMORY_REGION(node, object_size());
+    node = node->m_next;
+  }
+}
+
+SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size,
+                                                PowerOfTwo<usize> align) -> NullableOwnPtr<u8> {
   if (!m_front.isset() || size > object_size() || align > object_align()) [[unlikely]] {
     return nullptr;
   }
 
   const auto freenode = m_front;
+  ASAN_UNPOISON_MEMORY_REGION(freenode.unwrap(), size);
+
   m_front = freenode->m_next;
 
-  auto* space_ptr = reinterpret_cast<u8*>(freenode.unwrap());
-  const auto space_range = View<u8>(space_ptr, object_size());
-  assert_invariant(space_range.into_ptr().is_aligned(align));
+  OwnPtr object_ptr = reinterpret_cast<u8*>(freenode.unwrap());
+  assert_invariant(object_ptr.is_aligned(align));
 
-  return space_range;
+  return object_ptr;
 }
 
-SYM_EXPORT void IntrusivePool::virt_deallocate_bytes(View<u8> ptr) {
-  assert_invariant(ptr.size() == object_size());
+SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
+                                                  PowerOfTwo<usize> align) {
+  align = max(align.unwrap(), alignof(FreeNode));
+  assert_invariant(size <= object_size() && align >= object_align());
 
-  const auto node_view = ptr.subview_unchecked(0, sizeof(FreeNode));
-  assert_invariant(node_view.into_ptr().is_aligned(alignof(FreeNode)));
-
-  auto* node = reinterpret_cast<FreeNode*>(node_view.into_ptr().unwrap());
+  RefPtr node = reinterpret_cast<FreeNode*>(ptr.unwrap());
 
   node->m_next = m_front;
-  m_front = node;
+  m_front = node.unwrap();
+
+  ASAN_POISON_MEMORY_REGION(ptr.unwrap(), size);
 }
 
-SYM_EXPORT auto IntrusivePool::virt_utilize_bytes(View<u8> pool) -> LeftoverMemory {
+SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
   if (pool.empty()) [[unlikely]] {
     return {{pool}, {}};
   }
@@ -95,7 +106,8 @@ SYM_EXPORT auto IntrusivePool::virt_utilize_bytes(View<u8> pool) -> LeftoverMemo
       const auto object_range = remaining.subview_unchecked(0, object_size());
 
       // Wierd, but it works..
-      virt_deallocate_bytes(object_range);
+      virt_do_deallocate(object_range.into_ptr().take_own().unwrap(), object_range.size(),
+                         object_align());
 
       remaining = remaining.subview_unchecked(object_size());
     };
@@ -107,9 +119,4 @@ SYM_EXPORT auto IntrusivePool::virt_utilize_bytes(View<u8> pool) -> LeftoverMemo
   const auto end_unused = remaining;
 
   return {{beginning_unused}, {end_unused}};
-}
-
-SYM_EXPORT void IntrusivePool::virt_anew() {
-  m_front = nullptr;
-  virt_utilize_bytes(m_initial_pool);
 }

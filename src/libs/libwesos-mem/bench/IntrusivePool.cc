@@ -7,8 +7,11 @@
 
 #include <benchmark/benchmark.h>
 
+#include <cstdarg>
+#include <cstdio>
 #include <iostream>
 #include <wesos-mem/IntrusivePool.hh>
+#include <wesos-mem/TracingResource.hh>
 
 #include "UnifiedBenchmark.hh"
 
@@ -37,7 +40,7 @@ static void BM_IntrusivePool_Evo_Creation(benchmark::State& state) {
   deps_setup();
 
   IntrusivePool::ObjectSize object_size = 1;
-  ClampedAlign object_align = PowerOfTwo(1ULL);
+  ClampedAlign object_align = PowerOfTwo(1UL);
   std::vector<u8> storage;
 
   for (auto x : state) {
@@ -56,7 +59,7 @@ static void BM_IntrusivePool_Evo_Synchronized(benchmark::State& state) {
 
   usize alloc_count = 0;
   IntrusivePool::ObjectSize object_size = 1;
-  ClampedAlign object_align = PowerOfTwo(1ULL);
+  ClampedAlign object_align = PowerOfTwo(1UL);
   std::vector<u8> storage;
 
   for (auto x : state) {
@@ -80,7 +83,7 @@ static void BM_IntrusivePool_Evo_Unsynchronized(benchmark::State& state) {
 
   usize alloc_count = 0;
   IntrusivePool::ObjectSize object_size = 1;
-  ClampedAlign object_align = PowerOfTwo(1ULL);
+  ClampedAlign object_align = PowerOfTwo(1UL);
   std::vector<u8> storage;
 
   for (auto x : state) {

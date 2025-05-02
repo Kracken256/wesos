@@ -23,15 +23,9 @@ namespace wesos::mem {
     NullableRefPtr<Chunk> m_some;
     View<u8> m_initial_pool;
 
-  protected:
-    [[nodiscard, gnu::pure]] auto virt_allocate_bytes(Least<usize, 0> size, PowerOfTwo<usize> align)
-        -> Nullable<View<u8>> override;
-
-    void virt_deallocate_bytes(View<u8> ptr) override;
-
-    auto virt_utilize_bytes(View<u8> pool) -> LeftoverMemory override;
-
-    void virt_anew() override;
+    auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override;
+    auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void override;
+    auto virt_do_utilize(View<u8> pool) -> LeftoverMemory override;
 
   public:
     IntrusiveChainFirstFit(View<u8> pool = View<u8>::create_empty());

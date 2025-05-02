@@ -15,42 +15,18 @@ using namespace wesos::mem;
 
 SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() = default;
 
-SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes_nosync(
-    Least<usize, 0> size, PowerOfTwo<usize> align, bool zero_memory) -> Nullable<View<u8>> {
-  auto slice_opt = virt_allocate_bytes(size, align);
-  assert_invariant(slice_opt.is_null() || slice_opt.unwrap_unchecked().size() == sizeof(size));
-
-  if (slice_opt.isset() && zero_memory) {
-    memset(slice_opt.unwrap_unchecked().into_ptr().unwrap(), 0, size);
-  }
-
-  return slice_opt;
+SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align)
+    -> NullableOwnPtr<u8> {
+  return virt_do_allocate(size, align);
 }
 
-SYM_EXPORT void MemoryResourceProtocol::deallocate_bytes_nosync(Nullable<View<u8>> ptr) {
+SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<u8> ptr, usize size,
+                                                         PowerOfTwo<usize> align) -> void {
   if (ptr.isset()) [[likely]] {
-    virt_deallocate_bytes(ptr.unwrap_unchecked());
+    virt_do_deallocate(ptr.get_unchecked(), size, align);
   }
-}
-
-SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes_nosync(View<u8> pool) -> LeftoverMemory {
-  return virt_utilize_bytes(pool);
-}
-
-SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(Least<usize, 0> size,
-                                                       PowerOfTwo<usize> align,
-                                                       bool zero_memory) -> Nullable<View<u8>> {
-  return m_mutex.critical_section([&] { return allocate_bytes_nosync(size, align, zero_memory); });
-}
-
-SYM_EXPORT void MemoryResourceProtocol::deallocate_bytes(Nullable<View<u8>> ptr) {
-  return m_mutex.critical_section([&] { return deallocate_bytes_nosync(ptr); });
 }
 
 SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> LeftoverMemory {
-  return m_mutex.critical_section([&] { return utilize_bytes_nosync(pool); });
-}
-
-SYM_EXPORT void MemoryResourceProtocol::anew() {
-  m_mutex.critical_section([&] { virt_anew(); });
+  return virt_do_utilize(pool);
 }

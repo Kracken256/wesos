@@ -1,137 +1,141 @@
-/**
- * This file is part of the WesOS project.
- *
- * WesOS is public domain software: you can redistribute it and/or modify
- * it under the terms of the Unlicense(https://unlicense.org/).
- */
+/// TODO: Reenable code
 
-#include <benchmark/benchmark.h>
+// /**
+//  * This file is part of the WesOS project.
+//  *
+//  * WesOS is public domain software: you can redistribute it and/or modify
+//  * it under the terms of the Unlicense(https://unlicense.org/).
+//  */
 
-#include <iostream>
-#include <wesos-mem/IntrusiveChainFirstFit.hh>
+// #include <benchmark/benchmark.h>
 
-#include "UnifiedBenchmark.hh"
+// #include <iostream>
+// #include <wesos-mem/IntrusiveChainFirstFit.hh>
 
-using namespace wesos;
-using namespace wesos::mem;
-using namespace wesos::mem::testing;
+// #include "UnifiedBenchmark.hh"
 
-using ClampedAlign = ClampMost<PowerOfTwo<usize>, 16ULL>;
+// using namespace wesos;
+// using namespace wesos::mem;
+// using namespace wesos::mem::testing;
 
-static void deps_setup() {
-  wesos::assert::register_output_callback(
-      nullptr,
-      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
-        std::cerr << "\n==========================================================================="
-                     "===========\n"
-                  << "| Assertion Failed: \"" << message << "\";\n"
-                  << "| Function: [" << func_name << "]: " << line << ";\n"
-                  << "| File: \"" << file_name << "\";\n"
-                  << "============================================================================="
-                     "=========\n"
-                  << std::endl;
-      });
-}
+// using ClampedAlign = ClampMost<PowerOfTwo<usize>, 16ULL>;
 
-static void BM_IntrusiveChainFirstFit_Evo_Creation(benchmark::State& state) {
-  deps_setup();
+// static void deps_setup() {
+//   wesos::assert::register_output_callback(
+//       nullptr,
+//       [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+//         std::cerr <<
+//         "\n==========================================================================="
+//                      "===========\n"
+//                   << "| Assertion Failed: \"" << message << "\";\n"
+//                   << "| Function: [" << func_name << "]: " << line << ";\n"
+//                   << "| File: \"" << file_name << "\";\n"
+//                   <<
+//                   "============================================================================="
+//                      "=========\n"
+//                   << std::endl;
+//       });
+// }
 
-  constexpr usize pool_size = 1'000'000;
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+// static void BM_IntrusiveChainFirstFit_Evo_Creation(benchmark::State& state) {
+//   deps_setup();
 
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-  }
-}
+//   constexpr usize pool_size = 1'000'000;
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-static void BM_IntrusiveChainFirstFit_Evo_Synchronized(benchmark::State& state) {
-  deps_setup();
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//   }
+// }
 
-  const usize pool_size = 1'000'000;
-  const auto options = BenchmarkOptions(1U, 4096U, 1U, 16U);
+// static void BM_IntrusiveChainFirstFit_Evo_Synchronized(benchmark::State& state) {
+//   deps_setup();
 
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+//   const usize pool_size = 1'000'000;
+//   const auto options = BenchmarkOptions(1U, 4096U, 1U, 16U);
 
-  usize alloc_count = 0;
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-    allocator_benchmark(mm, true, options, alloc_count);
-  }
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-  state.SetItemsProcessed(isize(alloc_count));
-}
+//   usize alloc_count = 0;
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//     allocator_benchmark(mm, true, options, alloc_count);
+//   }
 
-static void BM_IntrusiveChainFirstFit_Evo_Unsynchronized(benchmark::State& state) {
-  deps_setup();
+//   state.SetItemsProcessed(isize(alloc_count));
+// }
 
-  const usize pool_size = 1'000'000;
-  const auto options = BenchmarkOptions(1U, 4096U, 1U, 16U);
+// static void BM_IntrusiveChainFirstFit_Evo_Unsynchronized(benchmark::State& state) {
+//   deps_setup();
 
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+//   const usize pool_size = 1'000'000;
+//   const auto options = BenchmarkOptions(1U, 4096U, 1U, 16U);
 
-  usize alloc_count = 0;
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-    allocator_benchmark(mm, false, options, alloc_count);
-  }
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-  state.SetItemsProcessed(isize(alloc_count));
-}
+//   usize alloc_count = 0;
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//     allocator_benchmark(mm, false, options, alloc_count);
+//   }
 
-static void BM_IntrusiveChainFirstFit_Mono_Creation(benchmark::State& state) {
-  deps_setup();
+//   state.SetItemsProcessed(isize(alloc_count));
+// }
 
-  constexpr usize pool_size = 1'000'000;
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+// static void BM_IntrusiveChainFirstFit_Mono_Creation(benchmark::State& state) {
+//   deps_setup();
 
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-  }
-}
+//   constexpr usize pool_size = 1'000'000;
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-static void BM_IntrusiveChainFirstFit_Mono_Synchronized(benchmark::State& state) {
-  deps_setup();
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//   }
+// }
 
-  const usize pool_size = 1'000'000;
-  const auto options = BenchmarkOptions(32U, 32U, 8U, 8U);
+// static void BM_IntrusiveChainFirstFit_Mono_Synchronized(benchmark::State& state) {
+//   deps_setup();
 
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+//   const usize pool_size = 1'000'000;
+//   const auto options = BenchmarkOptions(32U, 32U, 8U, 8U);
 
-  usize alloc_count = 0;
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-    allocator_benchmark(mm, true, options, alloc_count);
-  }
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-  state.SetItemsProcessed(isize(alloc_count));
-}
+//   usize alloc_count = 0;
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//     allocator_benchmark(mm, true, options, alloc_count);
+//   }
 
-static void BM_IntrusiveChainFirstFit_Mono_Unsynchronized(benchmark::State& state) {
-  deps_setup();
+//   state.SetItemsProcessed(isize(alloc_count));
+// }
 
-  const usize pool_size = 1'000'000;
-  const auto options = BenchmarkOptions(32U, 32U, 8U, 8U);
+// static void BM_IntrusiveChainFirstFit_Mono_Unsynchronized(benchmark::State& state) {
+//   deps_setup();
 
-  auto storage = std::vector<u8>(pool_size);
-  auto storage_view = View<u8>(storage.data(), storage.size());
+//   const usize pool_size = 1'000'000;
+//   const auto options = BenchmarkOptions(32U, 32U, 8U, 8U);
 
-  usize alloc_count = 0;
-  for (auto x : state) {
-    auto mm = IntrusiveChainFirstFit(storage_view);
-    allocator_benchmark(mm, false, options, alloc_count);
-  }
+//   auto storage = std::vector<u8>(pool_size);
+//   auto storage_view = View<u8>(storage.data(), storage.size());
 
-  state.SetItemsProcessed(isize(alloc_count));
-}
+//   usize alloc_count = 0;
+//   for (auto x : state) {
+//     auto mm = IntrusiveChainFirstFit(storage_view);
+//     allocator_benchmark(mm, false, options, alloc_count);
+//   }
 
-BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Creation);
-BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Synchronized);
-BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Unsynchronized);
-BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Creation);
-BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Synchronized);
-BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Unsynchronized);
+//   state.SetItemsProcessed(isize(alloc_count));
+// }
+
+// BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Creation);
+// BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Synchronized);
+// BENCHMARK(BM_IntrusiveChainFirstFit_Evo_Unsynchronized);
+// BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Creation);
+// BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Synchronized);
+// BENCHMARK(BM_IntrusiveChainFirstFit_Mono_Unsynchronized);
