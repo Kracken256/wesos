@@ -13,11 +13,7 @@
 namespace wesos::mem {
   class IntrusiveChainFirstFit final : public MemoryResourceProtocol {
   public:
-    struct Chunk {
-      Least<usize, 1> m_size;
-      NullableRefPtr<Chunk> m_next;
-      NullableRefPtr<Chunk> m_prev;
-    };
+    struct Chunk;
 
   private:
     NullableRefPtr<Chunk> m_some;
