@@ -79,7 +79,7 @@ SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
   RefPtr node = reinterpret_cast<FreeNode*>(ptr.unwrap());
 
   node->m_next = m_front;
-  m_front = node.unwrap();
+  m_front = node;
 
   ASAN_POISON_MEMORY_REGION(ptr.unwrap(), size);
 }
@@ -106,7 +106,7 @@ SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory 
       const auto object_range = remaining.subview_unchecked(0, object_size());
 
       // Wierd, but it works..
-      virt_do_deallocate(object_range.into_ptr().take_own().unwrap(), object_range.size(),
+      virt_do_deallocate(object_range.into_ptr().take_own().get_unchecked(), object_range.size(),
                          object_align());
 
       remaining = remaining.subview_unchecked(object_size());
