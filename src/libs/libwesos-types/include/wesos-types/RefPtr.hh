@@ -8,8 +8,10 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-builtin/Move.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
+#include <wesos-types/OwnPtr.hh>
 #include <wesos-types/PowerOfTwo.hh>
 
 namespace wesos::types {
@@ -22,6 +24,7 @@ namespace wesos::types {
 
   public:
     constexpr RefPtr(PointeeGeneric* ptr) : m_ptr(ptr) { assert_invariant(ptr != nullptr); }
+    constexpr RefPtr(OwnPtr<PointeeGeneric> ptr) : m_ptr(ptr.unwrap()) {}
     constexpr RefPtr(const RefPtr&) = default;
     constexpr RefPtr(RefPtr&&) = default;
     constexpr auto operator=(const RefPtr&) -> RefPtr& = default;
@@ -59,6 +62,9 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto add(usize i) const -> RefPtr { return unwrap() + i; }
     [[nodiscard]] constexpr auto sub(usize i) const -> RefPtr { return unwrap() - i; }
+
+    [[nodiscard]] constexpr auto load() const -> PointeeGeneric& { return *unwrap(); }
+    constexpr void store(PointeeGeneric x) const { *unwrap() = move(x); }
 
     [[nodiscard]] constexpr auto operator++() const -> RefPtr { return unwrap() + 1; }
     [[nodiscard]] constexpr auto operator++(int) const -> RefPtr { return unwrap() + 1; }

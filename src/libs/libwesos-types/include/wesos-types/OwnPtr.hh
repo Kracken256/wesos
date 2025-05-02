@@ -8,6 +8,7 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-builtin/Move.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/PowerOfTwo.hh>
@@ -59,6 +60,9 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto add(usize i) const -> OwnPtr { return unwrap() + i; }
     [[nodiscard]] constexpr auto sub(usize i) const -> OwnPtr { return unwrap() - i; }
+
+    [[nodiscard]] constexpr auto load() const -> PointeeGeneric& { return *unwrap(); }
+    constexpr void store(PointeeGeneric x) const { *unwrap() = move(x); }
 
     [[nodiscard]] constexpr auto operator++() const -> OwnPtr { return unwrap() + 1; }
     [[nodiscard]] constexpr auto operator++(int) const -> OwnPtr { return unwrap() + 1; }

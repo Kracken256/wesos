@@ -21,6 +21,7 @@
 #include <wesos-types/OwnPtr.hh>
 #include <wesos-types/PowerOfTwo.hh>
 #include <wesos-types/Primitive.hh>
+#include <wesos-types/Range.hh>
 #include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
 #include <wesos-types/Template.hh>
@@ -69,6 +70,7 @@ namespace wesos {
   using types::Least;
   using types::Most;
   using types::PowerOfTwo;
+  using types::Range;
 
   using types::operator""_u8;
   using types::operator""_u16;

@@ -23,6 +23,9 @@ CheckOptions:
   - key: readability-identifier-naming.GlobalVariableSuffix
     value: "_GLOBAL"
 
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: UPPER_CASE
+
   - key: readability-identifier-naming.IgnoreMainLikeFunctions
     value: true
 

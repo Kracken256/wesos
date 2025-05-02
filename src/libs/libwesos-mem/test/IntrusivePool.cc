@@ -76,10 +76,12 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          EXPECT_NE(the_alloc_ptr, null)
+          ASSERT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
 
-          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          memset(the_alloc_ptr.unwrap(), 0, size);
+
+          ASSERT_FALSE(pointers.contains(the_alloc_ptr));
           pointers.insert(the_alloc_ptr);
         }
       }
@@ -98,14 +100,16 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          EXPECT_NE(the_alloc_ptr, null)
+          ASSERT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
 
-          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          memset(the_alloc_ptr.unwrap(), 0, size);
+
+          ASSERT_FALSE(pointers.contains(the_alloc_ptr));
           pointers.insert(the_alloc_ptr);
         }
 
-        EXPECT_EQ(pointers, expected_objects);
+        ASSERT_EQ(pointers, expected_objects);
       }
 
       // Release all allocated pool objects
@@ -120,14 +124,16 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          EXPECT_NE(the_alloc_ptr, null)
+          ASSERT_NE(the_alloc_ptr, null)
               << "Failed on size(" << size << "), " << "align(" << align << ")";
 
-          EXPECT_FALSE(pointers.contains(the_alloc_ptr));
+          memset(the_alloc_ptr.unwrap(), 0, size);
+
+          ASSERT_FALSE(pointers.contains(the_alloc_ptr));
           pointers.insert(the_alloc_ptr);
         }
 
-        EXPECT_EQ(pointers, expected_objects);
+        ASSERT_EQ(pointers, expected_objects);
       }
 
       service.deallocate_bytes(buf, exact_buffer_size, align);

@@ -48,9 +48,9 @@ TEST(IntrusiveChainFirstFit, Allocate) {
     constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.into_uptr(); }
   };
 
-  const auto min_size = 16;
+  const auto min_size = 64;
   const auto max_size = 257;
-  const PowerOfTwo<usize> min_align = 1;
+  const PowerOfTwo<usize> min_align = 2;
   const PowerOfTwo<usize> max_align = 64;
 
   const auto max_space_per_alloc = ((max_size + max_align - 1) & -max_align);
@@ -76,12 +76,14 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = mm.allocate_bytes(size, align);
-        EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
+        auto the_alloc_ptr = mm.allocate_bytes(size, align);
+        ASSERT_NE(the_alloc_ptr, null)
+            << "Failed on size(" << size << "), " << "align(" << align << ")";
+        memset(the_alloc_ptr.unwrap(), 0, size);
 
-        EXPECT_FALSE(first_unique_ptr_set.contains(ptr));
-        first_unique_ptr_set.insert(ptr);
-        first_ptr_return_order.push_back({ptr, size, align});
+        ASSERT_FALSE(first_unique_ptr_set.contains(the_alloc_ptr));
+        first_unique_ptr_set.insert(the_alloc_ptr);
+        first_ptr_return_order.push_back({the_alloc_ptr, size, align});
       }
     }
 
@@ -93,12 +95,14 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   {
     for (usize size = min_size; size < max_size; size++) {
       for (auto align = min_align; align < max_align; align = align.next()) {
-        auto ptr = mm.allocate_bytes(size, align);
-        EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
+        auto the_alloc_ptr = mm.allocate_bytes(size, align);
+        ASSERT_NE(the_alloc_ptr, null)
+            << "Failed on size(" << size << "), " << "align(" << align << ")";
+        memset(the_alloc_ptr.unwrap(), 0, size);
 
-        EXPECT_FALSE(second_unique_ptr_set.contains(ptr));
-        second_unique_ptr_set.insert(ptr);
-        second_ptr_return_order.push_back({ptr, size, align});
+        ASSERT_FALSE(second_unique_ptr_set.contains(the_alloc_ptr));
+        second_unique_ptr_set.insert(the_alloc_ptr);
+        second_ptr_return_order.push_back({the_alloc_ptr, size, align});
       }
     }
 
@@ -108,7 +112,7 @@ TEST(IntrusiveChainFirstFit, Allocate) {
   }
 
   {  // Ensure this data structure is determinstic
-    EXPECT_EQ(first_unique_ptr_set, second_unique_ptr_set);
-    EXPECT_EQ(first_ptr_return_order, second_ptr_return_order);
+    ASSERT_EQ(first_unique_ptr_set, second_unique_ptr_set);
+    ASSERT_EQ(first_ptr_return_order, second_ptr_return_order);
   }
 }

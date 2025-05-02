@@ -32,5 +32,9 @@ namespace wesos::mem {
     ~IntrusiveChainFirstFit() override = default;
 
     [[nodiscard]] constexpr auto operator<=>(const IntrusiveChainFirstFit&) const = default;
+
+    [[nodiscard]] static constexpr auto max_alignment() -> PowerOfTwo<usize> {
+      return numeric_limit_max<u8>();
+    }
   };
 }  // namespace wesos::mem
