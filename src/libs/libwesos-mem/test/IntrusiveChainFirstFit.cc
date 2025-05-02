@@ -1,113 +1,114 @@
-/// TODO: Reenable code
+/**
+ * This file is part of the WesOS project.
+ *
+ * WesOS is public domain software: you can redistribute it and/or modify
+ * it under the terms of the Unlicense(https://unlicense.org/).
+ */
 
-// /**
-//  * This file is part of the WesOS project.
-//  *
-//  * WesOS is public domain software: you can redistribute it and/or modify
-//  * it under the terms of the Unlicense(https://unlicense.org/).
-//  */
+#include <gtest/gtest.h>
 
-// #include <gtest/gtest.h>
+#include <iostream>
+#include <unordered_set>
+#include <wesos-mem/IntrusiveChainFirstFit.hh>
 
-// #include <iostream>
-// #include <unordered_set>
-// #include <wesos-mem/IntrusiveChainFirstFit.hh>
+static void deps_setup() {
+  wesos::assert::register_output_callback(
+      nullptr,
+      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
+        std::cerr << "\n==========================================================================="
+                     "===========\n"
+                  << "| Assertion Failed: \"" << message << "\";\n"
+                  << "| Function: [" << func_name << "]: " << line << ";\n"
+                  << "| File: \"" << file_name << "\";\n"
+                  << "============================================================================="
+                     "=========\n"
+                  << std::endl;
+      });
+}
 
-// TEST(IntrusiveChainFirstFit, CreatePool) {
-//   using namespace wesos;
+TEST(IntrusiveChainFirstFit, CreatePool) {
+  deps_setup();
 
-//   constexpr auto buffer_size = 4096;
+  using namespace wesos;
 
-//   std::vector<u8> buf(buffer_size);
-//   View<u8> pool(buf.data(), buf.size());
+  constexpr auto buffer_size = 4096;
 
-//   auto mm = mem::IntrusiveChainFirstFit(pool);
-// }
+  std::vector<u8> buf(buffer_size);
+  View<u8> pool(buf.data(), buf.size());
 
-// TEST(IntrusiveChainFirstFit, Allocate) {
-//   using namespace wesos;
+  auto mm = mem::IntrusiveChainFirstFit(pool);
+}
 
-//   wesos::assert::register_output_callback(
-//       nullptr,
-//       [](void*, const char* message, const char* func_name, const char* file_name, int line) {
-//         std::cerr <<
-//         "\n==========================================================================="
-//                      "===========\n"
-//                   << "| Assertion Failed: \"" << message << "\";\n"
-//                   << "| Function: [" << func_name << "]: " << line << ";\n"
-//                   << "| File: \"" << file_name << "\";\n"
-//                   <<
-//                   "============================================================================="
-//                      "=========\n"
-//                   << std::endl;
-//       });
+TEST(IntrusiveChainFirstFit, Allocate) {
+  deps_setup();
 
-//   struct Hash {
-//     constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return
-//     x.into_uptr(); }
-//   };
+  using namespace wesos;
 
-//   const auto min_size = 16;
-//   const auto max_size = 257;
-//   const PowerOfTwo<usize> min_align = 1;
-//   const PowerOfTwo<usize> max_align = 64;
+  struct Hash {
+    constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.into_uptr(); }
+  };
 
-//   const auto max_space_per_alloc = ((max_size + max_align - 1) & -max_align);
-//   const auto mm_size = max_space_per_alloc * ((max_size - min_size) * (max_align - min_align));
+  const auto min_size = 16;
+  const auto max_size = 257;
+  const PowerOfTwo<usize> min_align = 1;
+  const PowerOfTwo<usize> max_align = 64;
 
-//   auto storage = std::vector<u8>(mm_size);
-//   auto storage_view = View<u8>(storage.data(), storage.size());
+  const auto max_space_per_alloc = ((max_size + max_align - 1) & -max_align);
+  const auto mm_size = max_space_per_alloc * ((max_size - min_size) * (max_align - min_align));
 
-//   auto mm = mem::IntrusiveChainFirstFit(storage_view);
+  auto storage = std::vector<u8>(mm_size);
+  auto storage_view = View<u8>(storage.data(), storage.size());
 
-//   struct Record {
-//     NullableOwnPtr<u8> m_ptr;
-//     usize m_size = 0, m_align = 0;
+  auto mm = mem::IntrusiveChainFirstFit(storage_view);
 
-//     [[nodiscard]] constexpr auto operator<=>(const Record&) const = default;
-//   };
+  struct Record {
+    NullableOwnPtr<u8> m_ptr;
+    usize m_size = 0, m_align = 0;
 
-//   std::unordered_set<NullableOwnPtr<u8>, Hash> first_unique_ptr_set;
-//   std::unordered_set<NullableOwnPtr<u8>, Hash> second_unique_ptr_set;
-//   std::vector<Record> first_ptr_return_order;
-//   std::vector<Record> second_ptr_return_order;
+    [[nodiscard]] constexpr auto operator<=>(const Record&) const = default;
+  };
 
-//   {
-//     for (usize size = min_size; size < max_size; size++) {
-//       for (auto align = min_align; align < max_align; align = align.next()) {
-//         auto ptr = mm.allocate_bytes(size, align);
-//         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
+  std::unordered_set<NullableOwnPtr<u8>, Hash> first_unique_ptr_set;
+  std::unordered_set<NullableOwnPtr<u8>, Hash> second_unique_ptr_set;
+  std::vector<Record> first_ptr_return_order;
+  std::vector<Record> second_ptr_return_order;
 
-//         EXPECT_FALSE(first_unique_ptr_set.contains(ptr));
-//         first_unique_ptr_set.insert(ptr);
-//         first_ptr_return_order.push_back({ptr, size, align});
-//       }
-//     }
+  {
+    for (usize size = min_size; size < max_size; size++) {
+      for (auto align = min_align; align < max_align; align = align.next()) {
+        auto ptr = mm.allocate_bytes(size, align);
+        EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
-//     for (auto [ptr, size, align] : first_ptr_return_order) {
-//       mm.deallocate_bytes(ptr, size, align);
-//     }
-//   }
+        EXPECT_FALSE(first_unique_ptr_set.contains(ptr));
+        first_unique_ptr_set.insert(ptr);
+        first_ptr_return_order.push_back({ptr, size, align});
+      }
+    }
 
-//   {
-//     for (usize size = min_size; size < max_size; size++) {
-//       for (auto align = min_align; align < max_align; align = align.next()) {
-//         auto ptr = mm.allocate_bytes(size, align);
-//         EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
+    for (auto [ptr, size, align] : first_ptr_return_order) {
+      mm.deallocate_bytes(ptr, size, align);
+    }
+  }
 
-//         EXPECT_FALSE(second_unique_ptr_set.contains(ptr));
-//         second_unique_ptr_set.insert(ptr);
-//         second_ptr_return_order.push_back({ptr, size, align});
-//       }
-//     }
+  {
+    for (usize size = min_size; size < max_size; size++) {
+      for (auto align = min_align; align < max_align; align = align.next()) {
+        auto ptr = mm.allocate_bytes(size, align);
+        EXPECT_NE(ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
-//     for (auto [ptr, size, align] : second_ptr_return_order) {
-//       mm.deallocate_bytes(ptr, size, align);
-//     }
-//   }
+        EXPECT_FALSE(second_unique_ptr_set.contains(ptr));
+        second_unique_ptr_set.insert(ptr);
+        second_ptr_return_order.push_back({ptr, size, align});
+      }
+    }
 
-//   {  // Ensure this data structure is determinstic
-//     EXPECT_EQ(first_unique_ptr_set, second_unique_ptr_set);
-//     EXPECT_EQ(first_ptr_return_order, second_ptr_return_order);
-//   }
-// }
+    for (auto [ptr, size, align] : second_ptr_return_order) {
+      mm.deallocate_bytes(ptr, size, align);
+    }
+  }
+
+  {  // Ensure this data structure is determinstic
+    EXPECT_EQ(first_unique_ptr_set, second_unique_ptr_set);
+    EXPECT_EQ(first_ptr_return_order, second_ptr_return_order);
+  }
+}
