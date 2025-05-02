@@ -62,102 +62,171 @@ SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
 }
 
 namespace wesos::mem::detail {
-  static constexpr auto MAX_ALIGNMENT_LOG2 = (sizeof(usize) * 8) - 1;
+  class BitHeader {
+    u8 m_before : 4;
+    u8 m_after : 4;
 
-  static auto alignment_log2(PowerOfTwo<usize> x) -> Most<u8, MAX_ALIGNMENT_LOG2> {
-    usize value = x.unwrap();
-    u8 result = 0;
+    friend class ChunkHeaderFormat;
+  } __attribute__((packed));
 
-    while ((value >>= 1) != 0) {
-      ++result;
+  static_assert(sizeof(BitHeader) < sizeof(Chunk) && alignof(BitHeader) < alignof(Chunk));
+
+  class ChunkHeaderFormat final {
+  public:
+    static constexpr auto MAX_U4 = 15;
+    static constexpr auto MAX_ALIGN = 16;
+
+    static_assert(sizeof(Chunk) - 1 <= MAX_U4);
+    static_assert(MAX_ALIGN - 1 <= MAX_U4);
+
+    using BytesBeforeCount = Range<usize, 1, MAX_ALIGN>;
+    using BytesAfterCount = Range<usize, 0, sizeof(Chunk) - 1>;
+
+    ChunkHeaderFormat(BitHeader& header) : m_header(header) {
+      ASAN_UNPOISON_MEMORY_REGION(&m_header, sizeof(BitHeader));
     }
 
-    return result;
+    ~ChunkHeaderFormat() {
+      //
+      ASAN_POISON_MEMORY_REGION(&m_header, sizeof(BitHeader));
+    }
+
+    [[nodiscard]] constexpr auto get_bytes_before() -> BytesBeforeCount {
+      return m_header.m_before + 1;
+    }
+
+    [[nodiscard]] constexpr auto get_bytes_after() -> BytesAfterCount { return m_header.m_after; }
+
+    constexpr void set_bytes_before(BytesBeforeCount x) {
+      m_header.m_before = static_cast<u8>(x.unwrap() - 1);
+    }
+    constexpr void set_bytes_after(BytesAfterCount x) {
+      m_header.m_after = static_cast<u8>(x.unwrap());
+    }
+
+  private:
+    BitHeader& m_header;
+  };
+
+  static auto get_dealigned_range(View<u8> zone) -> View<u8> {
+    auto zone_begin = zone.into_ptr().get_unchecked();
+    auto zone_end = zone_begin.add(zone.size());
+
+    auto& bit_header = *reinterpret_cast<BitHeader*>(zone_begin.sub(sizeof(BitHeader)).unwrap());
+    auto header = ChunkHeaderFormat(bit_header);
+
+    zone_begin = zone_begin.sub(header.get_bytes_before());
+    zone_end = zone_end.add(header.get_bytes_after());
+
+    return {zone_begin, zone_end};
   }
 
-  static auto alignment_exp2(Most<u8, MAX_ALIGNMENT_LOG2> x) -> usize {
-    return usize{1} << x.unwrap();
-  }
-
-  static auto store_metadata(View<u8> chunk, usize size,
-                             PowerOfTwo<usize> align) -> NullableRefPtr<u8> {
-    const auto chunk_ptr = chunk.into_ptr().get_unchecked();
-
-    if (chunk_ptr.is_aligned_pow2(align)) {
-      ASAN_UNPOISON_MEMORY_REGION(chunk_ptr.unwrap(), chunk.size());
-      return chunk_ptr;
+  static void print_freelist(NullableRefPtr<Chunk> root) {
+    printf("\n======= BEG FREE LIST =======\n");
+    for (NullableRefPtr<Chunk> node = root; node.isset(); node = node->m_next) {
+      printf("(%p, %zu) -> \n", (void*)node.unwrap(), node->m_size.unwrap());
     }
-
-    const auto padding = chunk_ptr.align_pow2(align).into_uptr() - chunk_ptr.into_uptr();
-    if (const auto max_padding_supported = 0xffff; padding > max_padding_supported) [[unlikely]] {
-      return nullptr;
-    }
-
-    const auto aligned_ptr = chunk_ptr.add(padding);
-    const auto metadata_ptr = aligned_ptr.sub(1);
-    const auto usable_range = View<u8>(aligned_ptr.unwrap(), size);
-
-    ASAN_UNPOISON_MEMORY_REGION(usable_range.into_ptr().unwrap(), usable_range.size());
-
-    ASAN_UNPOISON_MEMORY_REGION(metadata_ptr.unwrap(), 1);
-    metadata_ptr.store(alignment_log2(align));
-    ASAN_POISON_MEMORY_REGION(metadata_ptr.unwrap(), 1);
-
-    return aligned_ptr;
-  }
-
-  static auto get_dealigned_range(View<u8> zone, PowerOfTwo<usize> align) -> View<u8> {
-    const auto zone_ptr = zone.into_ptr().get_unchecked();
-
-    if (zone_ptr.is_aligned_pow2(align)) {
-      return zone;
-    }
-
-    /// TODO: Impl
-    always_assert(false);
-    return {};
+    printf("nullptr\n");
+    printf("======= END FREE LIST =======\n\n");
   }
 }  // namespace wesos::mem::detail
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<usize> align)
     -> NullableOwnPtr<u8> {
-  if (align > max_alignment()) {
+  using namespace detail;
+
+  if (align > max_alignment()) [[unlikely]] {
     return nullptr;
   }
 
-  W_DEBUG();
+  print_freelist(m_some);
 
-  for (auto node = m_some; node.isset(); node = node->m_next) {
+  for (NullableRefPtr<Chunk> node = m_some, prev = nullptr; node.isset();
+       prev = node, node = node->m_next) {
+    const auto next = node->m_next;
+
     const auto unaligned_chunk_start = RefPtr(reinterpret_cast<u8*>(node.unwrap()));
     const auto unaligned_chunk_end = RefPtr(unaligned_chunk_start.unwrap() + node->m_size);
-    const auto aligned_range_start = RefPtr(unaligned_chunk_start.align_pow2(align));
+    const auto aligned_range_start = RefPtr(unaligned_chunk_start  //
+                                                .add(sizeof(BitHeader))
+                                                .align_pow2(align));
     const auto aligned_range_end = RefPtr(aligned_range_start.unwrap() + size);
 
-    if (auto is_large_enough = aligned_range_end <= unaligned_chunk_end; !is_large_enough) {
-      W_DEBUG();
+    if (auto enough = aligned_range_end <= unaligned_chunk_end; !enough) {
       continue;
     }
 
-    const auto min_range = View<u8>(unaligned_chunk_start.unwrap(), aligned_range_end.unwrap());
-    const auto result = detail::store_metadata(min_range, size, align);
+    assert_invariant(aligned_range_start.sub(sizeof(BitHeader)) >= unaligned_chunk_start);
+    auto& bit_header =
+        *reinterpret_cast<BitHeader*>(aligned_range_start.sub(sizeof(BitHeader)).unwrap());
+    auto header = ChunkHeaderFormat(bit_header);
 
-    W_DEBUG();
+    {  // Don't forget what comes before us
+      const auto space_before = aligned_range_start.into_uptr() - unaligned_chunk_start.into_uptr();
+      header.set_bytes_before(space_before);
+    }
 
-    return result.unwrap();
+    {  // Don't loose sight of what comes after us
+      if (prev.isset()) {
+        prev->m_next = next;
+      } else {
+        m_some = nullptr;
+      }
+
+      auto extra_range = View<u8>(aligned_range_end, unaligned_chunk_end);
+      const auto extra_range_pad = extra_range.into_ptr().align_pow2(alignof(Chunk)).into_uptr() -
+                                   extra_range.into_ptr().into_uptr();
+
+      if (extra_range.size() < extra_range_pad + sizeof(Chunk)) {
+        const auto space_after = extra_range.size();
+        assert_invariant(space_after + extra_range_pad < sizeof(Chunk));
+        header.set_bytes_after(space_after + extra_range_pad);
+      } else {
+        extra_range = extra_range.subview_unchecked(extra_range_pad);
+
+        const auto new_chunk = OwnPtr(reinterpret_cast<Chunk*>(extra_range.into_ptr().unwrap()));
+        const auto new_chunk_size = extra_range.size();
+
+        ASAN_UNPOISON_MEMORY_REGION(new_chunk.unwrap(), new_chunk_size);
+
+        // Seek to maintain the order of the freelist.
+        auto seek = m_some;
+        while (seek.isset() && seek->m_size <= new_chunk_size) {
+          seek = seek->m_next;
+        }
+
+        if (seek.isset()) {
+          new_chunk->m_size = new_chunk_size;
+          new_chunk->m_next = seek->m_next;
+
+          seek->m_next = new_chunk;
+        } else {
+          new_chunk->m_size = new_chunk_size;
+          new_chunk->m_next = nullptr;
+          m_some = new_chunk;
+        }
+      }
+
+      print_freelist(m_some);
+    }
+
+    ASAN_UNPOISON_MEMORY_REGION(aligned_range_start.unwrap(), size);
+
+    return aligned_range_start.unwrap();
   }
-
-  W_DEBUG();
 
   return nullptr;
 }
 
 SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
                                                            PowerOfTwo<usize> align) {
-  assert_invariant(ptr.is_aligned(align));
+  using namespace detail;
 
-  const auto dealigned_range = detail::get_dealigned_range(View<u8>(ptr.unwrap(), size), align);
+  assert_invariant(ptr.is_aligned_pow2(align));
+
+  const auto dealigned_range = get_dealigned_range(View<u8>(ptr.unwrap(), size));
   assert_invariant(dealigned_range.size() >= sizeof(Chunk) &&
-                   dealigned_range.into_ptr().is_aligned(alignof(Chunk)));
+                   dealigned_range.into_ptr().is_aligned_pow2(alignof(Chunk)));
 
   ASAN_POISON_MEMORY_REGION(dealigned_range.into_ptr().unwrap(), dealigned_range.size());
 
@@ -171,8 +240,6 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
   }
 
   if (prev.isset()) {
-    W_DEBUG();
-
     ASAN_UNPOISON_MEMORY_REGION(chunk.unwrap(), sizeof(Chunk));
     chunk->m_size = chunk_size;
     chunk->m_next = prev->m_next;
@@ -187,12 +254,13 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
         chunk->m_size = chunk->m_size + chunk->m_next->m_size;
         chunk->m_next = chunk->m_next->m_next;
 
+        assert_invariant(chunk->m_size != 0);
+
         ASAN_POISON_MEMORY_REGION(begin_of_next.unwrap(), sizeof(Chunk));
       }
     }
-  } else {
-    W_DEBUG();
 
+  } else {
     ASAN_UNPOISON_MEMORY_REGION(chunk.unwrap(), sizeof(Chunk));
 
     chunk->m_size = chunk_size;
@@ -201,16 +269,39 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
     m_some = chunk;
   }
 
-  W_DEBUG();
+  detail::print_freelist(m_some);
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
-  if (pool.size() < sizeof(Chunk)) [[unlikely]] {
-    return {{pool}, {}};
+  using namespace detail;
+
+  auto window = pool;
+
+  {  // Adjust alignment and install header
+    const auto space_before_chunk =
+        window.into_ptr().add(sizeof(BitHeader)).align_pow2(alignof(Chunk)).into_uptr() -
+        window.into_ptr().into_uptr();
+
+    if (window.size() < space_before_chunk + sizeof(Chunk)) {
+      return {{pool}, {}};
+    }
+
+    window = window.subview_unchecked(space_before_chunk);
+    assert_invariant(window.into_ptr().is_aligned_pow2(alignof(Chunk)));
+
+    auto& bit_header =
+        *reinterpret_cast<BitHeader*>(window.into_ptr().sub(sizeof(BitHeader)).unwrap());
+    auto header = ChunkHeaderFormat(bit_header);
+
+    header.set_bytes_before(space_before_chunk);
+    header.set_bytes_after(0);
   }
 
-  const OwnPtr owned_ptr = pool.into_ptr().get_unchecked().unwrap();
-  virt_do_deallocate(owned_ptr, pool.size(), alignof(u8));
+  assert_invariant(window.size() >= sizeof(Chunk));
+  assert_invariant(window.into_ptr().is_aligned_pow2(alignof(Chunk)));
+
+  const OwnPtr owned_ptr = window.into_ptr().unwrap();
+  virt_do_deallocate(owned_ptr, window.size(), alignof(Chunk));
 
   return {};
 }

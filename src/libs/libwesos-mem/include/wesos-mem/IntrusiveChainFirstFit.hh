@@ -34,7 +34,8 @@ namespace wesos::mem {
     [[nodiscard]] constexpr auto operator<=>(const IntrusiveChainFirstFit&) const = default;
 
     [[nodiscard]] static constexpr auto max_alignment() -> PowerOfTwo<usize> {
-      return numeric_limit_max<u8>();
+      const auto max_alignment_supported = 16;
+      return max_alignment_supported;
     }
   };
 }  // namespace wesos::mem
