@@ -11,8 +11,6 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-#include <stdio.h>
-
 SYM_EXPORT TracingResource::TracingResource(MemoryResourceProtocol& debugee, PrintCallback print)
     : m_debugee(&debugee), m_print(print) {}
 
