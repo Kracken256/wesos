@@ -111,10 +111,6 @@ namespace wesos::types {
       assert_invariant(isset());
       return unwrap() - 1;
     }
-
-    [[nodiscard]] constexpr auto take_own() const -> NullableOwnPtr<PointeeGeneric> {
-      return this->unwrap();
-    }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),

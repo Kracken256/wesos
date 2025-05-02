@@ -112,7 +112,7 @@ namespace wesos::types {
       return unwrap() - 1;
     }
 
-    [[nodiscard]] constexpr auto take_ref() const -> NullableRefPtr<PointeeGeneric> {
+    [[nodiscard]] constexpr auto as_ref() const -> NullableRefPtr<PointeeGeneric> {
       return this->unwrap();
     }
   };

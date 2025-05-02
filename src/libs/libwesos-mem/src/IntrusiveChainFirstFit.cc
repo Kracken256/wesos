@@ -123,7 +123,8 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> Leftov
     return {{pool}, {}};
   }
 
-  virt_do_deallocate(pool.into_ptr().take_own().get_unchecked(), pool.size(), alignof(u8));
+  const OwnPtr owned_ptr = pool.into_ptr().get_unchecked().unwrap();
+  virt_do_deallocate(owned_ptr, pool.size(), alignof(u8));
 
   return {};
 }
