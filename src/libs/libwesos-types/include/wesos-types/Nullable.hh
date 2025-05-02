@@ -89,22 +89,22 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr operator bool() { return isset(); }
 
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& {
+    [[nodiscard]] constexpr auto value() const -> const ValueGeneric& {
       always_assert(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto unwrap_unchecked() const -> const ValueGeneric& {
+    [[nodiscard]] constexpr auto value_unchecked() const -> const ValueGeneric& {
       assert_invariant(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto unwrap() -> ValueGeneric& {
+    [[nodiscard]] constexpr auto value() -> ValueGeneric& {
       always_assert(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto unwrap_unchecked() -> ValueGeneric& {
+    [[nodiscard]] constexpr auto value_unchecked() -> ValueGeneric& {
       assert_invariant(isset());
       return get();
     }
