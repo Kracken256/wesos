@@ -5,6 +5,8 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#include <sanitizer/asan_interface.h>
+
 #include <wesos-builtin/Export.hh>
 #include <wesos-builtin/Range.hh>
 #include <wesos-mem/IntrusiveChainFirstFit.hh>
@@ -91,10 +93,10 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
 
   assert_invariant(ptr.is_aligned(align));
 
-  auto dealigned_range = get_dealigned_range(View<u8>(ptr.unwrap(), size));
+  const auto dealigned_range = get_dealigned_range(View<u8>(ptr.unwrap(), size));
   assert_invariant(dealigned_range.into_ptr().is_aligned(alignof(Chunk)));
 
-  RefPtr chunk = reinterpret_cast<Chunk*>(dealigned_range.into_ptr().unwrap());
+  const RefPtr chunk = reinterpret_cast<Chunk*>(dealigned_range.into_ptr().unwrap());
 
   if (!m_some.isset()) {
     W_DEBUG();
@@ -112,6 +114,8 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
   }
 
   W_DEBUG();
+
+  ASAN_POISON_MEMORY_REGION(dealigned_range.into_ptr().unwrap(), dealigned_range.size());
 }
 
 SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> LeftoverMemory {

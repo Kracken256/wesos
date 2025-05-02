@@ -7,34 +7,114 @@
 
 #pragma once
 
+#include <wesos-assert/Assert.hh>
 #include <wesos-types/Null.hh>
-#include <wesos-types/NullablePtrBase.hh>
+#include <wesos-types/Numeric.hh>
+#include <wesos-types/OwnPtr.hh>
+#include <wesos-types/PowerOfTwo.hh>
 #include <wesos-types/RefPtr.hh>
 
 namespace wesos::types {
   template <typename PointeeGeneric>
   class NullableOwnPtr;
 
-  template <typename PointeeGeneric>
-  class NullableRefPtr : public NullablePtrBase<PointeeGeneric, NullableRefPtr<PointeeGeneric>,
-                                                RefPtr<PointeeGeneric>> {
+  template <class PointeeGeneric>
+  class NullableRefPtr {
+    PointeeGeneric* m_ptr = nullptr;
+
   public:
     constexpr NullableRefPtr() = default;
     constexpr NullableRefPtr(Null) {}
-    constexpr NullableRefPtr(PointeeGeneric* ptr)
-        : NullablePtrBase<PointeeGeneric, NullableRefPtr<PointeeGeneric>, RefPtr<PointeeGeneric>>(
-              ptr) {}
-    constexpr NullableRefPtr(RefPtr<PointeeGeneric> ptr)
-        : NullablePtrBase<PointeeGeneric, NullableRefPtr<PointeeGeneric>, RefPtr<PointeeGeneric>>(
-              ptr.unwrap()) {}
+    constexpr NullableRefPtr(nullptr_t) {}
+    constexpr NullableRefPtr(PointeeGeneric* ptr) : m_ptr(ptr) {}
+    constexpr NullableRefPtr(RefPtr<PointeeGeneric> ptr) : m_ptr(ptr.unwrap()) {}
     constexpr NullableRefPtr(const NullableRefPtr&) = default;
     constexpr NullableRefPtr(NullableRefPtr&&) = default;
     constexpr auto operator=(const NullableRefPtr&) -> NullableRefPtr& = default;
     constexpr auto operator=(NullableRefPtr&&) -> NullableRefPtr& = default;
-    constexpr auto operator<=>(const NullableRefPtr&) const = default;
     constexpr ~NullableRefPtr() = default;
 
-    [[nodiscard]] constexpr auto take_own() const { return NullableOwnPtr(this->unwrap()); }
+    [[nodiscard]] constexpr auto operator<=>(const NullableRefPtr&) const = default;
+    [[nodiscard]] constexpr operator PointeeGeneric*() { return unwrap(); }
+
+    [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
+    [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
+    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto into_uptr() const -> uptr {
+      return reinterpret_cast<uptr>(unwrap());
+    }
+
+    [[nodiscard]] constexpr auto is_aligned(usize x) const -> bool { return into_uptr() % x == 0; }
+    [[nodiscard]] constexpr auto is_aligned_pow2(PowerOfTwo<usize> x) const -> bool {
+      return (into_uptr() & (x.unwrap() - 1)) == 0;
+    }
+
+    [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) const -> NullableRefPtr {
+      const auto ptr = into_uptr();
+      const auto align_ptr = (ptr + x - 1) & -x;
+      return reinterpret_cast<PointeeGeneric*>(align_ptr);
+    }
+
+    [[nodiscard]] constexpr auto align(usize x) const -> NullableRefPtr {
+      assert_invariant(x != 0);
+      const auto ptr = into_uptr();
+      const auto align_ptr = ptr + ((x - (ptr % x)) % x);
+      return reinterpret_cast<PointeeGeneric*>(align_ptr);
+    }
+
+    [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {
+      always_assert(isset());
+      return unwrap();
+    }
+
+    [[nodiscard]] constexpr auto get_unchecked() const -> RefPtr<PointeeGeneric> {
+      assert_invariant(isset());
+      return unwrap();
+    }
+
+    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* {
+      assert_invariant(isset());
+      return unwrap();
+    }
+
+    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& {
+      assert_invariant(isset());
+      return *unwrap();
+    }
+
+    [[nodiscard]] constexpr auto add(usize i) const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() + i;
+    }
+
+    [[nodiscard]] constexpr auto sub(usize i) const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() - i;
+    }
+
+    [[nodiscard]] constexpr auto operator++() const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() + 1;
+    }
+
+    [[nodiscard]] constexpr auto operator++(int) const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() + 1;
+    }
+
+    [[nodiscard]] constexpr auto operator--() const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() - 1;
+    }
+
+    [[nodiscard]] constexpr auto operator--(int) const -> NullableRefPtr {
+      assert_invariant(isset());
+      return unwrap() - 1;
+    }
+
+    [[nodiscard]] constexpr auto take_own() const -> NullableOwnPtr<PointeeGeneric> {
+      return this->unwrap();
+    }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),
