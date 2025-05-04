@@ -25,7 +25,7 @@ namespace wesos::sync {
 
   public:
     constexpr Atomic() = default;
-    constexpr explicit Atomic(Atom value) : m_value(value) {}
+    constexpr Atomic(Atom value) : m_value(value) {}
 
     [[nodiscard]] constexpr auto operator<=>(const Atomic& o) const { return load() <=> o.load(); };
 
@@ -56,5 +56,34 @@ namespace wesos::sync {
     auto compare_exchange_weak(Atom& expected, Atom desired, MemoryOrder order = memory_order_seq_cst) -> bool {
       return compare_exchange_weak(expected, desired, order, order);
     }
+
+    auto fetch_add(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_add(&m_value, val, order);
+    }
+
+    auto fetch_sub(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_sub(&m_value, val, order);
+    }
+
+    auto fetch_and(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_and(&m_value, val, order);
+    }
+
+    auto fetch_or(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_or(&m_value, val, order);
+    }
+
+    auto fetch_xor(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_xor(&m_value, val, order);
+    }
+
+    auto fetch_nand(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
+      return detail::atomic::arch::fetch_nand(&m_value, val, order);
+    }
+
+    auto operator++() -> Atom { return fetch_add(1) + 1; }
+    auto operator++(int) -> Atom { return fetch_add(1); }
+    auto operator--() -> Atom { return fetch_sub(1) - 1; }
+    auto operator--(int) -> Atom { return fetch_sub(1); }
   };
 }  // namespace wesos::sync

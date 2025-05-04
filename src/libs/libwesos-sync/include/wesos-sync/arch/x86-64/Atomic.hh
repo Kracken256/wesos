@@ -37,4 +37,34 @@ namespace wesos::sync::detail::atomic::arch {
                              MemoryOrder failure) -> bool {
     return __atomic_compare_exchange_n(ptr, expected, desired, true, success, failure);
   }
+
+  template <class Atom>
+  auto fetch_add(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_add(ptr, val, order);
+  }
+
+  template <class Atom>
+  auto fetch_sub(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_sub(ptr, val, order);
+  }
+
+  template <class Atom>
+  auto fetch_and(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_and(ptr, val, order);
+  }
+
+  template <class Atom>
+  auto fetch_or(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_or(ptr, val, order);
+  }
+
+  template <class Atom>
+  auto fetch_xor(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_xor(ptr, val, order);
+  }
+
+  template <class Atom>
+  auto fetch_nand(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
+    return __atomic_fetch_nand(ptr, val, order);
+  }
 }  // namespace wesos::sync::detail::atomic::arch
