@@ -10,33 +10,33 @@
 #include <wesos-types/Null.hh>
 
 namespace wesos::lambda {
-  template <typename FuncGeneric>
+  template <typename Func>
   class Lambda;
 
-  template <typename ResultGeneric, typename... ArgsGeneric>
-  class Lambda<ResultGeneric(ArgsGeneric...)> {
+  template <typename Result, typename... Args>
+  class Lambda<Result(Args...)> {
     class CallableBaseProtocol {
     public:
       virtual ~CallableBaseProtocol() = default;
 
-      virtual auto operator()(ArgsGeneric...) -> ResultGeneric = 0;
+      virtual auto operator()(Args...) -> Result = 0;
       virtual auto virt_clone() -> CallableBaseProtocol* = 0;
     };
 
-    template <typename FuncGeneric>
+    template <typename Func>
     class Callable final : public CallableBaseProtocol {
-      FuncGeneric m_functor;
+      Func m_functor;
 
     public:
-      Callable(FuncGeneric functor) : m_functor(functor) {}
+      Callable(Func functor) : m_functor(functor) {}
 
-      auto virt_clone() -> CallableBaseProtocol* override { return new Callable<FuncGeneric>(m_functor); }
+      auto virt_clone() -> CallableBaseProtocol* override { return new Callable<Func>(m_functor); }
 
-      auto operator()(ArgsGeneric... d) -> ResultGeneric override { return m_functor(d...); }
+      auto operator()(Args... d) -> Result override { return m_functor(d...); }
     };
 
   public:
-    using FunctionType = ResultGeneric(ArgsGeneric...);
+    using FunctionType = Result(Args...);
 
     constexpr Lambda() : m_callable(nullptr) {}
 
@@ -76,14 +76,14 @@ namespace wesos::lambda {
       return *this;
     }
 
-    template <class FuncGeneric>
-    Lambda(FuncGeneric&& f) {
-      m_callable = new Callable<FuncGeneric>(f);
+    template <class Func>
+    Lambda(Func&& f) {
+      m_callable = new Callable<Func>(f);
     }
 
     ~Lambda() { delete m_callable; }
 
-    auto operator()(ArgsGeneric... args) const -> ResultGeneric { return (*m_callable)(args...); }
+    auto operator()(Args... args) const -> Result { return (*m_callable)(args...); }
 
   private:
     CallableBaseProtocol* m_callable;
