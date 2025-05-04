@@ -36,44 +36,46 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto empty() const -> bool { return size() == 0; }
 
     [[nodiscard]] constexpr auto begin() -> Pointer { return m_base; }
-    [[nodiscard]] constexpr auto end() -> Pointer { return m_base.add(size()); }
+    [[nodiscard]] constexpr auto end() -> Pointer { return m_base.unwrap() + size(); }
     [[nodiscard]] constexpr auto cbegin() const -> ConstPointer { return m_base; }
-    [[nodiscard]] constexpr auto cend() const -> ConstPointer { return m_base.add(size()); }
+    [[nodiscard]] constexpr auto cend() const -> ConstPointer { return m_base.unwrap() + size(); }
 
     [[nodiscard]] constexpr auto into_ptr() const { return m_base; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
       assert_always(i < size());
-      return *(m_base.add(i));
+      return *(m_base.unwrap() + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& { return *(m_base.add(i)); }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
+      return *(m_base.unwrap() + i);
+    }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
       assert_always(i < size());
-      return *(m_base.add(i));
+      return *(m_base.unwrap() + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return *(m_base.add(i)); }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return *(m_base.unwrap() + i); }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View {
       assert_always(i <= size() && count <= size() - i);
-      return {m_base.add(i), count};
+      return {m_base.unwrap() + i, count};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) const -> View {
       assert_invariant(i <= size() && count <= size() - i);
-      return {m_base.add(i), count};
+      return {m_base.unwrap() + i, count};
     }
 
     [[nodiscard]] constexpr auto subview(usize i) const -> View {
       assert_always(i <= size());
-      return {m_base.add(i), size() - i};
+      return {m_base.unwrap() + i, size() - i};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i) const -> View {
       assert_invariant(i <= size());
-      return {m_base.add(i), size() - i};
+      return {m_base.unwrap() + i, size() - i};
     }
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
@@ -110,13 +112,13 @@ namespace wesos::types {
 
     constexpr auto set(usize i, ElementGeneric x) -> View& {
       assert_always(i <= size());
-      *m_base.add(i) = move(x);
+      m_base.unwrap()[i] = move(x);
       return *this;
     }
 
     constexpr auto set_unchecked(usize i, ElementGeneric x) -> View& {
       assert_invariant(i <= size());
-      *m_base.add(i) = move(x);
+      m_base.unwrap()[i] = move(x);
       return *this;
     }
 
