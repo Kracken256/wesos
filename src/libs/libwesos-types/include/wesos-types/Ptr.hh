@@ -52,4 +52,22 @@ namespace wesos::types {
 
     return bit_cast<PointeeType*>(aligned);
   }
+
+  template <class PointerTypeGeneric>
+  [[nodiscard]] static constexpr auto bytes_until_next_aligned_pow2(PointerTypeGeneric addr,
+                                                                    PowerOfTwo<usize> x) -> uptr
+    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  {
+    const auto address = [addr]() {
+      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+        return bit_cast<uptr>(addr);
+      } else {
+        return bit_cast<uptr>(addr.unwrap());
+      }
+    }();
+
+    const uptr aligned = (address + x.unwrap() - 1) & ~(x.unwrap() - 1);
+
+    return aligned - address;
+  }
 }  // namespace wesos::types
