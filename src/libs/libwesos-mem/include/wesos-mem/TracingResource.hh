@@ -14,8 +14,8 @@
 namespace wesos::mem {
   class TracingResource final : public MemoryResourceProtocol {
     auto virt_do_utilize(View<u8> pool) -> void override;
-    [[nodiscard]] auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override;
-    void virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) override;
+    [[nodiscard]] auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
+    void virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) override;
 
   public:
     using PrintCallback = int (*)(const char* fmt, ...);

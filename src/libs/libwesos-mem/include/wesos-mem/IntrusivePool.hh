@@ -28,8 +28,8 @@ namespace wesos::mem {
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
 
-    auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override;
-    auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void override;
+    auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
+    auto virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void override;
     auto virt_do_utilize(View<u8> pool) -> void override;
 
   public:

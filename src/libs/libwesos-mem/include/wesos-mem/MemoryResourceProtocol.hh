@@ -17,13 +17,13 @@ namespace wesos::mem {
 
     [[nodiscard]] constexpr auto operator<=>(const MemoryResourceProtocol&) const = default;
 
-    [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8>;
-    auto deallocate_bytes(NullableOwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void;
+    [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
     auto utilize_bytes(View<u8> pool) -> void;
 
   private:
-    virtual auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> = 0;
-    virtual auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
+    virtual auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> = 0;
+    virtual auto virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
     virtual auto virt_do_utilize(View<u8> pool) -> void = 0;
   };
 }  // namespace wesos::mem

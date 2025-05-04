@@ -44,7 +44,7 @@ TEST(IntrusivePool, Allocate) {
   using namespace wesos;
 
   struct Hash {
-    constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.as_uptr(); }
+    constexpr auto operator()(const NullableOwnPtr<void>& x) const -> size_t { return x.as_uptr(); }
   };
 
   const auto min_size = 16;
@@ -55,7 +55,7 @@ TEST(IntrusivePool, Allocate) {
   constexpr auto alloc_limit = 9;
 
   std::pmr::polymorphic_allocator<u8> service;
-  std::unordered_set<NullableOwnPtr<u8>, Hash> pointers;
+  std::unordered_set<NullableOwnPtr<void>, Hash> pointers;
 
   for (usize size = min_size; size < max_size; size++) {
     for (usize align = min_align; align < max_align; align *= 2) {

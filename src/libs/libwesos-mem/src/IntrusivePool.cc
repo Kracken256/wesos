@@ -53,7 +53,7 @@ SYM_EXPORT IntrusivePool::~IntrusivePool() {
   }
 }
 
-SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> {
+SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   if (!m_front.isset() || size > object_size() || align > object_align()) [[unlikely]] {
     return nullptr;
   }
@@ -66,10 +66,10 @@ SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> al
   const auto result = OwnPtr(bit_cast<u8*>(freenode.unwrap()));
   assert_invariant(is_aligned_pow2(result, align));
 
-  return result;
+  return result.unwrap();
 }
 
-SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) {
+SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
   assert_invariant(size <= object_size() && max(align.unwrap(), alignof(FreeNode)) == object_align());
 
   const auto node = OwnPtr(bit_cast<FreeNode*>(ptr.unwrap()));
@@ -89,6 +89,6 @@ SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> void {
     const auto object_ptr = OwnPtr(object_range.into_ptr().get_unchecked().unwrap());
     assert_invariant(object_range.size() == object_size() && is_aligned_pow2(object_ptr, object_align()));
 
-    virt_do_deallocate(object_ptr, object_size(), object_align());
+    virt_do_deallocate(object_ptr.unwrap(), object_size(), object_align());
   });
 }

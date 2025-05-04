@@ -53,7 +53,7 @@ void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool s
     return mm.allocate_bytes(size, align);
   };
 
-  const auto deallocate_sync = [&](NullableOwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) {
+  const auto deallocate_sync = [&](NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
     std::lock_guard lock(simulate_global_lock);
     return mm.deallocate_bytes(ptr, size, align);
   };

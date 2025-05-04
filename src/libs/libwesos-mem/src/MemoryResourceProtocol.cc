@@ -15,11 +15,11 @@ using namespace wesos::mem;
 
 SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() = default;
 
-SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> {
+SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   return virt_do_allocate(size, align);
 }
 
-SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<u8> ptr, usize size,
+SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<void> ptr, usize size,
                                                          PowerOfTwo<usize> align) -> void {
   if (ptr.isset()) [[likely]] {
     virt_do_deallocate(ptr.get_unchecked(), size, align);

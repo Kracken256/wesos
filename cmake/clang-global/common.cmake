@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 ################################################################################
 # LINTING AND REPORTING
 ################################################################################
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+add_compile_options(-Wall -Wextra -Wpedantic -Werror -Wold-style-cast)
 add_compile_options(-Wshadow -Wconversion -Wsign-conversion)
 add_compile_options(-Wno-error=unused-parameter -Wno-error=unused-variable -Wno-error=unused-function)
 add_compile_options(-Wno-error=deprecated -g3)
