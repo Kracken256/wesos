@@ -17,7 +17,7 @@ namespace wesos::smartptr {
     NullableOwnPtr<Object> m_ptr;
     mem::MemoryResourceProtocol& m_pmr;
 
-    Box(OwnPtr<Object> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(pmr) {}
+    constexpr Box(OwnPtr<Object> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(pmr) {}
 
   public:
     constexpr Box(const Box& o) = delete;
