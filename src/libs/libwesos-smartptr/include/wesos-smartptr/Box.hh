@@ -22,12 +22,12 @@ namespace wesos::smartptr {
   public:
     constexpr Box(const Box& o) = delete;
     constexpr auto operator=(const Box& o) -> Box& = delete;
-    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = nullptr; };
+    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = null; };
 
     constexpr auto operator=(Box&& o) -> Box& {
       if (this != &o) [[likely]] {
         m_ptr = o.m_ptr;
-        o.m_ptr = nullptr;
+        o.m_ptr = null;
       }
 
       return *this;
@@ -37,29 +37,90 @@ namespace wesos::smartptr {
       if (!m_ptr.is_null()) {
         m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
 #ifndef NDEBUG
-        m_ptr = nullptr;
+        m_ptr = null;
 #endif
       }
     }
 
-    template <class... Args>
-    [[nodiscard]] static auto create(Args... args) {
-      return [... args = forward<Args>(args)](mem::MemoryResourceProtocol& pmr) -> Nullable<Box> {
-        if (auto ptr = pmr.allocate_and_construct<Object>(1, args...)) [[likely]] {
-          return Box(ptr.unwrap(), pmr);
-        }
+    [[nodiscard]] constexpr auto operator<=>(const Box& o) const { return unwrap() <=> o.unwrap(); }
+    [[nodiscard]] constexpr auto operator==(types::Null) const { return is_null(); }
+    [[nodiscard]] constexpr auto operator==(types::nullptr_t) const { return is_null(); }
 
+    template <class... Args>
+    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr, Args&&... args) -> Nullable<Box> {
+      auto ptr = pmr.allocate_storage<Object>(1);
+      if (!ptr) {
         return null;
-      };
+      }
+
+      ::new (static_cast<void*>(ptr.unwrap())) Object(forward<Args>(args)...);
+
+      return Box(ptr.unwrap(), pmr);
     }
 
+    ///=========================================================================================
+    /// LIFETIME MANAGEMENT
+    ///=========================================================================================
+
+    constexpr auto disown() -> void { m_ptr = null; }
+
+    ///=========================================================================================
+    /// POINTER ACCESS
+    ///=========================================================================================
+
+    [[nodiscard]] constexpr auto unwrap() -> Object* { return m_ptr.unwrap(); }
+    [[nodiscard]] constexpr auto unwrap() const -> const Object* { return m_ptr.unwrap(); }
+
+    [[nodiscard]] constexpr auto isset() const -> bool { return m_ptr.isset(); }
+    [[nodiscard]] constexpr auto is_null() const -> bool { return m_ptr.is_null(); }
+
     template <class U = Object>
-    [[nodiscard]] constexpr auto get() -> U& requires(!types::is_same_v<U, void>) { return *m_ptr.as_ref().get(); }
+    [[nodiscard]] constexpr auto operator->() -> U* requires(!types::is_same_v<U, void>) {
+      assert_always(m_ptr.isset());
+      return unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto operator->() const -> const U* requires(!types::is_same_v<U, void>) {
+      assert_always(m_ptr.isset());
+      return unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto operator*() -> U& requires(!types::is_same_v<U, void>) {
+      assert_always(m_ptr.isset());
+      return *unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto operator*() const -> const U& requires(!types::is_same_v<U, void>) {
+      assert_always(m_ptr.isset());
+      return *unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto get() -> U& requires(!types::is_same_v<U, void>) {
+      assert_always(m_ptr.isset());
+      return *unwrap();
+    };
 
     template <class U = Object>
     [[nodiscard]] constexpr auto get() const -> const U& requires(!types::is_same_v<U, void>) {
-      return *m_ptr.as_ref().get();
-    }
+      assert_always(m_ptr.isset());
+      return *unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto get_unchecked() -> U& requires(!types::is_same_v<U, void>) {
+      assert_invariant(m_ptr.isset());
+      return *unwrap();
+    };
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto get_unchecked() const -> const U& requires(!types::is_same_v<U, void>) {
+      assert_invariant(m_ptr.isset());
+      return *unwrap();
+    };
   };
 
   static_assert(sizeof(Box<void>) == sizeof(void*) * 2);

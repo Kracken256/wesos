@@ -56,7 +56,7 @@ namespace wesos::mem {
 
       if (p) {
         for (usize i = 0; i < n; i++) {
-          construct<Object>(p.unwrap()[i], args...);
+          construct<Object>(p.unwrap()[i], forward<Args>(args)...);
         }
       }
 

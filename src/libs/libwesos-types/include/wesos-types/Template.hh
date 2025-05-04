@@ -145,12 +145,12 @@ namespace wesos::types {
   ///===========================================================================
 
   template <typename T>
-  constexpr auto forward(remove_reference_t<T>& t) noexcept -> T&& {
+  constexpr auto forward(remove_reference_t<T>& t) -> T&& {
     return static_cast<T&&>(t);
   }
 
   template <typename T>
-  constexpr auto forward(remove_reference_t<T>&& t) noexcept -> T&& {
+  constexpr auto forward(remove_reference_t<T>&& t) -> T&& {
     static_assert(!is_lvalue_reference_v<T>, "bad forward: can't forward an rvalue as an lvalue");
     return static_cast<T&&>(t);
   }
