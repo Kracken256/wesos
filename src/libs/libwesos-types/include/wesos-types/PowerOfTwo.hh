@@ -23,9 +23,7 @@ namespace wesos::types {
     }
 
   public:
-    constexpr PowerOfTwo(ValueGeneric x) : m_value(move(x)) {
-      assert_invariant(is_power_of_two(x));
-    };
+    constexpr PowerOfTwo(ValueGeneric x) : m_value(move(x)) { assert_invariant(is_power_of_two(x)); };
     constexpr PowerOfTwo(const PowerOfTwo&) = default;
     constexpr PowerOfTwo(PowerOfTwo&&) = default;
     constexpr auto operator=(const PowerOfTwo&) -> PowerOfTwo& = default;

@@ -18,8 +18,7 @@ namespace wesos::mem::testing {
       MethodGeneric m_method;
 
     public:
-      constexpr ZeroCostDelegate(ClassGeneric& base, MethodGeneric method)
-          : m_base(base), m_method(method) {}
+      constexpr ZeroCostDelegate(ClassGeneric& base, MethodGeneric method) : m_base(base), m_method(method) {}
 
       template <typename... ArgsGeneric>
       constexpr auto operator()(ArgsGeneric... args) const {
@@ -28,8 +27,8 @@ namespace wesos::mem::testing {
     };
   }  // namespace detail
 
-  static void benchmark_crunch(const auto& allocate, const auto& deallocate,
-                               const BenchmarkOptions& options, usize& alloc_count) {
+  static void benchmark_crunch(const auto& allocate, const auto& deallocate, const BenchmarkOptions& options,
+                               usize& alloc_count) {
     /// FIXME: Implement realistic allocation patterns
 
     const auto [min_size, max_size, min_align, max_align] = options;
@@ -47,8 +46,8 @@ namespace wesos::mem::testing {
 
 static std::mutex simulate_global_lock;
 
-void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool sync,
-                                              BenchmarkOptions options, usize& alloc_count) {
+void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool sync, BenchmarkOptions options,
+                                              usize& alloc_count) {
   const auto allocate_sync = [&](usize size, PowerOfTwo<usize> align) {
     std::lock_guard lock(simulate_global_lock);
     return mm.allocate_bytes(size, align);
@@ -59,19 +58,14 @@ void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool s
     return mm.deallocate_bytes(ptr, size, align);
   };
 
-  using AllocateFunc = detail::ZeroCostDelegate<MemoryResourceProtocol,
-                                                decltype(&MemoryResourceProtocol::allocate_bytes)>;
+  using AllocateFunc =
+      detail::ZeroCostDelegate<MemoryResourceProtocol, decltype(&MemoryResourceProtocol::allocate_bytes)>;
   using DeallocateFunc =
-      detail::ZeroCostDelegate<MemoryResourceProtocol,
-                               decltype(&MemoryResourceProtocol::deallocate_bytes)>;
+      detail::ZeroCostDelegate<MemoryResourceProtocol, decltype(&MemoryResourceProtocol::deallocate_bytes)>;
 
-  const auto allocate_nosync = [&]() {
-    return AllocateFunc(mm, &MemoryResourceProtocol::allocate_bytes);
-  }();
+  const auto allocate_nosync = [&]() { return AllocateFunc(mm, &MemoryResourceProtocol::allocate_bytes); }();
 
-  const auto deallocate_nosync = [&]() {
-    return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_bytes);
-  }();
+  const auto deallocate_nosync = [&]() { return DeallocateFunc(mm, &MemoryResourceProtocol::deallocate_bytes); }();
 
   if (sync) {
     benchmark_crunch(allocate_sync, deallocate_sync, options, alloc_count);

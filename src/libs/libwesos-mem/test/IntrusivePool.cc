@@ -13,8 +13,7 @@
 #include <wesos-mem/IntrusivePool.hh>
 
 static void deps_setup() {
-  wesos::assert::register_output_callback(nullptr, [](void*, const char* message,
-                                                      wesos::SourceLocation source) {
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message, wesos::SourceLocation source) {
     std::cerr << "\n==========================================================================="
                  "===========\n"
               << "| Assertion Failed: \"" << message << "\";\n"
@@ -75,8 +74,7 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          ASSERT_NE(the_alloc_ptr, null)
-              << "Failed on size(" << size << "), " << "align(" << align << ")";
+          ASSERT_NE(the_alloc_ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
           memset(the_alloc_ptr.unwrap(), 0, size);
 
@@ -99,8 +97,7 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          ASSERT_NE(the_alloc_ptr, null)
-              << "Failed on size(" << size << "), " << "align(" << align << ")";
+          ASSERT_NE(the_alloc_ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
           memset(the_alloc_ptr.unwrap(), 0, size);
 
@@ -123,8 +120,7 @@ TEST(IntrusivePool, Allocate) {
         for (usize alloc_i = 0; alloc_i < alloc_limit; alloc_i++) {
           auto the_alloc_ptr = mm.allocate_bytes(size, align);
 
-          ASSERT_NE(the_alloc_ptr, null)
-              << "Failed on size(" << size << "), " << "align(" << align << ")";
+          ASSERT_NE(the_alloc_ptr, null) << "Failed on size(" << size << "), " << "align(" << align << ")";
 
           memset(the_alloc_ptr.unwrap(), 0, size);
 

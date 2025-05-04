@@ -18,9 +18,7 @@ namespace wesos::types {
     constexpr Range(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
-    constexpr Range(ValueGeneric x) : m_value(move(x)) {
-      assert_invariant(x >= MinimumValue && x <= MaximumValue);
-    };
+    constexpr Range(ValueGeneric x) : m_value(move(x)) { assert_invariant(x >= MinimumValue && x <= MaximumValue); };
     constexpr Range(const Range&) = default;
     constexpr Range(Range&&) = default;
     constexpr auto operator=(const Range&) -> Range& = default;

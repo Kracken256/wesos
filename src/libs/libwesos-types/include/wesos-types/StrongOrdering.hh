@@ -89,14 +89,12 @@ namespace std {
     }
 
     [[nodiscard]]
-    friend constexpr auto operator<=>(partial_ordering v,
-                                      cmp_cat::unspec) noexcept -> partial_ordering {
+    friend constexpr auto operator<=>(partial_ordering v, cmp_cat::unspec) noexcept -> partial_ordering {
       return v;
     }
 
     [[nodiscard]]
-    friend constexpr auto operator<=>(cmp_cat::unspec,
-                                      partial_ordering v) noexcept -> partial_ordering {
+    friend constexpr auto operator<=>(cmp_cat::unspec, partial_ordering v) noexcept -> partial_ordering {
       if ((v.m_value & 1) != 0) {
         return partial_ordering(cmp_cat::_Ord(-v.m_value));
       }
@@ -259,14 +257,12 @@ namespace std {
     }
 
     [[nodiscard]]
-    friend constexpr auto operator<=>(strong_ordering v,
-                                      cmp_cat::unspec) noexcept -> strong_ordering {
+    friend constexpr auto operator<=>(strong_ordering v, cmp_cat::unspec) noexcept -> strong_ordering {
       return v;
     }
 
     [[nodiscard]]
-    friend constexpr auto operator<=>(cmp_cat::unspec,
-                                      strong_ordering v) noexcept -> strong_ordering {
+    friend constexpr auto operator<=>(cmp_cat::unspec, strong_ordering v) noexcept -> strong_ordering {
       return strong_ordering(cmp_cat::_Ord(-v.m_value));
     }
   };

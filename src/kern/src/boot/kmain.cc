@@ -9,8 +9,7 @@
 #include <wesos-kern/boot/Options.hh>
 
 namespace wesos::kern {
-  [[gnu::section(".text._start"), noreturn]] SYM_EXPORT void start(
-      Untrusted<boot::Options> boot_settings) {
+  [[gnu::section(".text._start"), noreturn]] SYM_EXPORT void start(Untrusted<boot::Options> boot_settings) {
     const auto& settings = boot_settings.trust_and_unwrap();
     (void)settings;
 

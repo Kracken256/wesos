@@ -46,8 +46,7 @@ namespace wesos::types {
 
   public:
     constexpr Triplet() = default;
-    constexpr Triplet(TypeAGeneric a, TypeBGeneric b, TypeCGeneric c)
-        : m_a(move(a)), m_b(move(b)), m_c(move(c)) {}
+    constexpr Triplet(TypeAGeneric a, TypeBGeneric b, TypeCGeneric c) : m_a(move(a)), m_b(move(b)), m_c(move(c)) {}
     constexpr Triplet(const Triplet&) = default;
     constexpr Triplet(Triplet&&) = default;
     constexpr auto operator=(const Triplet&) -> Triplet& = default;

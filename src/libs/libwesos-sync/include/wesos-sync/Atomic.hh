@@ -43,8 +43,7 @@ namespace wesos::sync {
 
     auto compare_exchange_strong(AtomGeneric& expected, AtomGeneric desired, MemoryOrder success,
                                  MemoryOrder failure) -> bool {
-      return detail::atomic::arch::compare_exchange_strong(&m_value, &expected, desired, success,
-                                                           failure);
+      return detail::atomic::arch::compare_exchange_strong(&m_value, &expected, desired, success, failure);
     }
 
     auto compare_exchange_strong(AtomGeneric& expected, AtomGeneric desired,
@@ -54,8 +53,7 @@ namespace wesos::sync {
 
     auto compare_exchange_weak(AtomGeneric& expected, AtomGeneric desired, MemoryOrder success,
                                MemoryOrder failure) -> bool {
-      return detail::atomic::arch::compare_exchange_weak(&m_value, &expected, desired, success,
-                                                         failure);
+      return detail::atomic::arch::compare_exchange_weak(&m_value, &expected, desired, success, failure);
     }
 
     auto compare_exchange_weak(AtomGeneric& expected, AtomGeneric desired,

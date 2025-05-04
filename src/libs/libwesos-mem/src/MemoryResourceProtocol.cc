@@ -15,8 +15,7 @@ using namespace wesos::mem;
 
 SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() = default;
 
-SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align)
-    -> NullableOwnPtr<u8> {
+SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> {
   return virt_do_allocate(size, align);
 }
 
@@ -27,6 +26,4 @@ SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<u8> ptr,
   }
 }
 
-SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> LeftoverMemory {
-  return virt_do_utilize(pool);
-}
+SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> LeftoverMemory { return virt_do_utilize(pool); }

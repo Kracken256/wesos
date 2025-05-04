@@ -53,6 +53,5 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto as_ref() const -> RefPtr<PointeeGeneric> { return unwrap(); }
   };
 
-  static_assert(sizeof(OwnPtr<void*>) == sizeof(void*),
-                "Size of OwnPtr<void*> must be equal to size of void*");
+  static_assert(sizeof(OwnPtr<void*>) == sizeof(void*), "Size of OwnPtr<void*> must be equal to size of void*");
 }  // namespace wesos::types

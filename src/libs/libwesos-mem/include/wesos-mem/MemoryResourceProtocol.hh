@@ -13,20 +13,17 @@
 namespace wesos::mem {
   class MemoryResourceProtocol {
   public:
-    using LeftoverMemory = Pair<Unused<View<u8>>, Unused<View<u8>>>;
-
     virtual ~MemoryResourceProtocol() = 0;
 
     [[nodiscard]] constexpr auto operator<=>(const MemoryResourceProtocol&) const = default;
 
-    [[nodiscard]] auto utilize_bytes(View<u8> pool) -> LeftoverMemory;
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8>;
-    void deallocate_bytes(NullableOwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align);
+    auto deallocate_bytes(NullableOwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void;
+    auto utilize_bytes(View<u8> pool) -> void;
 
   private:
     virtual auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> = 0;
-    virtual auto virt_do_deallocate(OwnPtr<u8> ptr, usize size,
-                                    PowerOfTwo<usize> align) -> void = 0;
-    virtual auto virt_do_utilize(View<u8> pool) -> LeftoverMemory = 0;
+    virtual auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
+    virtual auto virt_do_utilize(View<u8> pool) -> void = 0;
   };
 }  // namespace wesos::mem

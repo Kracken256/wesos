@@ -31,8 +31,7 @@ static void debug_s(const char* func, int line) {
 #define W_DEBUG() debug_s(__func__, __LINE__)
 }
 
-SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool)
-    : m_some(nullptr), m_initial_pool(pool) {
+SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(View<u8> pool) : m_some(nullptr), m_initial_pool(pool) {
   virt_do_utilize(pool);
 }
 
@@ -42,8 +41,7 @@ SYM_EXPORT IntrusiveChainFirstFit::IntrusiveChainFirstFit(IntrusiveChainFirstFit
   o.m_initial_pool.clear();
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o)
-    -> IntrusiveChainFirstFit& {
+SYM_EXPORT auto IntrusiveChainFirstFit::operator=(IntrusiveChainFirstFit&& o) -> IntrusiveChainFirstFit& {
   if (this != &o) {
     m_some = o.m_some;
     m_initial_pool = o.m_initial_pool;
@@ -81,9 +79,7 @@ namespace wesos::mem::detail {
     using BytesBeforeCount = Most<usize, MAX_U8>;
     using BytesAfterCount = Most<usize, MAX_U8>;
 
-    ChunkHeaderFormat(BitHeader& header) : m_meta(header) {
-      ASAN_UNPOISON_MEMORY_REGION(&m_meta, sizeof(BitHeader));
-    }
+    ChunkHeaderFormat(BitHeader& header) : m_meta(header) { ASAN_UNPOISON_MEMORY_REGION(&m_meta, sizeof(BitHeader)); }
 
     ~ChunkHeaderFormat() { ASAN_POISON_MEMORY_REGION(&m_meta, sizeof(BitHeader)); }
 
@@ -128,13 +124,11 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
     return nullptr;
   }
 
-  for (NullableRefPtr<Chunk> node = m_some, prev = nullptr; node.isset();
-       prev = node, node = node->m_next) {
+  for (NullableRefPtr<Chunk> node = m_some, prev = nullptr; node.isset(); prev = node, node = node->m_next) {
     const auto unaligned_chunk_start = RefPtr(bit_cast<u8*>(node.unwrap()));
     const auto unaligned_chunk_end = RefPtr(unaligned_chunk_start.unwrap() + node->m_size);
 
-    const auto aligned_range_start =
-        RefPtr(next_aligned_pow2(unaligned_chunk_start.add(sizeof(BitHeader)), align));
+    const auto aligned_range_start = RefPtr(next_aligned_pow2(unaligned_chunk_start.add(sizeof(BitHeader)), align));
     const auto aligned_range_end = aligned_range_start.add(size);
 
     if (aligned_range_end > unaligned_chunk_end) {
@@ -200,9 +194,8 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
   return nullptr;
 }
 
-SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(
-    OwnPtr<u8> ptr, usize size,
-    PowerOfTwo<usize> align) {  /// TODO: Struct code review
+SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
+                                                           PowerOfTwo<usize> align) {  /// TODO: Struct code review
   using namespace detail;
 
   assert_invariant(is_aligned_pow2(ptr, align));
@@ -261,8 +254,7 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(
   detail::print_freelist(m_some);
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool)
-    -> LeftoverMemory {  /// TODO: Struct code review
+SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> LeftoverMemory {  /// TODO: Struct code review
   using namespace detail;
 
   auto window = pool;

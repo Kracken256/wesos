@@ -15,12 +15,8 @@ namespace wesos::mem::testing {
     PowerOfTwo<usize> m_align_min, m_align_max;
 
     constexpr BenchmarkOptions(auto size_min, auto size_max, auto align_min, auto align_max)
-        : m_size_min(size_min),
-          m_size_max(size_max),
-          m_align_min(align_min),
-          m_align_max(align_max) {}
+        : m_size_min(size_min), m_size_max(size_max), m_align_min(align_min), m_align_max(align_max) {}
   };
 
-  void allocator_benchmark(MemoryResourceProtocol& mm, bool sync, BenchmarkOptions options,
-                           usize& alloc_count);
+  void allocator_benchmark(MemoryResourceProtocol& mm, bool sync, BenchmarkOptions options, usize& alloc_count);
 }  // namespace wesos::mem::testing

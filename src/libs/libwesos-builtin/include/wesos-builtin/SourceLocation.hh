@@ -15,14 +15,11 @@ namespace wesos {
     using FileName = decltype(__builtin_FILE());
     using FunctionName = decltype(__builtin_FUNCTION());
 
-    constexpr SourceLocation(FileName file = __builtin_FILE(),
-                             FunctionName function = __builtin_FUNCTION(),
-                             LineNumber line = __builtin_LINE(),
-                             ColumnNumber column = __builtin_COLUMN())
+    constexpr SourceLocation(FileName file = __builtin_FILE(), FunctionName function = __builtin_FUNCTION(),
+                             LineNumber line = __builtin_LINE(), ColumnNumber column = __builtin_COLUMN())
         : m_file(file), m_function(function), m_line(line), m_column(column) {}
 
-    static constexpr auto current(FileName file = __builtin_FILE(),
-                                  FunctionName function = __builtin_FUNCTION(),
+    static constexpr auto current(FileName file = __builtin_FILE(), FunctionName function = __builtin_FUNCTION(),
                                   LineNumber line = __builtin_LINE(),
                                   ColumnNumber column = __builtin_COLUMN()) -> SourceLocation {
       return {file, function, line, column};

@@ -12,8 +12,7 @@
 #include <wesos-mem/TracingResource.hh>
 
 static void deps_setup() {
-  wesos::assert::register_output_callback(nullptr, [](void*, const char* message,
-                                                      wesos::SourceLocation source) {
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message, wesos::SourceLocation source) {
     std::cerr << "\n==========================================================================="
                  "===========\n"
               << "| Assertion Failed: \"" << message << "\";\n"

@@ -16,8 +16,7 @@
 
 namespace wesos::types {
   template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric addr,
-                                                      PowerOfTwo<usize> x) -> bool
+  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric addr, PowerOfTwo<usize> x) -> bool
     requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
   {
     const auto address = [addr]() {
@@ -37,8 +36,7 @@ namespace wesos::types {
     requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
   {
     using PointeeType =
-        remove_pointer_t<conditional_t<is_pointer_v<PointerTypeGeneric>, PointerTypeGeneric,
-                                       decltype(addr.unwrap())>>;
+        remove_pointer_t<conditional_t<is_pointer_v<PointerTypeGeneric>, PointerTypeGeneric, decltype(addr.unwrap())>>;
 
     const auto address = [addr]() {
       if constexpr (is_pointer_v<PointerTypeGeneric>) {

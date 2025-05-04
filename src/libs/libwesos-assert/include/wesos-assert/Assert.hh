@@ -21,12 +21,11 @@ namespace wesos::assert {
 
 // NOLINTBEGIN(readability-identifier-naming)
 
-#define always_assert(...)                                              \
-  [](bool eval, const char* eval_code,                                  \
-     wesos::SourceLocation source = wesos::SourceLocation::current()) { \
-    if (!eval) [[unlikely]] {                                           \
-      wesos::assert::assert_failure(eval_code, source);                 \
-    }                                                                   \
+#define always_assert(...)                                                                                \
+  [](bool eval, const char* eval_code, wesos::SourceLocation source = wesos::SourceLocation::current()) { \
+    if (!eval) [[unlikely]] {                                                                             \
+      wesos::assert::assert_failure(eval_code, source);                                                   \
+    }                                                                                                     \
   }((__VA_ARGS__), #__VA_ARGS__)
 
 #ifdef NDEBUG

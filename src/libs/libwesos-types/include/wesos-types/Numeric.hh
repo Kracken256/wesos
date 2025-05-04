@@ -58,31 +58,19 @@ namespace wesos::types {
 
   constexpr auto operator"" _u8(unsigned long long x) -> u8 { return static_cast<detail::__u8>(x); }
 
-  constexpr auto operator"" _u16(unsigned long long x) -> u16 {
-    return static_cast<detail::__u16>(x);
-  }
+  constexpr auto operator"" _u16(unsigned long long x) -> u16 { return static_cast<detail::__u16>(x); }
 
-  constexpr auto operator"" _u32(unsigned long long x) -> u32 {
-    return static_cast<detail::__u32>(x);
-  }
+  constexpr auto operator"" _u32(unsigned long long x) -> u32 { return static_cast<detail::__u32>(x); }
 
-  constexpr auto operator"" _u64(unsigned long long x) -> u64 {
-    return static_cast<detail::__u64>(x);
-  }
+  constexpr auto operator"" _u64(unsigned long long x) -> u64 { return static_cast<detail::__u64>(x); }
 
   constexpr auto operator"" _i8(unsigned long long x) -> i8 { return static_cast<detail::__i8>(x); }
 
-  constexpr auto operator"" _i16(unsigned long long x) -> i16 {
-    return static_cast<detail::__i16>(x);
-  }
+  constexpr auto operator"" _i16(unsigned long long x) -> i16 { return static_cast<detail::__i16>(x); }
 
-  constexpr auto operator"" _i32(unsigned long long x) -> i32 {
-    return static_cast<detail::__i32>(x);
-  }
+  constexpr auto operator"" _i32(unsigned long long x) -> i32 { return static_cast<detail::__i32>(x); }
 
-  constexpr auto operator"" _i64(unsigned long long x) -> i64 {
-    return static_cast<detail::__i64>(x);
-  }
+  constexpr auto operator"" _i64(unsigned long long x) -> i64 { return static_cast<detail::__i64>(x); }
 
   constexpr auto operator"" _f32(long double x) -> f32 { return static_cast<detail::__f32>(x); }
 
@@ -104,9 +92,8 @@ namespace wesos::types {
 
   template <class DstGeneric, class SrcGeneric>
   [[nodiscard]] static constexpr auto trunc_to(SrcGeneric x) -> DstGeneric {
-    static_assert(
-        sizeof(DstGeneric) < sizeof(SrcGeneric),
-        "Explicit truncation is disallowed because it is redundant. Use cast_to() instead.");
+    static_assert(sizeof(DstGeneric) < sizeof(SrcGeneric),
+                  "Explicit truncation is disallowed because it is redundant. Use cast_to() instead.");
     return static_cast<DstGeneric>(x);
   }
 

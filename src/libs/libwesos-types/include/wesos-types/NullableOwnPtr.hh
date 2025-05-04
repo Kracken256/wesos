@@ -92,9 +92,7 @@ namespace wesos::types {
       return unwrap() - 1;
     }
 
-    [[nodiscard]] constexpr auto as_ref() const -> NullableRefPtr<PointeeGeneric> {
-      return this->unwrap();
-    }
+    [[nodiscard]] constexpr auto as_ref() const -> NullableRefPtr<PointeeGeneric> { return this->unwrap(); }
   };
 
   static_assert(sizeof(NullableOwnPtr<void*>) == sizeof(void*),

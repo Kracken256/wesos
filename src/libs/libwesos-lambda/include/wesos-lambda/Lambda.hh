@@ -30,9 +30,7 @@ namespace wesos::lambda {
     public:
       Callable(FuncGeneric functor) : m_functor(functor) {}
 
-      auto virt_clone() -> CallableBaseProtocol* override {
-        return new Callable<FuncGeneric>(m_functor);
-      }
+      auto virt_clone() -> CallableBaseProtocol* override { return new Callable<FuncGeneric>(m_functor); }
 
       auto operator()(ArgsGeneric... d) -> ResultGeneric override { return m_functor(d...); }
     };
@@ -46,8 +44,7 @@ namespace wesos::lambda {
 
     constexpr auto operator<=>(const Lambda& other) const = default;
 
-    Lambda(const Lambda& other)
-        : m_callable(other.m_callable ? other.m_callable->clone() : nullptr) {}
+    Lambda(const Lambda& other) : m_callable(other.m_callable ? other.m_callable->clone() : nullptr) {}
 
     constexpr Lambda(Lambda&& other) {
       if (this != &other) [[likely]] {

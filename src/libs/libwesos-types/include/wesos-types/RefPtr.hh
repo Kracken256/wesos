@@ -53,6 +53,5 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto operator--(int) const -> RefPtr { return unwrap() - 1; }
   };
 
-  static_assert(sizeof(RefPtr<void*>) == sizeof(void*),
-                "Size of RefPtr<void*> must be equal to size of void*");
+  static_assert(sizeof(RefPtr<void*>) == sizeof(void*), "Size of RefPtr<void*> must be equal to size of void*");
 }  // namespace wesos::types

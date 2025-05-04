@@ -27,14 +27,14 @@ namespace wesos::sync::detail::atomic::arch {
   }
 
   template <typename AtomGeneric>
-  auto compare_exchange_strong(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired,
-                               MemoryOrder success, MemoryOrder failure) -> bool {
+  auto compare_exchange_strong(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
+                               MemoryOrder failure) -> bool {
     return __atomic_compare_exchange_n(ptr, expected, desired, false, success, failure);
   }
 
   template <typename AtomGeneric>
-  auto compare_exchange_weak(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired,
-                             MemoryOrder success, MemoryOrder failure) -> bool {
+  auto compare_exchange_weak(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
+                             MemoryOrder failure) -> bool {
     return __atomic_compare_exchange_n(ptr, expected, desired, true, success, failure);
   }
 }  // namespace wesos::sync::detail::atomic::arch

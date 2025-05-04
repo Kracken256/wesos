@@ -47,18 +47,14 @@ namespace wesos::types {
       return *(m_base.add(i));
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
-      return *(m_base.add(i));
-    }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& { return *(m_base.add(i)); }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
       always_assert(i < size());
       return *(m_base.add(i));
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& {
-      return *(m_base.add(i));
-    }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return *(m_base.add(i)); }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View {
       always_assert(i <= size() && count <= size() - i);
@@ -138,8 +134,7 @@ namespace wesos::types {
   };
 
   using ChunkAlignedRemaining = View<u8>;
-  static inline auto for_each_chunk_aligned(View<u8> raw, usize chunk_size,
-                                            PowerOfTwo<usize> chunk_align,
+  static inline auto for_each_chunk_aligned(View<u8> raw, usize chunk_size, PowerOfTwo<usize> chunk_align,
                                             auto lambda) -> ChunkAlignedRemaining {
     while (true) {
       const auto left_pad = bytes_until_next_aligned_pow2(raw.into_ptr(), chunk_align);

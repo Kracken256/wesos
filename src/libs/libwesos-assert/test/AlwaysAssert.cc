@@ -10,8 +10,7 @@
 #include <wesos-assert/Assert.hh>
 
 TEST(always_assert, call) {
-  wesos::assert::register_output_callback(nullptr, [](void*, const char* message,
-                                                      wesos::SourceLocation source) {
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message, wesos::SourceLocation source) {
     std::cerr << "\n==========================================================================="
                  "===========\n"
               << "| Assertion Failed: \"" << message << "\";\n"

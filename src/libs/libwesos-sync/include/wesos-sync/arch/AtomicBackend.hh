@@ -20,10 +20,10 @@ namespace wesos::sync::detail::atomic::arch {
   auto exchange(AtomGeneric* ptr, AtomGeneric value, MemoryOrder order) -> AtomGeneric;
 
   template <typename AtomGeneric>
-  auto compare_exchange_strong(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired,
-                               MemoryOrder success, MemoryOrder failure) -> bool;
+  auto compare_exchange_strong(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
+                               MemoryOrder failure) -> bool;
 
   template <typename AtomGeneric>
-  auto compare_exchange_weak(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired,
-                             MemoryOrder success, MemoryOrder failure) -> bool;
+  auto compare_exchange_weak(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
+                             MemoryOrder failure) -> bool;
 }  // namespace wesos::sync::detail::atomic::arch

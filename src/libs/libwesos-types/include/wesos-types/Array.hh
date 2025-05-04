@@ -76,9 +76,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto end() -> ElementGeneric* { return m_data + length(); }
 
     [[nodiscard]] constexpr auto into_ptr() -> RefPtr<ElementGeneric> { return m_data; }
-    [[nodiscard]] constexpr auto as_view() {
-      return View<ElementGeneric>(into_ptr().unwrap(), length());
-    }
+    [[nodiscard]] constexpr auto as_view() { return View<ElementGeneric>(into_ptr().unwrap(), length()); }
 
     ///=========================================================================
 

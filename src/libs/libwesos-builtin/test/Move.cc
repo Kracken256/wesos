@@ -16,9 +16,7 @@ TEST(Move, Move) {
 
   public:
     MoveSemanticsTest(volatile unsigned &counter) : m_counter(counter) {}
-    MoveSemanticsTest(MoveSemanticsTest &&other) : m_counter(other.m_counter) {
-      other.m_active = false;
-    }
+    MoveSemanticsTest(MoveSemanticsTest &&other) : m_counter(other.m_counter) { other.m_active = false; }
     MoveSemanticsTest(const MoveSemanticsTest &) = default;
     ~MoveSemanticsTest() {
       if (m_active) {

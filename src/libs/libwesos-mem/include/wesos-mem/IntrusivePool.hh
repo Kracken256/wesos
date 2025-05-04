@@ -33,8 +33,7 @@ namespace wesos::mem {
     auto virt_do_utilize(View<u8> pool) -> LeftoverMemory override;
 
   public:
-    IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align,
-                  View<u8> pool = View<u8>::create_empty());
+    IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool = View<u8>::create_empty());
     IntrusivePool(const IntrusivePool&) = delete;
     IntrusivePool(IntrusivePool&&);
     auto operator=(const IntrusivePool&) -> IntrusivePool& = delete;

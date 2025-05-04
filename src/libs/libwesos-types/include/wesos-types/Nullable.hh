@@ -109,9 +109,7 @@ namespace wesos::types {
       return get();
     }
 
-    [[nodiscard]] constexpr auto value_or(ValueGeneric&& y) const -> ValueGeneric {
-      return isset() ? get() : y;
-    }
+    [[nodiscard]] constexpr auto value_or(ValueGeneric&& y) const -> ValueGeneric { return isset() ? get() : y; }
 
     constexpr auto operator=(ValueGeneric x) -> Nullable& {
       assign(move(x));
