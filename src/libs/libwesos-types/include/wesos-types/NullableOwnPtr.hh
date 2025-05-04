@@ -40,7 +40,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto into_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
+    [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
     [[nodiscard]] constexpr auto get() const -> OwnPtr<PointeeGeneric> {
       always_assert(isset());

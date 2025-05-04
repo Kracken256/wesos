@@ -142,8 +142,8 @@ namespace wesos::types {
                                             PowerOfTwo<usize> chunk_align,
                                             auto lambda) -> ChunkAlignedRemaining {
     while (true) {
-      const auto left_pad = raw.into_ptr().align_pow2(chunk_align).into_uptr()  //
-                            - raw.into_ptr().into_uptr();
+      const auto left_pad = next_aligned_pow2(raw.into_ptr(), chunk_align).as_uptr()  //
+                            - raw.into_ptr().as_uptr();
       if (raw.size() < left_pad + chunk_size) {
         break;
       }

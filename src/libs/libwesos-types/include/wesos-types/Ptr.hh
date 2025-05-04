@@ -16,34 +16,34 @@
 
 namespace wesos::types {
   template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto is_aligned(PointerTypeGeneric ptr, usize x) -> bool {
-    if constexpr (is_pointer_v<PointerTypeGeneric>) {
-      return bit_cast<uptr>(ptr) % x == 0;
-    } else {
-      return bit_cast<uptr>(ptr.into_uptr()) % x == 0;
-    }
+  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric addr,
+                                                      PowerOfTwo<usize> x) -> bool {
+    const auto address = [addr]() {
+      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+        return bit_cast<uptr>(addr);
+      } else {
+        return bit_cast<uptr>(addr.unwrap());
+      }
+    }();
+
+    return (address & (x.unwrap() - 1)) == 0;
   }
 
   template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric ptr,
-                                                      PowerOfTwo<usize> x) -> bool {
-    if constexpr (is_pointer_v<PointerTypeGeneric>) {
-      return (bit_cast<uptr>(ptr) & (x.unwrap() - 1)) == 0;
-    } else {
-      return (bit_cast<uptr>(ptr.into_uptr()) & (x.unwrap() - 1)) == 0;
-    }
+  [[nodiscard]] static constexpr auto next_aligned_pow2(PointerTypeGeneric addr,
+                                                        PowerOfTwo<usize> x) -> PointerTypeGeneric {
+    using PointeeType = remove_reference_t<decltype(*addr)>;
+
+    const auto address = [addr]() {
+      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+        return bit_cast<uptr>(addr);
+      } else {
+        return bit_cast<uptr>(addr.unwrap());
+      }
+    }();
+
+    const uptr aligned = (address + x.unwrap() - 1) & ~(x.unwrap() - 1);
+
+    return bit_cast<PointeeType*>(aligned);
   }
-
-  // [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) -> NullableOwnPtr {
-  //   const auto ptr = into_uptr();
-  //   const auto align_ptr = (ptr + x - 1) & -x;
-  //   return bit_cast<PointeeGeneric*>(align_ptr);
-  // }
-
-  // [[nodiscard]] constexpr auto align(usize x) -> NullableOwnPtr {
-  //   assert_invariant(x != 0);
-  //   const auto ptr = into_uptr();
-  //   const auto align_ptr = ptr + ((x - (ptr % x)) % x);
-  //   return bit_cast<PointeeGeneric*>(align_ptr);
-  // }
 }  // namespace wesos::types

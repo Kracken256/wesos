@@ -42,20 +42,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto into_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
-
-    [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) const -> NullableRefPtr {
-      const auto ptr = into_uptr();
-      const auto align_ptr = (ptr + x - 1) & -x;
-      return bit_cast<PointeeGeneric*>(align_ptr);
-    }
-
-    [[nodiscard]] constexpr auto align(usize x) const -> NullableRefPtr {
-      assert_invariant(x != 0);
-      const auto ptr = into_uptr();
-      const auto align_ptr = ptr + ((x - (ptr % x)) % x);
-      return bit_cast<PointeeGeneric*>(align_ptr);
-    }
+    [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
     [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {
       always_assert(isset());

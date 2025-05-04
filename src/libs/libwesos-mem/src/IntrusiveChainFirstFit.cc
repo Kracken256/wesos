@@ -134,7 +134,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
     const auto unaligned_chunk_end = RefPtr(unaligned_chunk_start.unwrap() + node->m_size);
 
     const auto aligned_range_start =
-        RefPtr(unaligned_chunk_start.add(sizeof(BitHeader)).align_pow2(align));
+        RefPtr(next_aligned_pow2(unaligned_chunk_start.add(sizeof(BitHeader)), align));
     const auto aligned_range_end = aligned_range_start.add(size);
 
     if (aligned_range_end > unaligned_chunk_end) {
@@ -145,13 +145,13 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
     auto& bit_header = *bit_cast<BitHeader*>(aligned_range_start.sub(sizeof(BitHeader)).unwrap());
     auto header = ChunkHeaderFormat(bit_header);
 
-    const auto space_before = aligned_range_start.into_uptr() - unaligned_chunk_start.into_uptr();
+    const auto space_before = aligned_range_start.as_uptr() - unaligned_chunk_start.as_uptr();
     header.set_bytes_before(space_before);
 
-    const auto space_after = unaligned_chunk_end.into_uptr() - aligned_range_end.into_uptr();
+    const auto space_after = unaligned_chunk_end.as_uptr() - aligned_range_end.as_uptr();
 
-    const auto new_chunk_ptr_raw = aligned_range_end.align_pow2(alignof(Chunk));
-    const auto padding = new_chunk_ptr_raw.into_uptr() - aligned_range_end.into_uptr();
+    const auto new_chunk_ptr_raw = next_aligned_pow2(aligned_range_end, alignof(Chunk));
+    const auto padding = new_chunk_ptr_raw.as_uptr() - aligned_range_end.as_uptr();
 
     if (space_after < padding + sizeof(Chunk)) {
       header.set_bytes_after(space_after);
@@ -163,7 +163,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
     } else {
       const auto new_chunk_ptr = new_chunk_ptr_raw;
       const auto new_chunk = OwnPtr(bit_cast<Chunk*>(new_chunk_ptr.unwrap()));
-      const auto new_chunk_size = unaligned_chunk_end.into_uptr() - new_chunk_ptr.into_uptr();
+      const auto new_chunk_size = unaligned_chunk_end.as_uptr() - new_chunk_ptr.as_uptr();
 
       ASAN_UNPOISON_MEMORY_REGION(new_chunk.unwrap(), new_chunk_size);
 
@@ -172,7 +172,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_allocate(usize size, PowerOfTwo<
       // Insert new_chunk into freelist in address order
       NullableRefPtr<Chunk> seek = m_some;
       NullableRefPtr<Chunk> seek_prev = nullptr;
-      while (seek.isset() && seek.into_uptr() < new_chunk.into_uptr()) {
+      while (seek.isset() && seek.as_uptr() < new_chunk.as_uptr()) {
         seek_prev = seek;
         seek = seek->m_next;
       }
@@ -218,7 +218,7 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(
 
   NullableRefPtr<Chunk> prev = nullptr;
   NullableRefPtr<Chunk> curr = m_some;
-  while (curr.isset() && curr.into_uptr() < chunk.into_uptr()) {
+  while (curr.isset() && curr.as_uptr() < chunk.as_uptr()) {
     prev = curr;
     curr = curr->m_next;
   }
@@ -269,8 +269,8 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool)
 
   {  // Adjust alignment and install header
     const auto space_before_chunk =
-        window.into_ptr().add(sizeof(BitHeader)).align_pow2(alignof(Chunk)).into_uptr() -
-        window.into_ptr().into_uptr();
+        next_aligned_pow2(window.into_ptr().add(sizeof(BitHeader)), alignof(Chunk)).as_uptr() -
+        window.into_ptr().as_uptr();
 
     if (window.size() < space_before_chunk + sizeof(Chunk)) {
       return {{pool}, {}};

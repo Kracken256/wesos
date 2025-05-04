@@ -98,8 +98,8 @@ SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory 
         virt_do_deallocate(object_ptr, object_size(), object_align());
       });
 
-  const auto front_padding = pool.into_ptr().align_pow2(object_align()).into_uptr() -  //
-                             pool.into_ptr().into_uptr();
+  const auto front_padding = next_aligned_pow2(pool.into_ptr(), object_align()).as_uptr() -  //
+                             pool.into_ptr().as_uptr();
   const auto beginning_unused = pool.subview_unchecked(0, front_padding);
   const auto end_unused = leftover;
 

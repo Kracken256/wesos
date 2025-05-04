@@ -34,20 +34,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr operator PointeeGeneric*() { return unwrap(); }
 
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto into_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
-
-    [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) const -> OwnPtr {
-      const auto ptr = into_uptr();
-      const auto align_ptr = (ptr + x - 1) & -x;
-      return bit_cast<PointeeGeneric*>(align_ptr);
-    }
-
-    [[nodiscard]] constexpr auto align(usize x) const -> OwnPtr {
-      assert_invariant(x != 0);
-      const auto ptr = into_uptr();
-      const auto align_ptr = ptr + ((x - (ptr % x)) % x);
-      return bit_cast<PointeeGeneric*>(align_ptr);
-    }
+    [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
     [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* { return unwrap(); }
     [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& { return *unwrap(); }

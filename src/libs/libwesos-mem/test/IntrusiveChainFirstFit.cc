@@ -44,7 +44,7 @@ TEST(IntrusiveChainFirstFit, Merge) {
   using namespace wesos;
 
   struct Hash {
-    constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.into_uptr(); }
+    constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return x.as_uptr(); }
   };
 
   const auto size = 64;
@@ -78,7 +78,7 @@ TEST(IntrusiveChainFirstFit, Merge) {
 
 //   struct Hash {
 //     constexpr auto operator()(const NullableOwnPtr<u8>& x) const -> size_t { return
-//     x.into_uptr(); }
+//     x.as_uptr(); }
 //   };
 
 //   const auto min_size = 64;
