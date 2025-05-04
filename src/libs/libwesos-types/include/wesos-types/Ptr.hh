@@ -15,12 +15,12 @@
 #include <wesos-types/Template.hh>
 
 namespace wesos::types {
-  template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric addr, PowerOfTwo<usize> x) -> bool
-    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  template <class PointerType>
+  [[nodiscard]] static constexpr auto is_aligned_pow2(PointerType addr, PowerOfTwo<usize> x) -> bool
+    requires(is_pointer_v<PointerType> || is_pointer_v<decltype(addr.unwrap())>)
   {
     const auto address = [addr]() {
-      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+      if constexpr (is_pointer_v<PointerType>) {
         return bit_cast<uptr>(addr);
       } else {
         return bit_cast<uptr>(addr.unwrap());
@@ -30,16 +30,15 @@ namespace wesos::types {
     return (address & (x.unwrap() - 1)) == 0;
   }
 
-  template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto next_aligned_pow2(PointerTypeGeneric addr,
-                                                        PowerOfTwo<usize> x) -> PointerTypeGeneric
-    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  template <class PointerType>
+  [[nodiscard]] static constexpr auto next_aligned_pow2(PointerType addr, PowerOfTwo<usize> x) -> PointerType
+    requires(is_pointer_v<PointerType> || is_pointer_v<decltype(addr.unwrap())>)
   {
     using PointeeType =
-        remove_pointer_t<conditional_t<is_pointer_v<PointerTypeGeneric>, PointerTypeGeneric, decltype(addr.unwrap())>>;
+        remove_pointer_t<conditional_t<is_pointer_v<PointerType>, PointerType, decltype(addr.unwrap())>>;
 
     const auto address = [addr]() {
-      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+      if constexpr (is_pointer_v<PointerType>) {
         return bit_cast<uptr>(addr);
       } else {
         return bit_cast<uptr>(addr.unwrap());
@@ -51,13 +50,12 @@ namespace wesos::types {
     return bit_cast<PointeeType*>(aligned);
   }
 
-  template <class PointerTypeGeneric>
-  [[nodiscard]] static constexpr auto bytes_until_next_aligned_pow2(PointerTypeGeneric addr,
-                                                                    PowerOfTwo<usize> x) -> uptr
-    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  template <class PointerType>
+  [[nodiscard]] static constexpr auto bytes_until_next_aligned_pow2(PointerType addr, PowerOfTwo<usize> x) -> uptr
+    requires(is_pointer_v<PointerType> || is_pointer_v<decltype(addr.unwrap())>)
   {
     const auto address = [addr]() {
-      if constexpr (is_pointer_v<PointerTypeGeneric>) {
+      if constexpr (is_pointer_v<PointerType>) {
         return bit_cast<uptr>(addr);
       } else {
         return bit_cast<uptr>(addr.unwrap());

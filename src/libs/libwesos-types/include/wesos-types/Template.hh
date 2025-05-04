@@ -31,8 +31,8 @@ namespace wesos::types {
 
   ///===========================================================================
 
-  template <typename TpGeneric, typename UpGeneric>
-  inline constexpr bool is_same_v = __is_same(TpGeneric, UpGeneric);
+  template <typename Tp, typename Up>
+  inline constexpr bool is_same_v = __is_same(Tp, Up);
 
   template <typename T>
   struct remove_reference {

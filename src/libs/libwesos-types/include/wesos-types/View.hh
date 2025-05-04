@@ -14,10 +14,10 @@
 #include <wesos-types/Ptr.hh>
 
 namespace wesos::types {
-  template <typename ElementGeneric>
+  template <typename T>
   class View {
-    using Pointer = NullableRefPtr<ElementGeneric>;
-    using ConstPointer = NullableRefPtr<const ElementGeneric>;
+    using Pointer = NullableRefPtr<T>;
+    using ConstPointer = NullableRefPtr<const T>;
 
     Pointer m_base;
     usize m_size;
@@ -42,21 +42,19 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto into_ptr() const { return m_base; }
 
-    [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
+    [[nodiscard]] constexpr auto get(usize i) const -> const T& {
       assert_always(i < size());
       return *(m_base.unwrap() + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& {
-      return *(m_base.unwrap() + i);
-    }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const T& { return *(m_base.unwrap() + i); }
 
-    [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
+    [[nodiscard]] constexpr auto get(usize i) -> T& {
       assert_always(i < size());
       return *(m_base.unwrap() + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return *(m_base.unwrap() + i); }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) -> T& { return *(m_base.unwrap() + i); }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View {
       assert_always(i <= size() && count <= size() - i);
@@ -110,19 +108,19 @@ namespace wesos::types {
 
     ///========================================================================================
 
-    constexpr auto set(usize i, ElementGeneric x) -> View& {
+    constexpr auto set(usize i, T x) -> View& {
       assert_always(i <= size());
       m_base.unwrap()[i] = move(x);
       return *this;
     }
 
-    constexpr auto set_unchecked(usize i, ElementGeneric x) -> View& {
+    constexpr auto set_unchecked(usize i, T x) -> View& {
       assert_invariant(i <= size());
       m_base.unwrap()[i] = move(x);
       return *this;
     }
 
-    constexpr auto fill(const ElementGeneric& x) -> View& {
+    constexpr auto fill(const T& x) -> View& {
       for (auto& ele : *this) {
         ele = x;
       }

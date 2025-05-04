@@ -10,13 +10,13 @@
 #include <wesos-builtin/Move.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric>
+  template <class T>
   class Unused {
-    ValueGeneric m_value;
+    T m_value;
 
   public:
     constexpr Unused() = default;
-    constexpr Unused(ValueGeneric x) : m_value(move(x)){};
+    constexpr Unused(T x) : m_value(move(x)){};
     constexpr Unused(const Unused&) = default;
     constexpr Unused(Unused&&) = default;
     constexpr auto operator=(const Unused&) -> Unused& = default;
@@ -24,8 +24,8 @@ namespace wesos::types {
     constexpr ~Unused() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const Unused& o) const = default;
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
-    [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
+    [[nodiscard]] constexpr auto unwrap() const -> const T& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const T* { return &m_value; }
+    [[nodiscard]] constexpr operator T() const { return m_value; }
   };
 }  // namespace wesos::types

@@ -15,15 +15,15 @@
 #include <wesos-types/PowerOfTwo.hh>
 
 namespace wesos::types {
-  template <typename PointeeGeneric>
+  template <typename Pointee>
   class RefPtr;
 
-  template <class PointeeGeneric>
+  template <class Pointee>
   class OwnPtr {
-    PointeeGeneric* m_ptr;
+    Pointee* m_ptr;
 
   public:
-    constexpr OwnPtr(PointeeGeneric* ptr) : m_ptr(ptr) { assert_invariant(ptr != nullptr); }
+    constexpr OwnPtr(Pointee* ptr) : m_ptr(ptr) { assert_invariant(ptr != nullptr); }
     constexpr OwnPtr(const OwnPtr&) = default;
     constexpr OwnPtr(OwnPtr&&) = default;
     constexpr auto operator=(const OwnPtr&) -> OwnPtr& = default;
@@ -31,70 +31,70 @@ namespace wesos::types {
     constexpr ~OwnPtr() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const OwnPtr&) const = default;
-    [[nodiscard]] constexpr operator PointeeGeneric*() { return unwrap(); }
+    [[nodiscard]] constexpr operator Pointee*() { return unwrap(); }
 
-    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto unwrap() const -> Pointee* { return m_ptr; }
     [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator->() const -> U* requires(!is_same_v<U, void>) { return unwrap(); }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator*() const -> U& requires(!is_same_v<U, void>) { return *unwrap(); }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto add(usize i) const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() + i;
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto sub(usize i) const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() - i;
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto load() const -> U& requires(!is_same_v<U, void>) { return *unwrap(); }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     constexpr void store(U x) const
       requires(!is_same_v<U, void>)
     {
       *unwrap() = move(x);
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator++() const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() + 1;
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator++(int) const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() + 1;
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator--() const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() - 1;
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator--(int) const -> OwnPtr
       requires(!is_same_v<U, void>)
     {
       return unwrap() - 1;
     }
 
-    [[nodiscard]] constexpr auto as_ref() const -> RefPtr<PointeeGeneric> { return unwrap(); }
+    [[nodiscard]] constexpr auto as_ref() const -> RefPtr<Pointee> { return unwrap(); }
   };
 
   static_assert(sizeof(OwnPtr<void*>) == sizeof(void*), "Size of OwnPtr<void*> must be equal to size of void*");

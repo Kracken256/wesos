@@ -11,14 +11,14 @@
 #include <wesos-builtin/Move.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric, auto MinimumValue, auto MaximumValue>
+  template <class T, auto Minimum, auto Maximum>
   class Range {
-    ValueGeneric m_value;
+    T m_value;
 
-    constexpr Range(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
+    constexpr Range(T x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
-    constexpr Range(ValueGeneric x) : m_value(move(x)) { assert_invariant(x >= MinimumValue && x <= MaximumValue); };
+    constexpr Range(T x) : m_value(move(x)) { assert_invariant(x >= Minimum && x <= Maximum); };
     constexpr Range(const Range&) = default;
     constexpr Range(Range&&) = default;
     constexpr auto operator=(const Range&) -> Range& = default;
@@ -26,12 +26,12 @@ namespace wesos::types {
     constexpr ~Range() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
-    [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
+    [[nodiscard]] constexpr auto unwrap() const -> const T& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const T* { return &m_value; }
+    [[nodiscard]] constexpr operator T() const { return m_value; }
 
-    [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> Range {
-      assert_invariant(x >= MinimumValue && x <= MaximumValue);
+    [[nodiscard]] constexpr static auto create_unchecked(T x) -> Range {
+      assert_invariant(x >= Minimum && x <= Maximum);
       return {move(x), true};
     }
   };

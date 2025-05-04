@@ -16,20 +16,20 @@
 #include <wesos-types/RefPtr.hh>
 
 namespace wesos::types {
-  template <typename PointeeGeneric>
+  template <typename Pointee>
   class NullableOwnPtr;
 
-  template <class PointeeGeneric>
+  template <class Pointee>
   class NullableRefPtr {
-    PointeeGeneric* m_ptr = nullptr;
+    Pointee* m_ptr = nullptr;
 
   public:
     constexpr NullableRefPtr() = default;
     constexpr NullableRefPtr(Null) {}
     constexpr NullableRefPtr(nullptr_t) {}
-    constexpr NullableRefPtr(PointeeGeneric* ptr) : m_ptr(ptr) {}
-    constexpr NullableRefPtr(RefPtr<PointeeGeneric> ptr) : m_ptr(ptr.unwrap()) {}
-    constexpr NullableRefPtr(OwnPtr<PointeeGeneric> ptr) : m_ptr(ptr.unwrap()) {}
+    constexpr NullableRefPtr(Pointee* ptr) : m_ptr(ptr) {}
+    constexpr NullableRefPtr(RefPtr<Pointee> ptr) : m_ptr(ptr.unwrap()) {}
+    constexpr NullableRefPtr(OwnPtr<Pointee> ptr) : m_ptr(ptr.unwrap()) {}
     constexpr NullableRefPtr(const NullableRefPtr&) = default;
     constexpr NullableRefPtr(NullableRefPtr&&) = default;
     constexpr auto operator=(const NullableRefPtr&) -> NullableRefPtr& = default;
@@ -37,30 +37,30 @@ namespace wesos::types {
     constexpr ~NullableRefPtr() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const NullableRefPtr&) const = default;
-    [[nodiscard]] constexpr operator PointeeGeneric*() { return unwrap(); }
+    [[nodiscard]] constexpr operator Pointee*() { return unwrap(); }
 
     [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
-    [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
+    [[nodiscard]] constexpr auto unwrap() const -> Pointee* { return m_ptr; }
     [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
-    [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {
+    [[nodiscard]] constexpr auto get() const -> RefPtr<Pointee> {
       assert_always(isset());
       return unwrap();
     }
 
-    [[nodiscard]] constexpr auto get_unchecked() const -> RefPtr<PointeeGeneric> {
+    [[nodiscard]] constexpr auto get_unchecked() const -> RefPtr<Pointee> {
       assert_invariant(isset());
       return unwrap();
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator->() const -> U* requires(!is_same_v<U, void>) {
       assert_invariant(isset());
       return unwrap();
     }
 
-    template <class U = PointeeGeneric>
+    template <class U = Pointee>
     [[nodiscard]] constexpr auto operator*() const -> U& requires(!is_same_v<U, void>) {
       assert_invariant(isset());
       return *unwrap();

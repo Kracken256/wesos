@@ -10,13 +10,13 @@
 #include <wesos-builtin/Move.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric>
+  template <class T>
   class Untrusted {
-    ValueGeneric m_value;
+    T m_value;
 
   public:
     constexpr Untrusted() = default;
-    constexpr Untrusted(ValueGeneric value) : m_value(move(value)) {}
+    constexpr Untrusted(T value) : m_value(move(value)) {}
     constexpr Untrusted(const Untrusted&) = default;
     constexpr Untrusted(Untrusted&&) = default;
     constexpr auto operator=(const Untrusted&) -> Untrusted& = default;
@@ -25,8 +25,8 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto operator<=>(const Untrusted&) const = default;
 
-    [[nodiscard]] constexpr auto trust_and_unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto trust_and_unwrap() -> ValueGeneric& { return m_value; }
+    [[nodiscard]] constexpr auto trust_and_unwrap() const -> const T& { return m_value; }
+    [[nodiscard]] constexpr auto trust_and_unwrap() -> T& { return m_value; }
 
     constexpr void ensure_safe(auto verify) const { assert_always(verify(m_value)); }
   };

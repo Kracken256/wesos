@@ -12,25 +12,25 @@
 #include <wesos-types/Null.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric>
+  template <class T>
   class Nullable {
     union Payload {
       int m_placeholder;
-      ValueGeneric m_obj;
+      T m_obj;
 
       constexpr Payload() : m_placeholder{} {}
       constexpr ~Payload(){};
     } m_value;
     bool m_isset = false;
 
-    [[nodiscard]] constexpr auto get() const -> const ValueGeneric& { return m_value.m_obj; }
-    [[nodiscard]] constexpr auto get() -> ValueGeneric& { return m_value.m_obj; }
+    [[nodiscard]] constexpr auto get() const -> const T& { return m_value.m_obj; }
+    [[nodiscard]] constexpr auto get() -> T& { return m_value.m_obj; }
 
   public:
     constexpr Nullable() = default;
     constexpr Nullable(Null) {}
     constexpr Nullable(nullptr_t) {}
-    constexpr Nullable(ValueGeneric x) { assign(move(x)); }
+    constexpr Nullable(T x) { assign(move(x)); }
     constexpr Nullable(const Nullable&) = default;
     constexpr Nullable(Nullable&& o) {
       if (o.isset()) {
@@ -89,34 +89,34 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr operator bool() { return isset(); }
 
-    [[nodiscard]] constexpr auto value() const -> const ValueGeneric& {
+    [[nodiscard]] constexpr auto value() const -> const T& {
       assert_always(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto value_unchecked() const -> const ValueGeneric& {
+    [[nodiscard]] constexpr auto value_unchecked() const -> const T& {
       assert_invariant(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto value() -> ValueGeneric& {
+    [[nodiscard]] constexpr auto value() -> T& {
       assert_always(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto value_unchecked() -> ValueGeneric& {
+    [[nodiscard]] constexpr auto value_unchecked() -> T& {
       assert_invariant(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto value_or(ValueGeneric&& y) const -> ValueGeneric { return isset() ? get() : y; }
+    [[nodiscard]] constexpr auto value_or(T&& y) const -> T { return isset() ? get() : y; }
 
-    constexpr auto operator=(ValueGeneric x) -> Nullable& {
+    constexpr auto operator=(T x) -> Nullable& {
       assign(move(x));
       return *this;
     }
 
-    constexpr auto assign(ValueGeneric x) -> Nullable& {
+    constexpr auto assign(T x) -> Nullable& {
       unset();
       m_value.m_obj = move(x);
       m_isset = true;
@@ -126,19 +126,19 @@ namespace wesos::types {
 
     constexpr auto unset() -> Nullable& {
       if (isset()) {
-        get().~ValueGeneric();
+        get().~T();
         m_isset = false;
       }
 
       return *this;
     }
 
-    constexpr auto anew() -> ValueGeneric& {
+    constexpr auto anew() -> T& {
       unset();
       return assign({});
     }
 
-    constexpr auto ensure() -> ValueGeneric& {
+    constexpr auto ensure() -> T& {
       if (!isset()) {
         assign({});
       }

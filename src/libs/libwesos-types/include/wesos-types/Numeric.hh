@@ -78,26 +78,26 @@ namespace wesos::types {
 
   constexpr auto operator"" _usize(unsigned long long x) -> usize { return static_cast<usize>(x); }
 
-  template <class DstGeneric, class SrcGeneric>
-  [[nodiscard]] static constexpr auto cast_to(SrcGeneric x) -> DstGeneric {
-    static_assert(sizeof(DstGeneric) >= sizeof(SrcGeneric),
+  template <class Dst, class Src>
+  [[nodiscard]] static constexpr auto cast_to(Src x) -> Dst {
+    static_assert(sizeof(Dst) >= sizeof(Src),
                   "Implicit conversion is disallowed because it loses numeric precision. Use "
                   "trunc_to() instead.");
-    static_assert(!is_same_v<DstGeneric, SrcGeneric>,
+    static_assert(!is_same_v<Dst, Src>,
                   "Explicit conversion is disallowed because the destination type is the same as "
                   "source type.");
 
-    return static_cast<DstGeneric>(x);
+    return static_cast<Dst>(x);
   }
 
-  template <class DstGeneric, class SrcGeneric>
-  [[nodiscard]] static constexpr auto trunc_to(SrcGeneric x) -> DstGeneric {
-    static_assert(sizeof(DstGeneric) < sizeof(SrcGeneric),
+  template <class Dst, class Src>
+  [[nodiscard]] static constexpr auto trunc_to(Src x) -> Dst {
+    static_assert(sizeof(Dst) < sizeof(Src),
                   "Explicit truncation is disallowed because it is redundant. Use cast_to() instead.");
-    return static_cast<DstGeneric>(x);
+    return static_cast<Dst>(x);
   }
 
-  template <class ValueGeneric>
+  template <class T>
   [[nodiscard]] static constexpr auto numeric_limit_max() -> u64 {
     using namespace detail;
 
@@ -110,28 +110,28 @@ namespace wesos::types {
     constexpr u64 i32_max = 0x7fffffff;
     constexpr u64 i64_max = 0x7fffffffffffffff;
 
-    if constexpr (is_same_v<ValueGeneric, __u8>) {
+    if constexpr (is_same_v<T, __u8>) {
       return u8_max;
-    } else if constexpr (is_same_v<ValueGeneric, __u16>) {
+    } else if constexpr (is_same_v<T, __u16>) {
       return u16_max;
-    } else if constexpr (is_same_v<ValueGeneric, __u32>) {
+    } else if constexpr (is_same_v<T, __u32>) {
       return u32_max;
-    } else if constexpr (is_same_v<ValueGeneric, __u64>) {
+    } else if constexpr (is_same_v<T, __u64>) {
       return u64_max;
-    } else if constexpr (is_same_v<ValueGeneric, __i8>) {
+    } else if constexpr (is_same_v<T, __i8>) {
       return i8_max;
-    } else if constexpr (is_same_v<ValueGeneric, __i16>) {
+    } else if constexpr (is_same_v<T, __i16>) {
       return i16_max;
-    } else if constexpr (is_same_v<ValueGeneric, __i32>) {
+    } else if constexpr (is_same_v<T, __i32>) {
       return i32_max;
-    } else if constexpr (is_same_v<ValueGeneric, __i64>) {
+    } else if constexpr (is_same_v<T, __i64>) {
       return i64_max;
     } else {
-      static_assert(is_same_v<ValueGeneric, ValueGeneric>, "Unsupported type");
+      static_assert(is_same_v<T, T>, "Unsupported type");
     }
   }
 
-  template <class ValueGeneric>
+  template <class T>
   [[nodiscard]] static constexpr auto numeric_limit_min() -> i64 {
     using namespace detail;
 
@@ -144,24 +144,24 @@ namespace wesos::types {
     constexpr i64 i32_min = -0x80000000LL;                            // -2147483648
     constexpr i64 i64_min = static_cast<i64>(0x8000000000000000ULL);  // -9223372036854775808
 
-    if constexpr (is_same_v<ValueGeneric, __u8>) {
+    if constexpr (is_same_v<T, __u8>) {
       return u8_min;
-    } else if constexpr (is_same_v<ValueGeneric, __u16>) {
+    } else if constexpr (is_same_v<T, __u16>) {
       return u16_min;
-    } else if constexpr (is_same_v<ValueGeneric, __u32>) {
+    } else if constexpr (is_same_v<T, __u32>) {
       return u32_min;
-    } else if constexpr (is_same_v<ValueGeneric, __u64>) {
+    } else if constexpr (is_same_v<T, __u64>) {
       return u64_min;
-    } else if constexpr (is_same_v<ValueGeneric, __i8>) {
+    } else if constexpr (is_same_v<T, __i8>) {
       return i8_min;
-    } else if constexpr (is_same_v<ValueGeneric, __i16>) {
+    } else if constexpr (is_same_v<T, __i16>) {
       return i16_min;
-    } else if constexpr (is_same_v<ValueGeneric, __i32>) {
+    } else if constexpr (is_same_v<T, __i32>) {
       return i32_min;
-    } else if constexpr (is_same_v<ValueGeneric, __i64>) {
+    } else if constexpr (is_same_v<T, __i64>) {
       return i64_min;
     } else {
-      static_assert(is_same_v<ValueGeneric, ValueGeneric>, "Unsupported type");
+      static_assert(is_same_v<T, T>, "Unsupported type");
     }
   }
 }  // namespace wesos::types
