@@ -52,7 +52,7 @@ SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb
   });
 }
 
-SYM_EXPORT void wesos::assert_failure(const char* message, SourceLocation source) {
+SYM_EXPORT void wesos::assert::assert_failure(const char* message, SourceLocation source) {
   using namespace assert;
 
   auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
