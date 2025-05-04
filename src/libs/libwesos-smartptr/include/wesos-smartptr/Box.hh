@@ -7,24 +7,22 @@
 
 #pragma once
 
-#include <wesos-mem/IntrusivePool.hh>  /// TODO: Remove me
 #include <wesos-mem/MemoryResourceProtocol.hh>
-#include <wesos-mem/PolymorphicAllocator.hh>
 #include <wesos-types/NullableOwnPtr.hh>
 #include <wesos-types/Template.hh>
 
 namespace wesos::smartptr {
-  template <class Pointee, class Allocator = mem::PolymorphicAllocator<Pointee>>
+  template <class Object>
   class Box {
-    NullableOwnPtr<Pointee> m_ptr;
-    Allocator m_allocator;
+    NullableOwnPtr<Object> m_ptr;
+    mem::MemoryResourceProtocol& m_pmr;
 
-    Box(OwnPtr<Pointee> ptr, Allocator allocator) : m_ptr(ptr), m_allocator(move(allocator)) {}
+    Box(OwnPtr<Object> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(pmr) {}
 
   public:
     constexpr Box(const Box& o) = delete;
     constexpr auto operator=(const Box& o) -> Box& = delete;
-    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_allocator(move(o.m_allocator)) { o.m_ptr = nullptr; };
+    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = nullptr; };
 
     constexpr auto operator=(Box&& o) -> Box& {
       if (this != &o) [[likely]] {
@@ -36,34 +34,33 @@ namespace wesos::smartptr {
     };
 
     ~Box() {
-      if (m_ptr.is_null()) {
-        return;
-      }
-
-      auto raw_ptr = m_ptr.unwrap();
-
-      m_allocator.destroy(*raw_ptr);
-      m_allocator.deallocate_storage(raw_ptr, 1);
-
+      if (!m_ptr.is_null()) {
+        m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
 #ifndef NDEBUG
-      m_ptr = nullptr;
+        m_ptr = nullptr;
 #endif
+      }
     }
 
     template <class... Args>
     [[nodiscard]] static auto create(Args... args) {
       return [... args = forward<Args>(args)](mem::MemoryResourceProtocol& pmr) -> Nullable<Box> {
-        auto pma = mem::PolymorphicAllocator<Pointee>(pmr);
-
-        const auto storage = pma.allocate_storage(1);
-        if (storage.is_null()) [[unlikely]] {
-          return null;
+        if (auto ptr = pmr.allocate_and_construct<Object>(1, args...)) [[likely]] {
+          return Box(ptr.unwrap(), pmr);
         }
 
-        pma.construct(*storage.unwrap(), args...);
-
-        return Box(storage.unwrap(), move(pma));
+        return null;
       };
     }
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto get() -> U& requires(!types::is_same_v<U, void>) { return *m_ptr.as_ref().get(); }
+
+    template <class U = Object>
+    [[nodiscard]] constexpr auto get() const -> const U& requires(!types::is_same_v<U, void>) {
+      return *m_ptr.as_ref().get();
+    }
   };
+
+  static_assert(sizeof(Box<void>) == sizeof(void*) * 2);
 }  // namespace wesos::smartptr

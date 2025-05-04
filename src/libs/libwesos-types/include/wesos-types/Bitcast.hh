@@ -10,7 +10,7 @@
 #include <wesos-types/Template.hh>
 
 namespace wesos {
-  template <typename To, typename From>
+  template <class To, class From>
   [[nodiscard]] constexpr auto bit_cast(const From& from) -> To
     requires(sizeof(To) == sizeof(From)) && __is_trivially_copyable
   (To) && __is_trivially_copyable(From) {

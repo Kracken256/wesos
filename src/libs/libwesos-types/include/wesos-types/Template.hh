@@ -197,5 +197,41 @@ namespace wesos::types {
 
   ///===========================================================================
 
+  template <typename T>
+  struct is_move_constructible {
+  private:
+    // Try to instantiate a move constructor
+    template <typename U, typename = decltype(U(declval<U&&>()))>
+    static auto test(int) -> true_type;
+
+    // Fallback if above is ill-formed
+    template <typename>
+    static auto test(...) -> false_type;
+
+  public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+  };
+
+  template <typename T>
+  inline constexpr bool is_move_constructible_v = is_move_constructible<T>::value;
+
+  template <typename T>
+  struct is_copy_constructible {
+  private:
+    // Try to instantiate a copy constructor
+    template <typename U, typename = decltype(U(declval<const U&>()))>
+    static auto test(int) -> true_type;
+
+    // Fallback
+    template <typename>
+    static auto test(...) -> false_type;
+
+  public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+  };
+
+  template <typename T>
+  inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
+
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types

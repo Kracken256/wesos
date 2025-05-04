@@ -18,7 +18,7 @@
 #endif
 
 namespace wesos::sync {
-  template <typename Atom>
+  template <class Atom>
   class Atomic {
   private:
     Atom m_value;

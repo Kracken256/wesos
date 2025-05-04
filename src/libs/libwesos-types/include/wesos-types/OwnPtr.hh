@@ -15,7 +15,7 @@
 #include <wesos-types/PowerOfTwo.hh>
 
 namespace wesos::types {
-  template <typename Pointee>
+  template <class Pointee>
   class RefPtr;
 
   template <class Pointee>

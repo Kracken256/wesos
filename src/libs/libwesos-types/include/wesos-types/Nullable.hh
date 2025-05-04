@@ -9,43 +9,61 @@
 
 #include <wesos-assert/Assert.hh>
 #include <wesos-builtin/Move.hh>
+#include <wesos-types/Array.hh>
+#include <wesos-types/Bitcast.hh>
 #include <wesos-types/Null.hh>
+#include <wesos-types/Template.hh>
 
 namespace wesos::types {
   template <class T>
   class Nullable {
-    union Payload {
-      int m_placeholder;
-      T m_obj;
-
-      constexpr Payload() : m_placeholder{} {}
-      constexpr ~Payload(){};
-    } m_value;
+    alignas(T) Array<u8, sizeof(T)> m_obj;
     bool m_isset = false;
 
-    [[nodiscard]] constexpr auto get() const -> const T& { return m_value.m_obj; }
-    [[nodiscard]] constexpr auto get() -> T& { return m_value.m_obj; }
+    [[nodiscard]] constexpr auto get() const -> const T& { return *bit_cast<T*>(&m_obj); }
+    [[nodiscard]] constexpr auto get() -> T& { return *bit_cast<T*>(&m_obj); }
 
   public:
     constexpr Nullable() = default;
     constexpr Nullable(Null) {}
     constexpr Nullable(nullptr_t) {}
     constexpr Nullable(T x) { assign(move(x)); }
-    constexpr Nullable(const Nullable&) = default;
-    constexpr Nullable(Nullable&& o) {
+
+    constexpr Nullable(const Nullable& o)
+      requires(is_copy_constructible_v<T>)
+    {
+      if (o.isset()) {
+        assign(o.get());
+      }
+    };
+
+    constexpr Nullable(Nullable&& o)
+      requires(is_move_constructible_v<T>)
+    {
       if (o.isset()) {
         assign(move(o.get()));
-        o.unset();
       }
     }
-    constexpr auto operator=(const Nullable&) -> Nullable& = default;
-    constexpr auto operator=(Nullable&& o) -> Nullable& {
+    constexpr auto operator=(const Nullable& o) -> Nullable&
+      requires(is_copy_constructible_v<T>)
+    {
       if (o.isset()) {
-        assign(move(o.get()));
-        o.unset();
+        assign(o.get());
       } else {
         unset();
       }
+    }
+    constexpr auto operator=(Nullable&& o) -> Nullable&
+      requires(is_move_constructible_v<T>)
+    {
+      if (this != &o) {
+        if (o.isset()) {
+          assign(move(o.get()));
+        } else {
+          unset();
+        }
+      }
+
       return *this;
     }
     constexpr ~Nullable() { unset(); }
@@ -117,8 +135,11 @@ namespace wesos::types {
     }
 
     constexpr auto assign(T x) -> Nullable& {
-      unset();
-      m_value.m_obj = move(x);
+      if (isset()) {
+        get().~T();
+      }
+
+      new (&m_obj) T(move(x));  // placement new
       m_isset = true;
 
       return *this;
@@ -133,10 +154,7 @@ namespace wesos::types {
       return *this;
     }
 
-    constexpr auto anew() -> T& {
-      unset();
-      return assign({});
-    }
+    constexpr auto anew() -> Nullable& { return assign({}); }
 
     constexpr auto ensure() -> T& {
       if (!isset()) {

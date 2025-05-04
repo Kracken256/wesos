@@ -20,7 +20,7 @@ namespace wesos::mem::testing {
     public:
       constexpr ZeroCostDelegate(Class& base, Method method) : m_base(base), m_method(method) {}
 
-      template <typename... Args>
+      template <class... Args>
       constexpr auto operator()(Args... args) const {
         return (m_base.*m_method)(args...);
       }

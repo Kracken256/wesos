@@ -16,7 +16,7 @@
 #include <wesos-types/RefPtr.hh>
 
 namespace wesos::types {
-  template <typename Pointee>
+  template <class Pointee>
   class NullableOwnPtr;
 
   template <class Pointee>
@@ -37,7 +37,8 @@ namespace wesos::types {
     constexpr ~NullableRefPtr() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const NullableRefPtr&) const = default;
-    [[nodiscard]] constexpr operator Pointee*() { return unwrap(); }
+    [[nodiscard]] constexpr operator Pointee*() const { return unwrap(); }
+    [[nodiscard]] constexpr operator bool() const { return isset(); }
 
     [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }

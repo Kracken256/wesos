@@ -14,7 +14,7 @@
 #include <wesos-types/Ptr.hh>
 
 namespace wesos::types {
-  template <typename T>
+  template <class T>
   class View {
     using Pointer = NullableRefPtr<T>;
     using ConstPointer = NullableRefPtr<const T>;

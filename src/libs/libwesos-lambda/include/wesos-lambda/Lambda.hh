@@ -10,10 +10,10 @@
 #include <wesos-types/Null.hh>
 
 namespace wesos::lambda {
-  template <typename Func>
+  template <class Func>
   class Lambda;
 
-  template <typename Result, typename... Args>
+  template <class Result, class... Args>
   class Lambda<Result(Args...)> {
     class CallableBaseProtocol {
     public:
@@ -23,7 +23,7 @@ namespace wesos::lambda {
       virtual auto virt_clone() -> CallableBaseProtocol* = 0;
     };
 
-    template <typename Func>
+    template <class Func>
     class Callable final : public CallableBaseProtocol {
       Func m_functor;
 
