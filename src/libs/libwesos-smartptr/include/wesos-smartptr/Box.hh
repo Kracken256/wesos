@@ -36,9 +36,6 @@ namespace wesos::smartptr {
     ~Box() {
       if (!m_ptr.is_null()) {
         m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
-#ifndef NDEBUG
-        m_ptr = null;
-#endif
       }
     }
 
@@ -62,7 +59,12 @@ namespace wesos::smartptr {
     /// LIFETIME MANAGEMENT
     ///=========================================================================================
 
-    constexpr auto disown() -> void { m_ptr = null; }
+    constexpr auto disown() -> void {
+      if (!m_ptr.is_null()) {
+        m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+        m_ptr = null;
+      }
+    }
 
     ///=========================================================================================
     /// POINTER ACCESS

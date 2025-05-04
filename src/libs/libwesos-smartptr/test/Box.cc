@@ -71,6 +71,7 @@ TEST(Box, ArgumentForwarding) {
     EXPECT_EQ(constructed, 1);
     EXPECT_EQ(copied, 0);
     EXPECT_EQ(moved, 1);
+    EXPECT_EQ(destructed, 1);
   }
 
   EXPECT_EQ(constructed, 1);
@@ -99,7 +100,7 @@ TEST(Box, NoCopy) {
     EXPECT_EQ(copied, 0);
   }
 
-  EXPECT_EQ(moved, 0);
+  EXPECT_EQ(copied, 0);
 }
 
 TEST(Box, NoMove) {
@@ -123,4 +124,33 @@ TEST(Box, NoMove) {
   }
 
   EXPECT_EQ(moved, 0);
+}
+
+TEST(Box, Disown) {
+  static_assert(sizeof(SemanticCounter) >= mem::IntrusivePool::minimum_size());
+
+  const auto buf_size = sizeof(SemanticCounter);
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
+
+  usize constructed = 0;
+  usize moved = 0;
+  usize copied = 0;
+  usize destructed = 0;
+
+  auto box_maybe = Box<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+  ASSERT_NE(box_maybe, null);
+  auto box = move(box_maybe.value());
+
+  EXPECT_EQ(constructed, 1);
+  EXPECT_EQ(copied, 0);
+  EXPECT_EQ(moved, 0);
+  EXPECT_EQ(destructed, 0);
+
+  box.disown();
+
+  EXPECT_EQ(constructed, 1);
+  EXPECT_EQ(copied, 0);
+  EXPECT_EQ(moved, 0);
+  EXPECT_EQ(destructed, 1);
 }
