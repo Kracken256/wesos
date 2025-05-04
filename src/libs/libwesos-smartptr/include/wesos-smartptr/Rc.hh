@@ -30,11 +30,15 @@ namespace wesos::smartptr {
 
   public:
     constexpr Rc(const Rc& o) : m_ptr(o.m_ptr), m_state(o.m_state) {
+      assert_invariant(m_state.isset());
+
       ++m_state->m_state_rc;
       ++m_state->m_data_rc;
     }
 
     constexpr auto operator=(const Rc& o) -> Rc& {
+      assert_invariant(m_state.isset());
+
       m_ptr = o.m_ptr;
       m_state = o.m_state;
       ++m_state->m_state_rc;

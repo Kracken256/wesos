@@ -7,4 +7,204 @@
 
 #include <gtest/gtest.h>
 
+#include <wesos-mem/IntrusivePool.hh>
 #include <wesos-smartptr/Arc.hh>
+
+using namespace wesos;
+using namespace wesos::smartptr;
+
+class SemanticCounter final {
+  usize &m_constructed, &m_moved, &m_copied, &m_destructed;
+
+public:
+  SemanticCounter(usize &constructed, usize &moved, usize &copied, usize &destructed)
+      : m_constructed(constructed), m_moved(moved), m_copied(copied), m_destructed(destructed) {
+    ++m_constructed;
+  }
+  SemanticCounter(const SemanticCounter &o)
+      : m_constructed(o.m_constructed), m_moved(o.m_moved), m_copied(o.m_copied), m_destructed(o.m_destructed) {
+    ++m_copied;
+  }
+  SemanticCounter(SemanticCounter &&o)
+      : m_constructed(o.m_constructed), m_moved(o.m_moved), m_copied(o.m_copied), m_destructed(o.m_destructed) {
+    ++m_moved;
+  };
+
+  ~SemanticCounter() { ++m_destructed; }
+};
+
+TEST(Arc, CreateIntArc) {
+  const auto buf_size = 64;
+  const auto value = 42;
+
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(Arc<int>::min_alloc_size(), Arc<int>::min_alloc_alignment(), bytes.as_view());
+
+  auto int_arc_maybe = Arc<int>::create(pmr, value);
+  ASSERT_NE(int_arc_maybe, null);
+  auto int_arc = move(int_arc_maybe.value());
+
+  EXPECT_EQ(int_arc.get(), value);
+  EXPECT_EQ(int_arc.ref_count(), 1);
+
+  *int_arc = value + 1;
+
+  EXPECT_EQ(*int_arc, value + 1);
+  EXPECT_EQ(int_arc.ref_count(), 1);
+}
+
+TEST(Arc, ArgumentForwarding) {
+  const auto buf_size = 64;
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                                bytes.as_view());
+
+  usize constructed = 0;
+  usize moved = 0;
+  usize copied = 0;
+  usize destructed = 0;
+
+  {
+    auto rc_maybe = Arc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+    ASSERT_NE(rc_maybe, null);
+    auto arc = move(rc_maybe.value());
+
+    EXPECT_EQ(arc.ref_count(), 1);
+
+    auto arc_copy = arc;  // NOLINT(performance-unnecessary-copy-initialization)
+
+    EXPECT_EQ(arc.ref_count(), 2);
+    EXPECT_EQ(arc_copy.ref_count(), 2);
+
+    EXPECT_EQ(constructed, 1);
+    EXPECT_EQ(copied, 0);
+    EXPECT_EQ(moved, 1);
+    EXPECT_EQ(destructed, 1);
+  }
+
+  EXPECT_EQ(constructed, 1);
+  EXPECT_EQ(copied, 0);
+  EXPECT_EQ(moved, 1);
+  EXPECT_EQ(destructed, 2);
+}
+
+TEST(Arc, NoCopy) {
+  static_assert(sizeof(SemanticCounter) >= mem::IntrusivePool::minimum_size());
+
+  const auto buf_size = 64;
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                                bytes.as_view());
+
+  usize constructed = 0;
+  usize moved = 0;
+  usize copied = 0;
+  usize destructed = 0;
+
+  {
+    auto rc_maybe = Arc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    ASSERT_NE(rc_maybe, null);
+    auto arc = move(rc_maybe.value());
+
+    EXPECT_EQ(copied, 0);
+  }
+
+  EXPECT_EQ(copied, 0);
+}
+
+TEST(Arc, NoMove) {
+  static_assert(sizeof(SemanticCounter) >= mem::IntrusivePool::minimum_size());
+
+  const auto buf_size = 64;
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                                bytes.as_view());
+
+  usize constructed = 0;
+  usize moved = 0;
+  usize copied = 0;
+  usize destructed = 0;
+
+  {
+    auto rc_maybe = Arc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    ASSERT_NE(rc_maybe, null);
+    auto arc = move(rc_maybe.value());
+
+    EXPECT_EQ(moved, 0);
+  }
+
+  EXPECT_EQ(moved, 0);
+}
+
+TEST(Arc, Disown) {
+  const auto buf_size = 64;
+  auto bytes = Array<u8, buf_size>();
+  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                                bytes.as_view());
+
+  usize constructed = 0;
+  usize moved = 0;
+  usize copied = 0;
+  usize destructed = 0;
+
+  Nullable<Arc<SemanticCounter>> ref_a;
+
+  {
+    Nullable<Arc<SemanticCounter>> ref_b;
+
+    {
+      Nullable<Arc<SemanticCounter>> ref_c;
+
+      {
+        auto rc_maybe = Arc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+        ASSERT_NE(rc_maybe, null);
+        auto arc = move(rc_maybe.value());
+
+        EXPECT_EQ(arc.ref_count(), 1);
+
+        ref_a = arc;
+        ref_b = arc;
+        ref_c = arc;
+
+        EXPECT_EQ(arc.ref_count(), 4);
+        EXPECT_EQ(ref_a.value().ref_count(), 4);
+        EXPECT_EQ(ref_b.value().ref_count(), 4);
+        EXPECT_EQ(ref_c.value().ref_count(), 4);
+
+        EXPECT_EQ(constructed, 1);
+        EXPECT_EQ(copied, 0);
+        EXPECT_EQ(moved, 1);
+        EXPECT_EQ(destructed, 1);
+      }
+
+      EXPECT_EQ(constructed, 1);
+      EXPECT_EQ(copied, 0);
+      EXPECT_EQ(moved, 1);
+      EXPECT_EQ(destructed, 1);
+
+      EXPECT_EQ(ref_a.value().ref_count(), 3);
+      EXPECT_EQ(ref_b.value().ref_count(), 3);
+      EXPECT_EQ(ref_c.value().ref_count(), 3);
+    }
+
+    EXPECT_EQ(constructed, 1);
+    EXPECT_EQ(copied, 0);
+    EXPECT_EQ(moved, 1);
+    EXPECT_EQ(destructed, 1);
+
+    EXPECT_EQ(ref_a.value().ref_count(), 2);
+    EXPECT_EQ(ref_b.value().ref_count(), 2);
+
+    ref_b->disown();
+
+    EXPECT_EQ(ref_a.value().ref_count(), 0);
+    EXPECT_EQ(ref_b.value().ref_count(), 0);
+  }
+
+  EXPECT_EQ(ref_a.value().ref_count(), 0);
+
+  EXPECT_EQ(constructed, 1);
+  EXPECT_EQ(copied, 0);
+  EXPECT_EQ(moved, 1);
+  EXPECT_EQ(destructed, 2);
+}
