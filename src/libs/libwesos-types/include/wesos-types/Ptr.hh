@@ -17,7 +17,9 @@
 namespace wesos::types {
   template <class PointerTypeGeneric>
   [[nodiscard]] static constexpr auto is_aligned_pow2(PointerTypeGeneric addr,
-                                                      PowerOfTwo<usize> x) -> bool {
+                                                      PowerOfTwo<usize> x) -> bool
+    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  {
     const auto address = [addr]() {
       if constexpr (is_pointer_v<PointerTypeGeneric>) {
         return bit_cast<uptr>(addr);
@@ -31,8 +33,12 @@ namespace wesos::types {
 
   template <class PointerTypeGeneric>
   [[nodiscard]] static constexpr auto next_aligned_pow2(PointerTypeGeneric addr,
-                                                        PowerOfTwo<usize> x) -> PointerTypeGeneric {
-    using PointeeType = remove_reference_t<decltype(*addr)>;
+                                                        PowerOfTwo<usize> x) -> PointerTypeGeneric
+    requires(is_pointer_v<PointerTypeGeneric> || is_pointer_v<decltype(addr.unwrap())>)
+  {
+    using PointeeType =
+        remove_pointer_t<conditional_t<is_pointer_v<PointerTypeGeneric>, PointerTypeGeneric,
+                                       decltype(addr.unwrap())>>;
 
     const auto address = [addr]() {
       if constexpr (is_pointer_v<PointerTypeGeneric>) {
