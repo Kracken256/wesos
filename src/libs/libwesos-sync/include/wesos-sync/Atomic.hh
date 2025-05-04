@@ -18,46 +18,42 @@
 #endif
 
 namespace wesos::sync {
-  template <typename AtomGeneric>
+  template <typename Atom>
   class Atomic {
   private:
-    AtomGeneric m_value;
+    Atom m_value;
 
   public:
     constexpr Atomic() = default;
-    constexpr explicit Atomic(AtomGeneric value) : m_value(value) {}
+    constexpr explicit Atomic(Atom value) : m_value(value) {}
 
     [[nodiscard]] constexpr auto operator<=>(const Atomic& o) const { return load() <=> o.load(); };
 
-    void store(AtomGeneric desired, MemoryOrder order = memory_order_seq_cst) {
+    void store(Atom desired, MemoryOrder order = memory_order_seq_cst) {
       detail::atomic::arch::store(&m_value, desired, order);
     }
 
-    auto load(MemoryOrder order = memory_order_seq_cst) const -> AtomGeneric {
+    auto load(MemoryOrder order = memory_order_seq_cst) const -> Atom {
       return detail::atomic::arch::load(&m_value, order);
     }
 
-    auto exchange(AtomGeneric desired, MemoryOrder order = memory_order_seq_cst) -> AtomGeneric {
+    auto exchange(Atom desired, MemoryOrder order = memory_order_seq_cst) -> Atom {
       return detail::atomic::arch::exchange(&m_value, desired, order);
     }
 
-    auto compare_exchange_strong(AtomGeneric& expected, AtomGeneric desired, MemoryOrder success,
-                                 MemoryOrder failure) -> bool {
+    auto compare_exchange_strong(Atom& expected, Atom desired, MemoryOrder success, MemoryOrder failure) -> bool {
       return detail::atomic::arch::compare_exchange_strong(&m_value, &expected, desired, success, failure);
     }
 
-    auto compare_exchange_strong(AtomGeneric& expected, AtomGeneric desired,
-                                 MemoryOrder order = memory_order_seq_cst) -> bool {
+    auto compare_exchange_strong(Atom& expected, Atom desired, MemoryOrder order = memory_order_seq_cst) -> bool {
       return compare_exchange_strong(expected, desired, order, order);
     }
 
-    auto compare_exchange_weak(AtomGeneric& expected, AtomGeneric desired, MemoryOrder success,
-                               MemoryOrder failure) -> bool {
+    auto compare_exchange_weak(Atom& expected, Atom desired, MemoryOrder success, MemoryOrder failure) -> bool {
       return detail::atomic::arch::compare_exchange_weak(&m_value, &expected, desired, success, failure);
     }
 
-    auto compare_exchange_weak(AtomGeneric& expected, AtomGeneric desired,
-                               MemoryOrder order = memory_order_seq_cst) -> bool {
+    auto compare_exchange_weak(Atom& expected, Atom desired, MemoryOrder order = memory_order_seq_cst) -> bool {
       return compare_exchange_weak(expected, desired, order, order);
     }
   };

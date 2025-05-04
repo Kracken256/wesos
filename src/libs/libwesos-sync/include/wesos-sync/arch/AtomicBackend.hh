@@ -10,20 +10,19 @@
 #include <wesos-sync/MemoryOrder.hh>
 
 namespace wesos::sync::detail::atomic::arch {
-  template <typename AtomGeneric>
-  void store(AtomGeneric* ptr, AtomGeneric value, MemoryOrder order);
+  template <typename Atom>
+  void store(Atom* ptr, Atom value, MemoryOrder order);
 
-  template <typename AtomGeneric>
-  auto load(const AtomGeneric* ptr, MemoryOrder order) -> AtomGeneric;
+  template <typename Atom>
+  auto load(const Atom* ptr, MemoryOrder order) -> Atom;
 
-  template <typename AtomGeneric>
-  auto exchange(AtomGeneric* ptr, AtomGeneric value, MemoryOrder order) -> AtomGeneric;
+  template <typename Atom>
+  auto exchange(Atom* ptr, Atom value, MemoryOrder order) -> Atom;
 
-  template <typename AtomGeneric>
-  auto compare_exchange_strong(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
+  template <typename Atom>
+  auto compare_exchange_strong(Atom* ptr, Atom* expected, Atom desired, MemoryOrder success,
                                MemoryOrder failure) -> bool;
 
-  template <typename AtomGeneric>
-  auto compare_exchange_weak(AtomGeneric* ptr, AtomGeneric* expected, AtomGeneric desired, MemoryOrder success,
-                             MemoryOrder failure) -> bool;
+  template <typename Atom>
+  auto compare_exchange_weak(Atom* ptr, Atom* expected, Atom desired, MemoryOrder success, MemoryOrder failure) -> bool;
 }  // namespace wesos::sync::detail::atomic::arch
