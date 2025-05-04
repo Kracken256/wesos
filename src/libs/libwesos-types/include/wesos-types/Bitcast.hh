@@ -10,10 +10,10 @@
 #include <wesos-types/Template.hh>
 
 namespace wesos {
-  template <typename ToGeneric, typename FromGeneric>
-  [[nodiscard]] constexpr auto bit_cast(const FromGeneric& from) -> ToGeneric
-    requires(sizeof(ToGeneric) == sizeof(FromGeneric)) && __is_trivially_copyable
-  (ToGeneric) && __is_trivially_copyable(FromGeneric) {
-    return __builtin_bit_cast(ToGeneric, from);
+  template <typename To, typename From>
+  [[nodiscard]] constexpr auto bit_cast(const From& from) -> To
+    requires(sizeof(To) == sizeof(From)) && __is_trivially_copyable
+  (To) && __is_trivially_copyable(From) {
+    return __builtin_bit_cast(To, from);
   }
 }  // namespace wesos

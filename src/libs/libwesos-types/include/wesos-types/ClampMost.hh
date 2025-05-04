@@ -11,18 +11,16 @@
 #include <wesos-builtin/Move.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric, auto MostValue>
+  template <class T, auto Maximum>
   class ClampMost {
-    ValueGeneric m_value;
+    T m_value;
 
-    constexpr ClampMost(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
+    constexpr ClampMost(T x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
-    [[nodiscard]] static constexpr auto clamp(ValueGeneric x) -> ValueGeneric {
-      return x > MostValue ? ValueGeneric(MostValue) : x;
-    }
+    [[nodiscard]] static constexpr auto clamp(T x) -> T { return x > Maximum ? T(Maximum) : x; }
 
   public:
-    constexpr ClampMost(ValueGeneric x) : m_value(clamp(move(x))){};
+    constexpr ClampMost(T x) : m_value(clamp(move(x))){};
     constexpr ClampMost(const ClampMost&) = default;
     constexpr ClampMost(ClampMost&&) = default;
     constexpr auto operator=(const ClampMost&) -> ClampMost& = default;
@@ -30,12 +28,12 @@ namespace wesos::types {
     constexpr ~ClampMost() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
-    [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
+    [[nodiscard]] constexpr auto unwrap() const -> const T& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const T* { return &m_value; }
+    [[nodiscard]] constexpr operator T() const { return m_value; }
 
-    [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> ClampMost {
-      assert_invariant(x <= MostValue);
+    [[nodiscard]] constexpr static auto create_unchecked(T x) -> ClampMost {
+      assert_invariant(x <= Maximum);
       return {move(x), true};
     }
   };

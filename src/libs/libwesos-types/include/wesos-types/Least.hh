@@ -11,14 +11,14 @@
 #include <wesos-builtin/Move.hh>
 
 namespace wesos::types {
-  template <class ValueGeneric, auto MinimumValue>
+  template <class T, auto Minimum>
   class Least {
-    ValueGeneric m_value;
+    T m_value;
 
-    constexpr Least(ValueGeneric x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
+    constexpr Least(T x, bool unsafe) : m_value(move(x)) { (void)unsafe; };
 
   public:
-    constexpr Least(ValueGeneric x) : m_value(move(x)) { assert_invariant(x >= MinimumValue); };
+    constexpr Least(T x) : m_value(move(x)) { assert_invariant(x >= Minimum); };
     constexpr Least(const Least&) = default;
     constexpr Least(Least&&) = default;
     constexpr auto operator=(const Least&) -> Least& = default;
@@ -26,12 +26,12 @@ namespace wesos::types {
     constexpr ~Least() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return unwrap() <=> o; }
-    [[nodiscard]] constexpr auto unwrap() const -> const ValueGeneric& { return m_value; }
-    [[nodiscard]] constexpr auto operator->() const -> const ValueGeneric* { return &m_value; }
-    [[nodiscard]] constexpr operator ValueGeneric() const { return m_value; }
+    [[nodiscard]] constexpr auto unwrap() const -> const T& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() const -> const T* { return &m_value; }
+    [[nodiscard]] constexpr operator T() const { return m_value; }
 
-    [[nodiscard]] constexpr static auto create_unchecked(ValueGeneric x) -> Least {
-      assert_invariant(x >= MinimumValue);
+    [[nodiscard]] constexpr static auto create_unchecked(T x) -> Least {
+      assert_invariant(x >= Minimum);
       return {move(x), true};
     }
   };
