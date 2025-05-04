@@ -35,56 +35,60 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
     [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* requires(!is_same_v<PointeeGeneric, void>) {
-      return unwrap();
-    }
+    template <class U = PointeeGeneric>
+    [[nodiscard]] constexpr auto operator->() const -> U* requires(!is_same_v<U, void>) { return unwrap(); }
 
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
-      return *unwrap();
-    }
+    template <class U = PointeeGeneric>
+    [[nodiscard]] constexpr auto operator*() const -> U& requires(!is_same_v<U, void>) { return *unwrap(); }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto add(usize i) const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() + i;
     }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto sub(usize i) const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() - i;
     }
 
-    [[nodiscard]] constexpr auto load() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
-      return *unwrap();
-    }
+    template <class U = PointeeGeneric>
+    [[nodiscard]] constexpr auto load() const -> U& requires(!is_same_v<U, void>) { return *unwrap(); }
 
-    constexpr void store(PointeeGeneric x) const
-      requires(!is_same_v<PointeeGeneric, void>)
+    template <class U = PointeeGeneric>
+    constexpr void store(U x) const
+      requires(!is_same_v<U, void>)
     {
       *unwrap() = move(x);
     }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto operator++() const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() + 1;
     }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto operator++(int) const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() + 1;
     }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto operator--() const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() - 1;
     }
 
+    template <class U = PointeeGeneric>
     [[nodiscard]] constexpr auto operator--(int) const -> RefPtr
-      requires(!is_same_v<PointeeGeneric, void>)
+      requires(!is_same_v<U, void>)
     {
       return unwrap() - 1;
     }

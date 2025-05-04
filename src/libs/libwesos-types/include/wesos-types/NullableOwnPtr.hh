@@ -52,12 +52,14 @@ namespace wesos::types {
       return unwrap();
     }
 
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* requires(!is_same_v<PointeeGeneric, void>) {
+    template <class U = PointeeGeneric>
+    [[nodiscard]] constexpr auto operator->() const -> U* requires(!is_same_v<U, void>) {
       assert_invariant(isset());
       return unwrap();
     }
 
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
+    template <class U = PointeeGeneric>
+    [[nodiscard]] constexpr auto operator*() const -> U& requires(!is_same_v<U, void>) {
       assert_invariant(isset());
       return *unwrap();
     }
