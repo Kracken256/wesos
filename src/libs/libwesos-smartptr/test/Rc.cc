@@ -8,7 +8,3 @@
 #include <gtest/gtest.h>
 
 #include <wesos-smartptr/Rc.hh>
-
-TEST(placeholder, placeholder) {
-  /// TODO:
-}

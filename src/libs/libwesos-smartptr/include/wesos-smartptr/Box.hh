@@ -1,78 +1,69 @@
-// /**
-//  * This file is part of the WesOS project.
-//  *
-//  * WesOS is public domain software: you can redistribute it and/or modify
-//  * it under the terms of the Unlicense(https://unlicense.org/).
-//  */
+/**
+ * This file is part of the WesOS project.
+ *
+ * WesOS is public domain software: you can redistribute it and/or modify
+ * it under the terms of the Unlicense(https://unlicense.org/).
+ */
 
-// #pragma once
+#pragma once
 
-// #include <wesos-mem/IntrusivePool.hh>  /// TODO: Remove me
-// #include <wesos-mem/MemoryResourceProtocol.hh>
-// #include <wesos-types/NullableOwnPtr.hh>
+#include <wesos-mem/IntrusivePool.hh>  /// TODO: Remove me
+#include <wesos-mem/MemoryResourceProtocol.hh>
+#include <wesos-mem/PolymorphicAllocator.hh>
+#include <wesos-types/NullableOwnPtr.hh>
+#include <wesos-types/Template.hh>
 
-// namespace wesos::smartptr {
-//   template <class PointeeGeneric>
-//   class Box {
-//     NullableOwnPtr<PointeeGeneric> m_ptr;
-//     mem::MemoryResourceProtocol* m_pmr;
+namespace wesos::smartptr {
+  template <class Pointee, class Allocator = mem::PolymorphicAllocator<Pointee>>
+  class Box {
+    NullableOwnPtr<Pointee> m_ptr;
+    Allocator m_allocator;
 
-//     Box(OwnPtr<PointeeGeneric> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(&pmr)
-//     {}
+    Box(OwnPtr<Pointee> ptr, Allocator allocator) : m_ptr(ptr), m_allocator(move(allocator)) {}
 
-//   public:
-//     constexpr Box(const Box& o) = delete;
-//     constexpr auto operator=(const Box& o) -> Box& = delete;
+  public:
+    constexpr Box(const Box& o) = delete;
+    constexpr auto operator=(const Box& o) -> Box& = delete;
+    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_allocator(move(o.m_allocator)) { o.m_ptr = nullptr; };
 
-//     constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = nullptr; };
+    constexpr auto operator=(Box&& o) -> Box& {
+      if (this != &o) [[likely]] {
+        m_ptr = o.m_ptr;
+        o.m_ptr = nullptr;
+      }
 
-//     constexpr auto operator=(Box&& o) -> Box& {
-//       if (this != &o) [[likely]] {
-//         m_ptr = o.m_ptr;
-//         o.m_ptr = nullptr;
-//       }
-//     };
+      return *this;
+    };
 
-//     ~Box() {
-//       assert_invariant(m_pmr != nullptr);
+    ~Box() {
+      if (m_ptr.is_null()) {
+        return;
+      }
 
-//       auto* object_ptr = m_ptr.unwrap();
-//       const auto object_range = View<u8>(bit_cast<u8*>(object_ptr),
-//       sizeof(PointeeGeneric));
+      auto raw_ptr = m_ptr.unwrap();
 
-//       object_ptr->~PointeeGeneric();
-//       m_pmr->deallocate_bytes(object_range, alignof(PointeeGeneric));
+      m_allocator.destroy(*raw_ptr);
+      m_allocator.deallocate_storage(raw_ptr, 1);
 
-// #ifndef NDEBUG
-//       m_ptr = nullptr;
-// #endif
-//     };
+#ifndef NDEBUG
+      m_ptr = nullptr;
+#endif
+    }
 
-//     template <class... ArgsGeneric>
-//     [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr) {
-//       return [&pmr](ArgsGeneric... args) -> Nullable<Box> {
-//         auto object_ptr = pmr.allocate_bytes(sizeof(PointeeGeneric), alignof(PointeeGeneric));
-//         if (object_ptr.is_null()) [[unlikely]] {
-//           return null;
-//         }
+    template <class... Args>
+    [[nodiscard]] static auto create(Args... args) {
+      return [... args = forward<Args>(args)](mem::MemoryResourceProtocol& pmr) -> Nullable<Box> {
+        auto pma = mem::PolymorphicAllocator<Pointee>(pmr);
 
-//         new (object_ptr.unwrap_unchecked().into_ptr()) PointeeGeneric(args...);
+        const auto storage = pma.allocate_storage(1);
+        if (storage.is_null()) [[unlikely]] {
+          return null;
+        }
 
-//         (void)pmr;
-//         return nullptr;
-//         /// TODO:
-//       };
-//     }
+        pma.construct(*storage.unwrap(), args...);
 
-//     /// TODO:
-//   };
-
-//   static void test() {  //
-//     Array<u8, 4096> bytes;
-//     mem::IntrusivePool pmr(sizeof(int), alignof(int), bytes.as_view());
-
-//     auto hello = Box<int>::create(pmr)().unwrap();
-
-//     constexpr auto sz = sizeof(hello);
-//   }
-// }  // namespace wesos::smartptr
+        return Box(storage.unwrap(), move(pma));
+      };
+    }
+  };
+}  // namespace wesos::smartptr

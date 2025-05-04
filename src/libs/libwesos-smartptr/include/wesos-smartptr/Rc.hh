@@ -12,13 +12,13 @@
 // #include <wesos-types/NullableOwnPtr.hh>
 
 // namespace wesos::smartptr {
-//   template <class PointeeGeneric>
+//   template <class Pointee>
 //   class Rc {
-//     NullableOwnPtr<PointeeGeneric> m_ptr;
+//     NullableOwnPtr<Pointee> m_ptr;
 //     usize& m_rc;
 //     mem::MemoryResourceProtocol* m_pmr;
 
-//     Rc(OwnPtr<PointeeGeneric> ptr, usize& rc, mem::MemoryResourceProtocol& pmr)
+//     Rc(OwnPtr<Pointee> ptr, usize& rc, mem::MemoryResourceProtocol& pmr)
 //         : m_ptr(ptr), m_rc(rc), m_pmr(&pmr) {}
 
 //   public:
@@ -48,10 +48,10 @@
 //       if (--m_rc == 0) [[unlikely]] {
 //         auto* object_ptr = m_ptr.unwrap();
 //         const auto object_range =
-//             View<u8>(bit_cast<u8*>(object_ptr), sizeof(PointeeGeneric));
+//             View<u8>(bit_cast<u8*>(object_ptr), sizeof(Pointee));
 
-//         object_ptr->~PointeeGeneric();
-//         m_pmr->deallocate_bytes(object_range, alignof(PointeeGeneric));
+//         object_ptr->~Pointee();
+//         m_pmr->deallocate_bytes(object_range, alignof(Pointee));
 
 // #ifndef NDEBUG
 //         m_ptr = nullptr;
@@ -59,9 +59,9 @@
 //       }
 //     };
 
-//     template <class... ArgsGeneric>
+//     template <class... Args>
 //     [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr) {
-//       return [&pmr](ArgsGeneric... args) -> Nullable<Rc> {
+//       return [&pmr](Args... args) -> Nullable<Rc> {
 //         (void)pmr;
 //         return nullptr;
 //         /// TODO:
