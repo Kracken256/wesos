@@ -65,23 +65,23 @@ SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size,
 
   m_front = freenode->m_next;
 
-  OwnPtr object_ptr = reinterpret_cast<u8*>(freenode.unwrap());
-  assert_invariant(object_ptr.is_aligned(align));
+  const auto result = OwnPtr(reinterpret_cast<u8*>(freenode.unwrap()));
+  assert_invariant(result.is_aligned(align));
 
-  return object_ptr;
+  return result;
 }
 
 SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
                                                   PowerOfTwo<usize> align) {
-  align = max(align.unwrap(), alignof(FreeNode));
-  assert_invariant(size <= object_size() && align >= object_align());
+  assert_invariant(size <= object_size() &&
+                   max(align.unwrap(), alignof(FreeNode)) == object_align());
 
-  RefPtr node = reinterpret_cast<FreeNode*>(ptr.unwrap());
+  const auto node = OwnPtr(reinterpret_cast<FreeNode*>(ptr.unwrap()));
 
   node->m_next = m_front;
   m_front = node;
 
-  ASAN_POISON_MEMORY_REGION(ptr.unwrap(), size);
+  ASAN_POISON_MEMORY_REGION(ptr.unwrap(), object_size());
 }
 
 SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
