@@ -131,5 +131,31 @@ namespace wesos::types {
   template <bool Cond, typename T, typename F>
   using conditional_t = typename conditional<Cond, T, F>::type;
 
+  ///===========================================================================
+
+  template <typename T>
+  struct is_lvalue_reference : false_type {};
+
+  template <typename T>
+  struct is_lvalue_reference<T&> : true_type {};
+
+  template <typename T>
+  inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
+
+  ///===========================================================================
+
+  template <typename T>
+  constexpr auto forward(remove_reference_t<T>& t) noexcept -> T&& {
+    return static_cast<T&&>(t);
+  }
+
+  template <typename T>
+  constexpr auto forward(remove_reference_t<T>&& t) noexcept -> T&& {
+    static_assert(!is_lvalue_reference_v<T>, "bad forward: can't forward an rvalue as an lvalue");
+    return static_cast<T&&>(t);
+  }
+
+  ///===========================================================================
+
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types
