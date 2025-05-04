@@ -21,7 +21,7 @@ namespace wesos::assert {
 
 // NOLINTBEGIN(readability-identifier-naming)
 
-#define always_assert(...)                                                                                \
+#define assert_always(...)                                                                                \
   [](bool eval, const char* eval_code, wesos::SourceLocation source = wesos::SourceLocation::current()) { \
     if (!eval) [[unlikely]] {                                                                             \
       wesos::assert::assert_failure(eval_code, source);                                                   \
@@ -31,7 +31,7 @@ namespace wesos::assert {
 #ifdef NDEBUG
 #define assert_invariant(...)
 #else
-#define assert_invariant(...) always_assert(__VA_ARGS__)
+#define assert_invariant(...) assert_always(__VA_ARGS__)
 #endif
 
 // NOLINTEND(readability-identifier-naming)

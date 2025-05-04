@@ -90,7 +90,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr operator bool() { return isset(); }
 
     [[nodiscard]] constexpr auto value() const -> const ValueGeneric& {
-      always_assert(isset());
+      assert_always(isset());
       return get();
     }
 
@@ -100,7 +100,7 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto value() -> ValueGeneric& {
-      always_assert(isset());
+      assert_always(isset());
       return get();
     }
 

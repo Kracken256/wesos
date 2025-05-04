@@ -27,12 +27,8 @@ SYM_EXPORT void TracingResource::virt_do_deallocate(OwnPtr<u8> ptr, usize size, 
   return m_debugee->deallocate_bytes(ptr, size, align);
 }
 
-SYM_EXPORT auto TracingResource::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
-  auto unused = m_debugee->utilize_bytes(pool);
+SYM_EXPORT auto TracingResource::virt_do_utilize(View<u8> pool) -> void {
+  m_debugee->utilize_bytes(pool);
 
-  m_print("do_utilize(%p, %zu) -> ((%p, %zu), (%p, %zu))\n", (void*)pool.into_ptr().unwrap(), pool.size(),
-          (void*)unused.first()->into_ptr().unwrap(), unused.first()->size(),
-          (void*)unused.second()->into_ptr().unwrap(), unused.second()->size());
-
-  return unused;
+  m_print("do_utilize(%p, %zu)\n", (void*)pool.into_ptr().unwrap(), pool.size());
 }

@@ -254,7 +254,7 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(OwnPtr<u8> ptr, usize
   detail::print_freelist(m_some);
 }
 
-SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> LeftoverMemory {  /// TODO: Struct code review
+SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> void {  /// TODO: Struct code review
   using namespace detail;
 
   auto window = pool;
@@ -265,7 +265,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> Leftov
         window.into_ptr().as_uptr();
 
     if (window.size() < space_before_chunk + sizeof(Chunk)) {
-      return {{pool}, {}};
+      return;
     }
 
     window = window.subview_unchecked(space_before_chunk);
@@ -283,6 +283,4 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool) -> Leftov
 
   const OwnPtr owned_ptr = window.into_ptr().unwrap();
   virt_do_deallocate(owned_ptr, window.size(), alignof(Chunk));
-
-  return {};
 }

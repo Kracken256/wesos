@@ -45,7 +45,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
     [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {
-      always_assert(isset());
+      assert_always(isset());
       return unwrap();
     }
 

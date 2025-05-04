@@ -26,4 +26,4 @@ SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<u8> ptr,
   }
 }
 
-SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> LeftoverMemory { return virt_do_utilize(pool); }
+SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> void { virt_do_utilize(pool); }

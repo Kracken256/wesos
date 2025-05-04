@@ -30,7 +30,7 @@ namespace wesos::mem {
 
     auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override;
     auto virt_do_deallocate(OwnPtr<u8> ptr, usize size, PowerOfTwo<usize> align) -> void override;
-    auto virt_do_utilize(View<u8> pool) -> LeftoverMemory override;
+    auto virt_do_utilize(View<u8> pool) -> void override;
 
   public:
     IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool = View<u8>::create_empty());

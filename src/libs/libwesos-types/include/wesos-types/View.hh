@@ -43,21 +43,21 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto into_ptr() const { return m_base; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
-      always_assert(i < size());
+      assert_always(i < size());
       return *(m_base.add(i));
     }
 
     [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const ElementGeneric& { return *(m_base.add(i)); }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
-      always_assert(i < size());
+      assert_always(i < size());
       return *(m_base.add(i));
     }
 
     [[nodiscard]] constexpr auto get_unchecked(usize i) -> ElementGeneric& { return *(m_base.add(i)); }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View {
-      always_assert(i <= size() && count <= size() - i);
+      assert_always(i <= size() && count <= size() - i);
       return {m_base.add(i), count};
     }
 
@@ -67,7 +67,7 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto subview(usize i) const -> View {
-      always_assert(i <= size());
+      assert_always(i <= size());
       return {m_base.add(i), size() - i};
     }
 
@@ -109,7 +109,7 @@ namespace wesos::types {
     ///========================================================================================
 
     constexpr auto set(usize i, ElementGeneric x) -> View& {
-      always_assert(i <= size());
+      assert_always(i <= size());
       *m_base.add(i) = move(x);
       return *this;
     }

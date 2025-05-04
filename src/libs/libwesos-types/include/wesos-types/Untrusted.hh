@@ -28,6 +28,6 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto trust_and_unwrap() const -> const ValueGeneric& { return m_value; }
     [[nodiscard]] constexpr auto trust_and_unwrap() -> ValueGeneric& { return m_value; }
 
-    constexpr void ensure_safe(auto verify) const { always_assert(verify(m_value)); }
+    constexpr void ensure_safe(auto verify) const { assert_always(verify(m_value)); }
   };
 }  // namespace wesos::types

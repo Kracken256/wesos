@@ -12,7 +12,7 @@
 
 namespace wesos::mem {
   class NullResource final : public MemoryResourceProtocol {
-    [[nodiscard]] auto virt_do_utilize(View<u8> pool) -> LeftoverMemory override { return {{pool}, {}}; };
+    auto virt_do_utilize(View<u8> pool) -> void override { (void)pool; };
 
     [[nodiscard]] auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<u8> override {
       (void)size;

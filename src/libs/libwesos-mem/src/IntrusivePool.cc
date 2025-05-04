@@ -80,21 +80,15 @@ SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size, Po
   ASAN_POISON_MEMORY_REGION(ptr.unwrap(), object_size());
 }
 
-SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory {
+SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> void {
   if (pool.empty()) [[unlikely]] {
-    return {{pool}, {}};
+    return;
   }
 
-  auto leftover = for_each_chunk_aligned(pool, object_size(), object_align(), [&](auto object_range) {
+  for_each_chunk_aligned(pool, object_size(), object_align(), [&](auto object_range) {
     const auto object_ptr = OwnPtr(object_range.into_ptr().get_unchecked().unwrap());
     assert_invariant(object_range.size() == object_size() && is_aligned_pow2(object_ptr, object_align()));
 
     virt_do_deallocate(object_ptr, object_size(), object_align());
   });
-
-  const auto left_padding = bytes_until_next_aligned_pow2(pool.into_ptr(), object_align());
-  const auto left_unused = pool.subview_unchecked(0, left_padding);
-  const auto right_unused = leftover;
-
-  return {{left_unused}, {right_unused}};
 }

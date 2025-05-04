@@ -9,7 +9,7 @@
 
 #include <wesos-assert/Assert.hh>
 
-TEST(always_assert, call) {
+TEST(assert_always, call) {
   wesos::assert::register_output_callback(nullptr, [](void*, const char* message, wesos::SourceLocation source) {
     std::cerr << "\n==========================================================================="
                  "===========\n"
@@ -21,9 +21,9 @@ TEST(always_assert, call) {
               << std::endl;
   });
 
-  // Test that always_assert does not abort when the condition is true
-  EXPECT_NO_FATAL_FAILURE(always_assert(true && "This should not fail"));
+  // Test that assert_always does not abort when the condition is true
+  EXPECT_NO_FATAL_FAILURE(assert_always(true && "This should not fail"));
 
-  // Test that always_assert aborts when the condition is false
-  EXPECT_DEATH(always_assert(false && "This should fail"), "This should fail");
+  // Test that assert_always aborts when the condition is false
+  EXPECT_DEATH(assert_always(false && "This should fail"), "This should fail");
 }

@@ -31,7 +31,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto empty() const -> bool { return length() == 0; }
 
     [[nodiscard]] constexpr auto get(usize i) const -> const ElementGeneric& {
-      always_assert(i < length());
+      assert_always(i < length());
       return m_data[i];
     }
 
@@ -41,7 +41,7 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto get(usize i) -> ElementGeneric& {
-      always_assert(i < length());
+      assert_always(i < length());
       return m_data[i];
     }
 
@@ -81,7 +81,7 @@ namespace wesos::types {
     ///=========================================================================
 
     constexpr void set(usize i, ElementGeneric value) {
-      always_assert(i < length());
+      assert_always(i < length());
       m_data[i] = move(value);
     }
 
