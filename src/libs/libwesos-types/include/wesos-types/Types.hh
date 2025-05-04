@@ -77,6 +77,8 @@ namespace wesos {
   using types::PowerOfTwo;
   using types::Range;
 
+  using types::forward;
+
   using types::operator""_u8;
   using types::operator""_u16;
   using types::operator""_u32;
