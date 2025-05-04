@@ -12,15 +12,15 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
-  template <typename ObjectGeneric>
+  template <typename Object>
   class PolymorphicAllocator {
   public:
-    using ValueType = ObjectGeneric;
+    using ValueType = Object;
 
     constexpr explicit PolymorphicAllocator(MemoryResourceProtocol& r) : m_resource(r) {}
 
-    template <typename UGeneric>
-    constexpr PolymorphicAllocator(const PolymorphicAllocator<UGeneric>& o) : m_resource(o.resource()) {}
+    template <typename U>
+    constexpr PolymorphicAllocator(const PolymorphicAllocator<U>& o) : m_resource(o.resource()) {}
 
     constexpr PolymorphicAllocator(const PolymorphicAllocator&) = default;
     constexpr PolymorphicAllocator(PolymorphicAllocator&&) = default;
@@ -28,23 +28,23 @@ namespace wesos::mem {
     constexpr auto operator=(PolymorphicAllocator&&) -> PolymorphicAllocator& = default;
     constexpr ~PolymorphicAllocator() = default;
 
-    [[nodiscard]] auto allocate_storage(usize n) -> NullableOwnPtr<ObjectGeneric> {
-      const auto address = m_resource.allocate_bytes(n * sizeof(ObjectGeneric), alignof(ObjectGeneric));
-      return static_cast<ObjectGeneric*>(address.unwrap());
+    [[nodiscard]] auto allocate_storage(usize n) -> NullableOwnPtr<Object> {
+      const auto address = m_resource.allocate_bytes(n * sizeof(Object), alignof(Object));
+      return static_cast<Object*>(address.unwrap());
     }
 
-    void deallocate_storage(NullableOwnPtr<ObjectGeneric> p, usize n) {
-      m_resource.deallocate_bytes(p, n * sizeof(ObjectGeneric), alignof(ObjectGeneric));
+    void deallocate_storage(NullableOwnPtr<Object> p, usize n) {
+      m_resource.deallocate_bytes(p.unwrap(), n * sizeof(Object), alignof(Object));
     }
 
     [[nodiscard]] auto resource() const -> MemoryResourceProtocol& { return m_resource; }
 
-    template <typename... ArgsGeneric>
-    void construct(ObjectGeneric& p, ArgsGeneric&&... args) {
-      ::new (static_cast<void*>(&p)) ObjectGeneric(forward<ArgsGeneric>(args)...);
+    template <typename... Args>
+    void construct(Object& p, Args&&... args) {
+      ::new (static_cast<void*>(&p)) Object(forward<Args>(args)...);
     }
 
-    void destroy(ObjectGeneric& p) { p.~U(); }
+    void destroy(Object& p) { p.~Object(); }
 
   private:
     MemoryResourceProtocol& m_resource;
