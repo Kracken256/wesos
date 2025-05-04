@@ -112,19 +112,29 @@ namespace wesos::types {
       return get();
     }
 
-    [[nodiscard]] constexpr auto value_unchecked() const -> const T& {
-      assert_invariant(isset());
+    [[nodiscard]] constexpr auto value() -> T& {
+      assert_always(isset());
       return get();
     }
 
-    [[nodiscard]] constexpr auto value() -> T& {
-      assert_always(isset());
+    [[nodiscard]] constexpr auto value_unchecked() const -> const T& {
+      assert_invariant(isset());
       return get();
     }
 
     [[nodiscard]] constexpr auto value_unchecked() -> T& {
       assert_invariant(isset());
       return get();
+    }
+
+    [[nodiscard]] constexpr auto operator->() -> T* {
+      assert_always(isset());
+      return &get();
+    }
+
+    [[nodiscard]] constexpr auto operator->() const -> const T* {
+      assert_always(isset());
+      return &get();
     }
 
     [[nodiscard]] constexpr auto value_or(T&& y) const -> T { return isset() ? get() : y; }
