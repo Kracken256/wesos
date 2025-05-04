@@ -12,16 +12,16 @@
 
 namespace wesos::mem::testing {
   namespace detail {
-    template <class ClassGeneric, class MethodGeneric>
+    template <class Class, class Method>
     class ZeroCostDelegate final {
-      ClassGeneric& m_base;
-      MethodGeneric m_method;
+      Class& m_base;
+      Method m_method;
 
     public:
-      constexpr ZeroCostDelegate(ClassGeneric& base, MethodGeneric method) : m_base(base), m_method(method) {}
+      constexpr ZeroCostDelegate(Class& base, Method method) : m_base(base), m_method(method) {}
 
-      template <typename... ArgsGeneric>
-      constexpr auto operator()(ArgsGeneric... args) const {
+      template <typename... Args>
+      constexpr auto operator()(Args... args) const {
         return (m_base.*m_method)(args...);
       }
     };
