@@ -54,6 +54,8 @@ SYM_EXPORT IntrusivePool::~IntrusivePool() {
 }
 
 SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+  size = max(size, sizeof(FreeNode));
+
   if (!m_front.isset() || size > object_size() || align > object_align()) [[unlikely]] {
     return nullptr;
   }
