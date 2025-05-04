@@ -36,19 +36,59 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
     [[nodiscard]] constexpr auto as_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* { return unwrap(); }
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& { return *unwrap(); }
+    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* requires(!is_same_v<PointeeGeneric, void>) {
+      return unwrap();
+    }
 
-    [[nodiscard]] constexpr auto add(usize i) const -> OwnPtr { return unwrap() + i; }
-    [[nodiscard]] constexpr auto sub(usize i) const -> OwnPtr { return unwrap() - i; }
+    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
+      return *unwrap();
+    }
 
-    [[nodiscard]] constexpr auto load() const -> PointeeGeneric& { return *unwrap(); }
-    constexpr void store(PointeeGeneric x) const { *unwrap() = move(x); }
+    [[nodiscard]] constexpr auto add(usize i) const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() + i;
+    }
 
-    [[nodiscard]] constexpr auto operator++() const -> OwnPtr { return unwrap() + 1; }
-    [[nodiscard]] constexpr auto operator++(int) const -> OwnPtr { return unwrap() + 1; }
-    [[nodiscard]] constexpr auto operator--() const -> OwnPtr { return unwrap() - 1; }
-    [[nodiscard]] constexpr auto operator--(int) const -> OwnPtr { return unwrap() - 1; }
+    [[nodiscard]] constexpr auto sub(usize i) const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() - i;
+    }
+
+    [[nodiscard]] constexpr auto load() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
+      return *unwrap();
+    }
+
+    constexpr void store(PointeeGeneric x) const
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      *unwrap() = move(x);
+    }
+
+    [[nodiscard]] constexpr auto operator++() const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() + 1;
+    }
+
+    [[nodiscard]] constexpr auto operator++(int) const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() + 1;
+    }
+
+    [[nodiscard]] constexpr auto operator--() const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() - 1;
+    }
+
+    [[nodiscard]] constexpr auto operator--(int) const -> OwnPtr
+      requires(!is_same_v<PointeeGeneric, void>)
+    {
+      return unwrap() - 1;
+    }
 
     [[nodiscard]] constexpr auto as_ref() const -> RefPtr<PointeeGeneric> { return unwrap(); }
   };

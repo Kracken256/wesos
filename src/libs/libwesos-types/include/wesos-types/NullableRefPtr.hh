@@ -54,44 +54,14 @@ namespace wesos::types {
       return unwrap();
     }
 
-    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* {
+    [[nodiscard]] constexpr auto operator->() const -> PointeeGeneric* requires(!is_same_v<PointeeGeneric, void>) {
       assert_invariant(isset());
       return unwrap();
     }
 
-    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& {
+    [[nodiscard]] constexpr auto operator*() const -> PointeeGeneric& requires(!is_same_v<PointeeGeneric, void>) {
       assert_invariant(isset());
       return *unwrap();
-    }
-
-    [[nodiscard]] constexpr auto add(usize i) const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() + i;
-    }
-
-    [[nodiscard]] constexpr auto sub(usize i) const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() - i;
-    }
-
-    [[nodiscard]] constexpr auto operator++() const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() + 1;
-    }
-
-    [[nodiscard]] constexpr auto operator++(int) const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() + 1;
-    }
-
-    [[nodiscard]] constexpr auto operator--() const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() - 1;
-    }
-
-    [[nodiscard]] constexpr auto operator--(int) const -> NullableRefPtr {
-      assert_invariant(isset());
-      return unwrap() - 1;
     }
   };
 
