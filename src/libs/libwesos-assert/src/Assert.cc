@@ -10,15 +10,12 @@
 #include <wesos-sync/SpinLock.hh>
 
 namespace wesos::assert {
-  static void default_output_callback(void*, const char* message, const char* func_name,
-                                      const char* file_name, int line) {
+  static void default_output_callback(void*, const char* message, SourceLocation source) {
     // This will run on bare-metal, so we can't use printf
     // or any other standard library functions. Just discard the message.
 
     (void)message;
-    (void)func_name;
-    (void)file_name;
-    (void)line;
+    (void)source;
   }
 
   static void default_abort_callback(void*) { __builtin_trap(); }
@@ -38,7 +35,7 @@ namespace wesos::assert {
 }  // namespace wesos::assert
 
 SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback cb) {
-  always_assert(cb != nullptr);
+  assert_invariant(cb != nullptr);
 
   OUTPUT_LOCK_GLOBAL.critical_section([&] {
     OUTPUT_GLOBAL.m_func = cb;
@@ -47,7 +44,7 @@ SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback 
 }
 
 SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb) {
-  always_assert(cb != nullptr);
+  assert_invariant(cb != nullptr);
 
   ABORT_LOCK_GLOBAL.critical_section([&] {
     ABORT_GLOBAL.m_func = cb;
@@ -55,15 +52,12 @@ SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb
   });
 }
 
-SYM_EXPORT void wesos::always_assert_impl(bool cond, const char* cond_str, int line,
-                                          const char* file_name, const char* func_name) {
-  if (!cond) [[unlikely]] {
-    using namespace assert;
+SYM_EXPORT void wesos::assert_failure(const char* message, SourceLocation source) {
+  using namespace assert;
 
-    auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
-    auto abort_copy = ABORT_LOCK_GLOBAL.critical_section([] { return ABORT_GLOBAL; });
+  auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
+  auto abort_copy = ABORT_LOCK_GLOBAL.critical_section([] { return ABORT_GLOBAL; });
 
-    output_copy.m_func(output_copy.m_data, cond_str, func_name, file_name, line);
-    abort_copy.m_func(abort_copy.m_data);
-  }
+  output_copy.m_func(output_copy.m_data, message, source);
+  abort_copy.m_func(abort_copy.m_data);
 }

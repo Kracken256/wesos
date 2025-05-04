@@ -13,18 +13,17 @@
 #include <wesos-assert/Assert.hh>
 
 TEST(assert_invariant, no_ndebug) {
-  wesos::assert::register_output_callback(
-      nullptr,
-      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
-        std::cerr << "\n==========================================================================="
-                     "===========\n"
-                  << "| Assertion Failed: \"" << message << "\";\n"
-                  << "| Function: [" << func_name << "]: " << line << ";\n"
-                  << "| File: \"" << file_name << "\";\n"
-                  << "============================================================================="
-                     "=========\n"
-                  << std::endl;
-      });
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message,
+                                                      wesos::SourceLocation source) {
+    std::cerr << "\n==========================================================================="
+                 "===========\n"
+              << "| Assertion Failed: \"" << message << "\";\n"
+              << "| Function: [" << source.function_name() << "]: " << source.line_number() << ";\n"
+              << "| File: \"" << source.file_name() << "\";\n"
+              << "============================================================================="
+                 "=========\n"
+              << std::endl;
+  });
 
   // Test that assert_invariant does not abort when the condition is true
   EXPECT_NO_FATAL_FAILURE(assert_invariant(true && "This should not fail"));

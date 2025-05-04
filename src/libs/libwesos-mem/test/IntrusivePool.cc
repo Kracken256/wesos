@@ -13,18 +13,17 @@
 #include <wesos-mem/IntrusivePool.hh>
 
 static void deps_setup() {
-  wesos::assert::register_output_callback(
-      nullptr,
-      [](void*, const char* message, const char* func_name, const char* file_name, int line) {
-        std::cerr << "\n==========================================================================="
-                     "===========\n"
-                  << "| Assertion Failed: \"" << message << "\";\n"
-                  << "| Function: [" << func_name << "]: " << line << ";\n"
-                  << "| File: \"" << file_name << "\";\n"
-                  << "============================================================================="
-                     "=========\n"
-                  << std::endl;
-      });
+  wesos::assert::register_output_callback(nullptr, [](void*, const char* message,
+                                                      wesos::SourceLocation source) {
+    std::cerr << "\n==========================================================================="
+                 "===========\n"
+              << "| Assertion Failed: \"" << message << "\";\n"
+              << "| Function: [" << source.function_name() << "]: " << source.line_number() << ";\n"
+              << "| File: \"" << source.file_name() << "\";\n"
+              << "============================================================================="
+                 "=========\n"
+              << std::endl;
+  });
 }
 
 TEST(IntrusivePool, CreatePool) {
