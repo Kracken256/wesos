@@ -8,6 +8,7 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
+#include <wesos-types/Bitcast.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/OwnPtr.hh>
@@ -41,26 +42,19 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto isset() const -> bool { return unwrap() != nullptr; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
     [[nodiscard]] constexpr auto unwrap() const -> PointeeGeneric* { return m_ptr; }
-    [[nodiscard]] constexpr auto into_uptr() const -> uptr {
-      return reinterpret_cast<uptr>(unwrap());
-    }
-
-    [[nodiscard]] constexpr auto is_aligned(usize x) const -> bool { return into_uptr() % x == 0; }
-    [[nodiscard]] constexpr auto is_aligned_pow2(PowerOfTwo<usize> x) const -> bool {
-      return (into_uptr() & (x.unwrap() - 1)) == 0;
-    }
+    [[nodiscard]] constexpr auto into_uptr() const -> uptr { return bit_cast<uptr>(unwrap()); }
 
     [[nodiscard]] constexpr auto align_pow2(PowerOfTwo<usize> x) const -> NullableRefPtr {
       const auto ptr = into_uptr();
       const auto align_ptr = (ptr + x - 1) & -x;
-      return reinterpret_cast<PointeeGeneric*>(align_ptr);
+      return bit_cast<PointeeGeneric*>(align_ptr);
     }
 
     [[nodiscard]] constexpr auto align(usize x) const -> NullableRefPtr {
       assert_invariant(x != 0);
       const auto ptr = into_uptr();
       const auto align_ptr = ptr + ((x - (ptr % x)) % x);
-      return reinterpret_cast<PointeeGeneric*>(align_ptr);
+      return bit_cast<PointeeGeneric*>(align_ptr);
     }
 
     [[nodiscard]] constexpr auto get() const -> RefPtr<PointeeGeneric> {

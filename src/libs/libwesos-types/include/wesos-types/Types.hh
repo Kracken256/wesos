@@ -21,6 +21,7 @@
 #include <wesos-types/OwnPtr.hh>
 #include <wesos-types/PowerOfTwo.hh>
 #include <wesos-types/Primitive.hh>
+#include <wesos-types/Ptr.hh>
 #include <wesos-types/Range.hh>
 #include <wesos-types/RefPtr.hh>
 #include <wesos-types/StrongOrdering.hh>
@@ -64,6 +65,9 @@ namespace wesos {
   using types::OwnPtr;
   using types::RefPtr;
   using types::View;
+
+  using types::is_aligned;
+  using types::is_aligned_pow2;
 
   using types::ClampLeast;
   using types::ClampMost;

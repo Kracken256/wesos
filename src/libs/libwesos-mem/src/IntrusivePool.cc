@@ -65,8 +65,8 @@ SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size,
 
   m_front = freenode->m_next;
 
-  const auto result = OwnPtr(reinterpret_cast<u8*>(freenode.unwrap()));
-  assert_invariant(result.is_aligned(align));
+  const auto result = OwnPtr(bit_cast<u8*>(freenode.unwrap()));
+  assert_invariant(is_aligned_pow2(result, align));
 
   return result;
 }
@@ -76,7 +76,7 @@ SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<u8> ptr, usize size,
   assert_invariant(size <= object_size() &&
                    max(align.unwrap(), alignof(FreeNode)) == object_align());
 
-  const auto node = OwnPtr(reinterpret_cast<FreeNode*>(ptr.unwrap()));
+  const auto node = OwnPtr(bit_cast<FreeNode*>(ptr.unwrap()));
 
   node->m_next = m_front;
   m_front = node;
@@ -89,34 +89,19 @@ SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> LeftoverMemory 
     return {{pool}, {}};
   }
 
-  View<u8> remaining = pool;
+  auto leftover =
+      for_each_chunk_aligned(pool, object_size(), object_align(), [&](auto object_range) {
+        const auto object_ptr = OwnPtr(object_range.into_ptr().get_unchecked().unwrap());
+        assert_invariant(object_range.size() == object_size() &&
+                         is_aligned_pow2(object_ptr, object_align()));
 
-  {
-    while (true) {
-      const auto padding = remaining.into_ptr().align_pow2(object_align()).into_uptr() -  //
-                           remaining.into_ptr().into_uptr();
-      if (remaining.size() < padding + object_size()) {
-        break;
-      }
-
-      remaining = remaining.subview_unchecked(padding);
-      assert_invariant(remaining.into_ptr().is_aligned(object_align()) &&
-                       remaining.size() >= object_size());
-
-      const auto object_range = remaining.subview_unchecked(0, object_size());
-
-      // Wierd, but it works..
-      const OwnPtr owned_ptr = object_range.into_ptr().get_unchecked().unwrap();
-      virt_do_deallocate(owned_ptr, object_range.size(), object_align());
-
-      remaining = remaining.subview_unchecked(object_size());
-    };
-  }
+        virt_do_deallocate(object_ptr, object_size(), object_align());
+      });
 
   const auto front_padding = pool.into_ptr().align_pow2(object_align()).into_uptr() -  //
                              pool.into_ptr().into_uptr();
   const auto beginning_unused = pool.subview_unchecked(0, front_padding);
-  const auto end_unused = remaining;
+  const auto end_unused = leftover;
 
   return {{beginning_unused}, {end_unused}};
 }

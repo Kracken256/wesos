@@ -63,7 +63,7 @@ TEST(IntrusivePool, Allocate) {
       const auto space_per_object = ((size + align - 1) & -align);
       const auto exact_buffer_size = space_per_object * alloc_limit;
 
-      u8* buf = reinterpret_cast<u8*>(service.allocate_bytes(exact_buffer_size, align));
+      u8* buf = bit_cast<u8*>(service.allocate_bytes(exact_buffer_size, align));
       ASSERT_NE(buf, nullptr);
 
       auto buf_view = View<u8>(buf, exact_buffer_size);

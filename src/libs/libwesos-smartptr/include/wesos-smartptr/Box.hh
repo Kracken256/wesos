@@ -37,7 +37,7 @@
 //       assert_invariant(m_pmr != nullptr);
 
 //       auto* object_ptr = m_ptr.unwrap();
-//       const auto object_range = View<u8>(reinterpret_cast<u8*>(object_ptr),
+//       const auto object_range = View<u8>(bit_cast<u8*>(object_ptr),
 //       sizeof(PointeeGeneric));
 
 //       object_ptr->~PointeeGeneric();

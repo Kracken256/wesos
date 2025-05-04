@@ -205,11 +205,11 @@ SYM_EXPORT void IntrusiveChainFirstFit::virt_do_deallocate(
     PowerOfTwo<usize> align) {  /// TODO: Struct code review
   using namespace detail;
 
-  assert_invariant(ptr.is_aligned_pow2(align));
+  assert_invariant(is_aligned_pow2(ptr, align));
 
   const auto dealigned_range = get_dealigned_range(View<u8>(ptr.unwrap(), size));
   assert_invariant(dealigned_range.size() >= sizeof(Chunk) &&
-                   dealigned_range.into_ptr().is_aligned_pow2(alignof(Chunk)));
+                   is_aligned_pow2(dealigned_range.into_ptr(), alignof(Chunk)));
 
   ASAN_POISON_MEMORY_REGION(dealigned_range.into_ptr().unwrap(), dealigned_range.size());
 
@@ -277,7 +277,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool)
     }
 
     window = window.subview_unchecked(space_before_chunk);
-    assert_invariant(window.into_ptr().is_aligned_pow2(alignof(Chunk)));
+    assert_invariant(is_aligned_pow2(window.into_ptr(), alignof(Chunk)));
 
     auto& bit_header = *bit_cast<BitHeader*>(window.into_ptr().sub(sizeof(BitHeader)).unwrap());
     auto header = ChunkHeaderFormat(bit_header);
@@ -287,7 +287,7 @@ SYM_EXPORT auto IntrusiveChainFirstFit::virt_do_utilize(View<u8> pool)
   }
 
   assert_invariant(window.size() >= sizeof(Chunk));
-  assert_invariant(window.into_ptr().is_aligned_pow2(alignof(Chunk)));
+  assert_invariant(is_aligned_pow2(window.into_ptr(), alignof(Chunk)));
 
   const OwnPtr owned_ptr = window.into_ptr().unwrap();
   virt_do_deallocate(owned_ptr, window.size(), alignof(Chunk));
