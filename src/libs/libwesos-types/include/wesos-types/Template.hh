@@ -157,5 +157,45 @@ namespace wesos::types {
 
   ///===========================================================================
 
+  template <typename T>
+  auto lvalue_ref_helper(T&) -> T&;
+
+  template <typename T>
+  auto test(decltype(lvalue_ref_helper<T>(declval<T>()))*) -> char;
+
+  template <typename T>
+  auto test(...) -> int;
+
+  template <typename T, bool = (sizeof(test<T>(nullptr)) == sizeof(char))>
+  struct add_lvalue_reference_impl {
+    using type = T&;
+  };
+
+  template <typename T>
+  struct add_lvalue_reference_impl<T, false> {
+    using type = T;
+  };
+
+  template <typename T>
+  struct add_lvalue_reference : add_lvalue_reference_impl<T> {};
+
+  template <typename T>
+  using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
+
+  ///===========================================================================
+
+  template <bool Condition, typename T = void>
+  struct enable_if {};
+
+  template <typename T>
+  struct enable_if<true, T> {
+    using type = T;
+  };
+
+  template <bool Condition, typename T = void>
+  using enable_if_t = typename enable_if<Condition, T>::type;
+
+  ///===========================================================================
+
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types
