@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.15)
 project(libwesos-lambda LANGUAGES CXX)
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cc")

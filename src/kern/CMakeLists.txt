@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.15)
 project(wesos-kernel LANGUAGES CXX ASM)
 
 file(GLOB_RECURSE KERNEL_CXX_SOURCES "src/*.cc")

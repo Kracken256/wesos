@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.15)
-
 set(CLANG_CXX_MINIMUM_VERSION 12)
 set(CLANG_C_MINIMUM_VERSION 12)
 
