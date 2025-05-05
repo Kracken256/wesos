@@ -11,14 +11,29 @@
 using namespace wesos;
 using namespace wesos::stream;
 
-SYM_EXPORT auto InputStreamProtocol::virt_read(View<u8>) -> ReadResult { return ReadResult::null(); }
-SYM_EXPORT auto InputStreamProtocol::virt_read_byte() -> Nullable<u8> { return null; }
 SYM_EXPORT auto InputStreamProtocol::virt_read_seek(isize) -> bool { return false; }
 SYM_EXPORT auto InputStreamProtocol::virt_read_pos() const -> Nullable<usize> { return null; }
-SYM_EXPORT auto InputStreamProtocol::virt_is_atomic() const -> bool { return true; }
+SYM_EXPORT auto InputStreamProtocol::virt_read_byte() -> Nullable<u8> {
+  if (u8 b; virt_read_some({&b, 1}).count() == 1) [[likely]] {
+    return b;
+  }
 
-SYM_EXPORT auto InputStreamProtocol::read(View<u8> space) -> ReadResult { return virt_read(space); };
+  return null;
+}
+
+SYM_EXPORT auto InputStreamProtocol::read_some(View<u8> someof) -> ReadResult { return virt_read_some(someof); }
 SYM_EXPORT auto InputStreamProtocol::read_byte() -> Nullable<u8> { return virt_read_byte(); }
-SYM_EXPORT auto InputStreamProtocol::read_seek(isize off) -> bool { return virt_read_seek(off); }
+SYM_EXPORT auto InputStreamProtocol::read_seek(isize pos) -> bool { return virt_read_seek(pos); }
 SYM_EXPORT auto InputStreamProtocol::read_pos() const -> Nullable<usize> { return virt_read_pos(); }
-SYM_EXPORT auto InputStreamProtocol::is_atomic() const -> bool { return virt_is_atomic(); }
+SYM_EXPORT auto InputStreamProtocol::read(View<u8> allof) -> bool {
+  while (!allof.empty()) {
+    auto res = read_some(allof);
+    if (res.failed()) [[unlikely]] {
+      return false;
+    }
+
+    allof = allof.subview_unchecked(res.count());
+  }
+
+  return true;
+}
