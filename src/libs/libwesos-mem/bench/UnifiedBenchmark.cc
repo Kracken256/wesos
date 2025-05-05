@@ -44,7 +44,7 @@ namespace wesos::mem::testing {
 
 }  // namespace wesos::mem::testing
 
-static std::mutex simulate_global_lock;
+static wesos::sync::SpinLock simulate_global_lock;
 
 void wesos::mem::testing::allocator_benchmark(MemoryResourceProtocol& mm, bool sync, BenchmarkOptions options,
                                               usize& alloc_count) {
