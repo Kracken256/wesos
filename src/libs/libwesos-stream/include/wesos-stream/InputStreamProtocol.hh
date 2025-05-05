@@ -10,5 +10,51 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::stream {
-  /// TODO: Implement stream
+  class ReadResult final {
+    usize m_value;
+
+  public:
+    constexpr ReadResult(usize x) : m_value(x){};
+    constexpr ReadResult(const ReadResult&) = default;
+    constexpr ReadResult(ReadResult&&) = default;
+    constexpr auto operator=(const ReadResult&) -> ReadResult& = default;
+    constexpr auto operator=(ReadResult&&) -> ReadResult& = default;
+    constexpr ~ReadResult() = default;
+
+    [[nodiscard]] constexpr auto operator<=>(const auto& o) const { return m_value <=> o; }
+    [[nodiscard]] constexpr auto operator->() const -> const usize* { return &m_value; }
+
+    [[nodiscard]] constexpr operator bool() const { return is_okay(); }
+    [[nodiscard]] constexpr auto is_okay() const -> bool { return m_value != 0; }
+    [[nodiscard]] constexpr auto failed() const -> bool { return !is_okay(); }
+
+    [[nodiscard]] constexpr auto count() const -> usize { return m_value; }
+
+    [[nodiscard]] static constexpr auto null() -> ReadResult { return 0; };
+  };
+
+  class InputStreamProtocol {
+  protected:
+    [[nodiscard]] virtual auto virt_read(View<u8> space) -> ReadResult;
+    [[nodiscard]] virtual auto virt_read_byte() -> Nullable<u8>;
+    [[nodiscard]] virtual auto virt_read_seek(isize off) -> bool;
+    [[nodiscard]] virtual auto virt_read_pos() const -> Nullable<usize>;
+    [[nodiscard]] virtual auto virt_is_atomic() const -> bool;
+
+  public:
+    constexpr InputStreamProtocol() = default;
+    constexpr InputStreamProtocol(const InputStreamProtocol&) = delete;
+    constexpr InputStreamProtocol(InputStreamProtocol&&) = delete;
+    constexpr auto operator=(const InputStreamProtocol&) -> InputStreamProtocol& = delete;
+    constexpr auto operator=(InputStreamProtocol&&) -> InputStreamProtocol& = delete;
+    constexpr virtual ~InputStreamProtocol() = default;
+
+    [[nodiscard]] constexpr auto operator<=>(const InputStreamProtocol&) const = default;
+
+    [[nodiscard]] auto read(View<u8> space) -> ReadResult;
+    [[nodiscard]] auto read_byte() -> Nullable<u8>;
+    [[nodiscard]] auto read_seek(isize off) -> bool;
+    [[nodiscard]] auto read_pos() const -> Nullable<usize>;
+    [[nodiscard]] auto is_atomic() const -> bool;
+  };
 }  // namespace wesos::stream
