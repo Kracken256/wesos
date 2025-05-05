@@ -11,7 +11,7 @@
 #include <wesos-sync/LockProtocol.hh>
 
 namespace wesos::sync {
-  class SpinLock : public LockProtocol {
+  class SpinLock final : public LockProtocol {
     Atomic<bool> m_locked;
 
   protected:
@@ -21,5 +21,10 @@ namespace wesos::sync {
 
   public:
     constexpr SpinLock() : m_locked(false) {}
+    constexpr SpinLock(const SpinLock&) = delete;
+    constexpr SpinLock(SpinLock&&) = delete;
+    constexpr auto operator=(const SpinLock&) -> SpinLock& = delete;
+    constexpr auto operator=(SpinLock&&) -> SpinLock& = delete;
+    constexpr ~SpinLock() override = default;
   };
 }  // namespace wesos::sync

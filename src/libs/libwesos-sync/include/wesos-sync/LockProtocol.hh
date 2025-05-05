@@ -17,7 +17,12 @@ namespace wesos::sync {
     virtual auto virt_unlock() -> void = 0;
 
   public:
-    virtual ~LockProtocol() = default;
+    constexpr LockProtocol() = default;
+    constexpr LockProtocol(const LockProtocol&) = delete;
+    constexpr LockProtocol(LockProtocol&&) = delete;
+    constexpr auto operator=(const LockProtocol&) -> LockProtocol& = delete;
+    constexpr auto operator=(LockProtocol&&) -> LockProtocol& = delete;
+    constexpr virtual ~LockProtocol() = default;
 
     class LockLease final {
       friend class LockProtocol;
