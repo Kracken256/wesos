@@ -26,11 +26,11 @@ namespace wesos::mem {
     auto remove_resource(MemoryResourceProtocol& child) -> void;
 
   public:
-    constexpr AtomicMemoryEconomy() = default;
-    constexpr AtomicMemoryEconomy(const AtomicMemoryEconomy&) = delete;
-    constexpr AtomicMemoryEconomy(AtomicMemoryEconomy&&) = delete;
-    constexpr auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
-    constexpr auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
-    constexpr ~AtomicMemoryEconomy() = default;
+    AtomicMemoryEconomy() = default;
+    AtomicMemoryEconomy(const AtomicMemoryEconomy&) = delete;
+    AtomicMemoryEconomy(AtomicMemoryEconomy&&) = delete;
+    auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
+    auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
+    ~AtomicMemoryEconomy() = default;
   };
 }  // namespace wesos::mem
