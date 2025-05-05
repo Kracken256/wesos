@@ -14,6 +14,7 @@
 #include <wesos-types/Least.hh>
 #include <wesos-types/Most.hh>
 #include <wesos-types/Move.hh>
+#include <wesos-types/New.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Nullable.hh>
 #include <wesos-types/NullableOwnPtr.hh>

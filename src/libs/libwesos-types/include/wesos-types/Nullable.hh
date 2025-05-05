@@ -11,6 +11,7 @@
 #include <wesos-types/Array.hh>
 #include <wesos-types/Bitcast.hh>
 #include <wesos-types/Move.hh>
+#include <wesos-types/New.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Template.hh>
 
