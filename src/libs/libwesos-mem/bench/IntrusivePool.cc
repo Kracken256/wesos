@@ -56,6 +56,7 @@ static void BM_IntrusivePool_Evo_Synchronized(benchmark::State& state) {
   deps_setup();
 
   usize alloc_count = 0;
+  isize bytes_processed = 0;
   IntrusivePool::ObjectSize object_size = 1;
   ClampedAlign object_align = PowerOfTwo(1UL);
   std::vector<u8> storage;
@@ -69,17 +70,21 @@ static void BM_IntrusivePool_Evo_Synchronized(benchmark::State& state) {
     auto mm = IntrusivePool(object_size, object_align, storage_view);
     allocator_benchmark(mm, true, options, alloc_count);
 
+    bytes_processed += object_size;
+
     object_size = object_size + 1;
     object_align = object_align->next();
   }
 
   state.SetItemsProcessed(isize(alloc_count));
+  state.SetBytesProcessed(bytes_processed);
 }
 
 static void BM_IntrusivePool_Evo_Unsynchronized(benchmark::State& state) {
   deps_setup();
 
   usize alloc_count = 0;
+  isize bytes_processed = 0;
   IntrusivePool::ObjectSize object_size = 1;
   ClampedAlign object_align = PowerOfTwo(1UL);
   std::vector<u8> storage;
@@ -93,11 +98,14 @@ static void BM_IntrusivePool_Evo_Unsynchronized(benchmark::State& state) {
     auto mm = IntrusivePool(object_size, object_align, storage_view);
     allocator_benchmark(mm, false, options, alloc_count);
 
+    bytes_processed += object_size;
+
     object_size = object_size + 1;
     object_align = object_align->next();
   }
 
   state.SetItemsProcessed(isize(alloc_count));
+  state.SetBytesProcessed(bytes_processed);
 }
 
 static void BM_IntrusivePool_Mono_Creation(benchmark::State& state) {
@@ -115,9 +123,14 @@ static void BM_IntrusivePool_Mono_Creation(benchmark::State& state) {
 static void BM_IntrusivePool_Mono_Synchronized(benchmark::State& state) {
   deps_setup();
 
+  struct MockData {
+    u64 m_data;
+    MockData *m_prev, *m_next;
+  };
+
   usize alloc_count = 0;
-  constexpr IntrusivePool::ObjectSize object_size = sizeof(int);
-  constexpr usize object_align = alignof(int);
+  constexpr IntrusivePool::ObjectSize object_size = sizeof(MockData);
+  constexpr usize object_align = alignof(MockData);
   [[gnu::aligned(object_align)]] Array<u8, object_size.unwrap()> storage;
 
   const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
@@ -128,14 +141,20 @@ static void BM_IntrusivePool_Mono_Synchronized(benchmark::State& state) {
   }
 
   state.SetItemsProcessed(isize(alloc_count));
+  state.SetBytesProcessed(isize(alloc_count * object_size));
 }
 
 static void BM_IntrusivePool_Mono_Unsynchronized(benchmark::State& state) {
   deps_setup();
 
+  struct MockData {
+    u64 m_data;
+    MockData *m_prev, *m_next;
+  };
+
   usize alloc_count = 0;
-  constexpr IntrusivePool::ObjectSize object_size = sizeof(int);
-  constexpr usize object_align = alignof(int);
+  constexpr IntrusivePool::ObjectSize object_size = sizeof(MockData);
+  constexpr usize object_align = alignof(MockData);
   [[gnu::aligned(object_align)]] Array<u8, object_size.unwrap()> storage;
 
   const auto options = BenchmarkOptions(object_size, object_size, object_align, object_align);
@@ -146,6 +165,7 @@ static void BM_IntrusivePool_Mono_Unsynchronized(benchmark::State& state) {
   }
 
   state.SetItemsProcessed(isize(alloc_count));
+  state.SetBytesProcessed(isize(alloc_count * object_size));
 }
 
 BENCHMARK(BM_IntrusivePool_Evo_Creation);
