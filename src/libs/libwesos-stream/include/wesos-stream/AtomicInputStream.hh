@@ -41,10 +41,10 @@ namespace wesos::stream {
   class AtomicInputStream : public InputStreamProtocol {
     friend smartptr::Box<AtomicInputStream>;
 
-    smartptr::Box<sync::LockProtocol> m_lock;
+    mutable smartptr::Box<sync::LockProtocol> m_lock;
     smartptr::Box<InputStreamProtocol> m_owned;
 
-    AtomicInputStream(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent);
+    AtomicInputStream(smartptr::Box<sync::LockProtocol> lock, smartptr::Box<InputStreamProtocol> parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -57,7 +57,7 @@ namespace wesos::stream {
     constexpr AtomicInputStream(AtomicInputStream&&) = delete;
     constexpr auto operator=(const AtomicInputStream&) -> AtomicInputStream& = delete;
     constexpr auto operator=(AtomicInputStream&&) -> AtomicInputStream& = delete;
-    ~AtomicInputStream() override;
+    constexpr ~AtomicInputStream() override = default;
 
     template <class InputStream, typename... Args>
     [[nodiscard]] static auto create_owned(mem::MemoryResourceProtocol& mm,

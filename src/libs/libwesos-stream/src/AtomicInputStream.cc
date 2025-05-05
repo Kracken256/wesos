@@ -42,3 +42,24 @@ SYM_EXPORT auto AtomicInputStreamRef::create(mem::MemoryResourceProtocol& mm,
 
   return null;
 }
+
+///===============================================================================================================
+
+SYM_EXPORT AtomicInputStream::AtomicInputStream(Box<LockProtocol> lock, Box<InputStreamProtocol> parent)
+    : m_lock(move(lock)), m_owned(move(parent)) {}
+
+SYM_EXPORT auto AtomicInputStream::virt_read_some(View<u8> someof) -> ReadResult {
+  return m_lock->critical_section([&] { return m_owned->read_some(someof); });
+}
+
+SYM_EXPORT auto AtomicInputStream::virt_read_byte() -> Nullable<u8> {
+  return m_lock->critical_section([&] { return m_owned->read_byte(); });
+}
+
+SYM_EXPORT auto AtomicInputStream::virt_read_seek(isize pos) -> bool {
+  return m_lock->critical_section([&] { return m_owned->read_seek(pos); });
+}
+
+SYM_EXPORT auto AtomicInputStream::virt_read_pos() const -> Nullable<usize> {
+  return m_lock->critical_section([&] { return m_owned->read_pos(); });
+}
