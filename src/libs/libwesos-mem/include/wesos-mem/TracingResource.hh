@@ -28,7 +28,7 @@ namespace wesos::mem {
     ~TracingResource() override = default;
 
   private:
-    MemoryResourceProtocol* m_debugee;
+    MemoryResourceProtocol& m_debugee;
     PrintCallback m_print;
   };
 }  // namespace wesos::mem

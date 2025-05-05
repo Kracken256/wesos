@@ -12,8 +12,10 @@
 
 namespace wesos::mem {
   class MemoryResourceProtocol {
+    friend class TracingResource;
+
   public:
-    MemoryResourceProtocol() = default;
+    MemoryResourceProtocol();
     MemoryResourceProtocol(const MemoryResourceProtocol&) = delete;
     MemoryResourceProtocol(MemoryResourceProtocol&&) = delete;
     auto operator=(const MemoryResourceProtocol&) -> MemoryResourceProtocol& = delete;
@@ -24,15 +26,14 @@ namespace wesos::mem {
     /// RAW MEMORY ALLOCATION
     ///=============================================================================================
 
-    [[nodiscard]] auto embezzle(usize max_size) -> View<u8>;
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
     auto utilize_bytes(View<u8> pool) -> void;
 
   private:
-    [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8> = 0;
-    [[nodiscard]] virtual auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> = 0;
-    virtual auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
-    virtual auto virt_utilize(View<u8> pool) -> void = 0;
+    [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8>;
+    [[nodiscard]] virtual auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    virtual auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
+    virtual auto virt_utilize(View<u8> pool) -> void;
   };
 }  // namespace wesos::mem
