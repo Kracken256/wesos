@@ -24,8 +24,7 @@ namespace wesos::sync {
     Atom m_value;
 
   public:
-    constexpr Atomic() = default;
-    constexpr Atomic(Atom value) : m_value(value) {}
+    constexpr Atomic(Atom value = Atom()) : m_value(value) {}
 
     [[nodiscard]] constexpr auto operator<=>(const Atomic& o) const { return load() <=> o.load(); };
 
