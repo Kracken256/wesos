@@ -11,7 +11,7 @@
 #include <wesos-sync/LockProtocol.hh>
 
 namespace wesos::stream {
-  class AtomicOutput : public OutputStreamProtocol {
+  class AtomicOutputStream : public OutputStreamProtocol {
     sync::LockProtocol& m_lock;
     OutputStreamProtocol& m_inner;
 
@@ -25,11 +25,11 @@ namespace wesos::stream {
     [[nodiscard]] auto virt_cache_size() const -> usize override;
 
   public:
-    AtomicOutput(OutputStreamProtocol& parent);
-    constexpr AtomicOutput(const AtomicOutput&) = delete;
-    constexpr AtomicOutput(AtomicOutput&&) = delete;
-    constexpr auto operator=(const AtomicOutput&) -> AtomicOutput& = delete;
-    constexpr auto operator=(AtomicOutput&&) -> AtomicOutput& = delete;
-    ~AtomicOutput() override;
+    AtomicOutputStream(OutputStreamProtocol& parent);
+    constexpr AtomicOutputStream(const AtomicOutputStream&) = delete;
+    constexpr AtomicOutputStream(AtomicOutputStream&&) = delete;
+    constexpr auto operator=(const AtomicOutputStream&) -> AtomicOutputStream& = delete;
+    constexpr auto operator=(AtomicOutputStream&&) -> AtomicOutputStream& = delete;
+    ~AtomicOutputStream() override;
   };
 }  // namespace wesos::stream

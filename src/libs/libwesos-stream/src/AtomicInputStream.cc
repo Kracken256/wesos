@@ -6,7 +6,7 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-stream/AtomicInput.hh>
+#include <wesos-stream/AtomicInputStream.hh>
 
 using namespace wesos;
 using namespace wesos::stream;

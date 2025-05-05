@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wesos-stream/AtomicInputStream.hh>
+#include <wesos-stream/AtomicOutputStream.hh>
 #include <wesos-stream/StreamProtocol.hh>
 #include <wesos-sync/LockProtocol.hh>
 

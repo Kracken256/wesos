@@ -13,13 +13,13 @@
 #include <wesos-sync/LockProtocol.hh>
 
 namespace wesos::stream {
-  class AtomicInputRef : public InputStreamProtocol {
-    friend smartptr::Box<AtomicInputRef>;
+  class AtomicInputStreamRef : public InputStreamProtocol {
+    friend smartptr::Box<AtomicInputStreamRef>;
 
     smartptr::Box<sync::LockProtocol> m_lock;
     InputStreamProtocol& m_inner;
 
-    AtomicInputRef(mem::MemoryResourceProtocol& mm, InputStreamProtocol& parent);
+    AtomicInputStreamRef(mem::MemoryResourceProtocol& mm, InputStreamProtocol& parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -28,23 +28,23 @@ namespace wesos::stream {
     [[nodiscard]] auto virt_read_pos() const -> Nullable<usize> override;
 
   public:
-    constexpr AtomicInputRef(const AtomicInputRef&) = delete;
-    constexpr AtomicInputRef(AtomicInputRef&&) = delete;
-    constexpr auto operator=(const AtomicInputRef&) -> AtomicInputRef& = delete;
-    constexpr auto operator=(AtomicInputRef&&) -> AtomicInputRef& = delete;
-    ~AtomicInputRef() override;
+    constexpr AtomicInputStreamRef(const AtomicInputStreamRef&) = delete;
+    constexpr AtomicInputStreamRef(AtomicInputStreamRef&&) = delete;
+    constexpr auto operator=(const AtomicInputStreamRef&) -> AtomicInputStreamRef& = delete;
+    constexpr auto operator=(AtomicInputStreamRef&&) -> AtomicInputStreamRef& = delete;
+    ~AtomicInputStreamRef() override;
 
     [[nodiscard]] static auto create(mem::MemoryResourceProtocol& mm,
-                                     InputStreamProtocol& parent) -> Nullable<smartptr::Box<AtomicInputRef>>;
+                                     InputStreamProtocol& parent) -> Nullable<smartptr::Box<AtomicInputStreamRef>>;
   };
 
-  class AtomicInput : public InputStreamProtocol {
-    friend smartptr::Box<AtomicInput>;
+  class AtomicInputStream : public InputStreamProtocol {
+    friend smartptr::Box<AtomicInputStream>;
 
     smartptr::Box<sync::LockProtocol> m_lock;
     smartptr::Box<InputStreamProtocol> m_owned;
 
-    AtomicInput(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent);
+    AtomicInputStream(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -53,18 +53,18 @@ namespace wesos::stream {
     [[nodiscard]] auto virt_read_pos() const -> Nullable<usize> override;
 
   public:
-    constexpr AtomicInput(const AtomicInput&) = delete;
-    constexpr AtomicInput(AtomicInput&&) = delete;
-    constexpr auto operator=(const AtomicInput&) -> AtomicInput& = delete;
-    constexpr auto operator=(AtomicInput&&) -> AtomicInput& = delete;
-    ~AtomicInput() override;
+    constexpr AtomicInputStream(const AtomicInputStream&) = delete;
+    constexpr AtomicInputStream(AtomicInputStream&&) = delete;
+    constexpr auto operator=(const AtomicInputStream&) -> AtomicInputStream& = delete;
+    constexpr auto operator=(AtomicInputStream&&) -> AtomicInputStream& = delete;
+    ~AtomicInputStream() override;
 
     template <class InputStream, typename... Args>
     [[nodiscard]] static auto create_owned(mem::MemoryResourceProtocol& mm,
-                                           Args... args) -> Nullable<smartptr::Box<AtomicInput>> {
+                                           Args... args) -> Nullable<smartptr::Box<AtomicInputStream>> {
       if (auto stream = smartptr::Box<InputStream>::create(mm, forward<Args>(args)...)) [[likely]] {
         auto base = smartptr::box_cast<InputStreamProtocol>(move(stream.value()));
-        return smartptr::Box<AtomicInput>::create(mm, mm, move(base));
+        return smartptr::Box<AtomicInputStream>::create(mm, mm, move(base));
       }
 
       return null;
