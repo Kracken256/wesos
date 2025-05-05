@@ -17,9 +17,8 @@ namespace wesos::smartptr {
     NullableOwnPtr<Object> m_ptr;
     mem::MemoryResourceProtocol& m_pmr;
 
-    constexpr Box(OwnPtr<Object> ptr, mem::MemoryResourceProtocol& pmr) : m_ptr(ptr), m_pmr(pmr) {}
-
   public:
+    constexpr Box(mem::MemoryResourceProtocol& pmr, OwnPtr<Object> ptr) : m_ptr(ptr), m_pmr(pmr) {}
     constexpr Box(const Box& o) = delete;
     constexpr auto operator=(const Box& o) -> Box& = delete;
     constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = null; };
@@ -52,19 +51,16 @@ namespace wesos::smartptr {
 
       ::new (static_cast<void*>(ptr.unwrap())) Object(forward<Args>(args)...);
 
-      return Box(ptr.unwrap(), pmr);
+      return Box(pmr, ptr.unwrap());
     }
 
     ///=========================================================================================
     /// LIFETIME MANAGEMENT
     ///=========================================================================================
 
-    constexpr auto disown() -> void {
-      if (!m_ptr.is_null()) [[likely]] {
-        m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
-        m_ptr = null;
-      }
-    }
+    constexpr auto disown() -> void { m_ptr = null; }
+
+    [[nodiscard]] constexpr auto memory_resource() -> mem::MemoryResourceProtocol& { return m_pmr; }
 
     ///=========================================================================================
     /// POINTER ACCESS
@@ -124,6 +120,15 @@ namespace wesos::smartptr {
       return *unwrap();
     };
   };
+
+  template <class To, class From>
+  [[nodiscard]] constexpr auto box_cast(Box<From> box) -> Box<To> {
+    auto inner_ptr = box.unwrap();
+    auto& pmr = box.memory_resource();
+    box.disown();
+
+    return Box<To>(pmr, inner_ptr);
+  }
 
   static_assert(sizeof(Box<void>) == sizeof(void*) * 2);
 }  // namespace wesos::smartptr
