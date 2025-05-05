@@ -11,12 +11,6 @@
 #include <wesos-sync/arch/AtomicBackend.hh>
 #include <wesos-types/Move.hh>
 
-#if defined(__x86_64__)
-#include <wesos-sync/arch/x86-64/Atomic.hh>
-#else
-#error "This implementation of wesos::Atomic does not support your platform. Sorry.."
-#endif
-
 namespace wesos::sync {
   template <class Atom>
   class Atomic {
@@ -29,19 +23,17 @@ namespace wesos::sync {
     [[nodiscard]] constexpr auto operator<=>(const Atomic& o) const { return load() <=> o.load(); };
 
     void store(Atom desired, MemoryOrder order = memory_order_seq_cst) {
-      detail::atomic::arch::store(&m_value, desired, order);
+      detail::atomic::store(&m_value, desired, order);
     }
 
-    auto load(MemoryOrder order = memory_order_seq_cst) const -> Atom {
-      return detail::atomic::arch::load(&m_value, order);
-    }
+    auto load(MemoryOrder order = memory_order_seq_cst) const -> Atom { return detail::atomic::load(&m_value, order); }
 
     auto exchange(Atom desired, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::exchange(&m_value, desired, order);
+      return detail::atomic::exchange(&m_value, desired, order);
     }
 
     auto compare_exchange_strong(Atom& expected, Atom desired, MemoryOrder success, MemoryOrder failure) -> bool {
-      return detail::atomic::arch::compare_exchange_strong(&m_value, &expected, desired, success, failure);
+      return detail::atomic::compare_exchange_strong(&m_value, &expected, desired, success, failure);
     }
 
     auto compare_exchange_strong(Atom& expected, Atom desired, MemoryOrder order = memory_order_seq_cst) -> bool {
@@ -49,7 +41,7 @@ namespace wesos::sync {
     }
 
     auto compare_exchange_weak(Atom& expected, Atom desired, MemoryOrder success, MemoryOrder failure) -> bool {
-      return detail::atomic::arch::compare_exchange_weak(&m_value, &expected, desired, success, failure);
+      return detail::atomic::compare_exchange_weak(&m_value, &expected, desired, success, failure);
     }
 
     auto compare_exchange_weak(Atom& expected, Atom desired, MemoryOrder order = memory_order_seq_cst) -> bool {
@@ -57,27 +49,27 @@ namespace wesos::sync {
     }
 
     auto fetch_add(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_add(&m_value, val, order);
+      return detail::atomic::fetch_add(&m_value, val, order);
     }
 
     auto fetch_sub(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_sub(&m_value, val, order);
+      return detail::atomic::fetch_sub(&m_value, val, order);
     }
 
     auto fetch_and(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_and(&m_value, val, order);
+      return detail::atomic::fetch_and(&m_value, val, order);
     }
 
     auto fetch_or(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_or(&m_value, val, order);
+      return detail::atomic::fetch_or(&m_value, val, order);
     }
 
     auto fetch_xor(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_xor(&m_value, val, order);
+      return detail::atomic::fetch_xor(&m_value, val, order);
     }
 
     auto fetch_nand(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
-      return detail::atomic::arch::fetch_nand(&m_value, val, order);
+      return detail::atomic::fetch_nand(&m_value, val, order);
     }
 
     auto operator++() -> Atom { return fetch_add(1) + 1; }
