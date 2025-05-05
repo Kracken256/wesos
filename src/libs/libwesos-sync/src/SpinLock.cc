@@ -6,8 +6,8 @@
  */
 
 #include <wesos-builtin/Export.hh>
+#include <wesos-cpu/Timing.hh>
 #include <wesos-sync/SpinLock.hh>
-#include <wesos-sync/Timing.hh>
 
 using namespace wesos::sync;
 
@@ -19,7 +19,7 @@ SYM_EXPORT void SpinLock::virt_lock() {
     }
 
     // Pause for better performance on hyperthreaded CPUs
-    ephemeral_pause();
+    cpu::ephemeral_pause();
   }
 }
 

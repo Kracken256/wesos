@@ -3,7 +3,7 @@ project(libwesos-sync LANGUAGES CXX)
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cc")
 
-set(WESOS_LIBS_DEPS wesos-builtin wesos-types)
+set(WESOS_LIBS_DEPS wesos-builtin wesos-types wesos-cpu)
 
 add_library(wesos-sync STATIC ${SOURCE_FILES})
 target_include_directories(wesos-sync PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
