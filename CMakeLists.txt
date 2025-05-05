@@ -17,6 +17,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${WESOS_SOURCE_DIR}/cmake")
 ################################################################################
 include(check_compiler)
 include(check_build_mode)
+include(configure)
 
 ################################################################################
 # PERFORM BUILD

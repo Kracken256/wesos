@@ -15,6 +15,7 @@ file(GLOB_RECURSE TEST_FILES "test/*.cc")
 add_executable(test-wesos-smartptr ${TEST_FILES})
 target_link_libraries(test-wesos-smartptr wesos-smartptr gtest gtest_main)
 install(TARGETS test-wesos-smartptr)
+add_test(NAME test-wesos-smartptr COMMAND test-wesos-smartptr)
 
 file(GLOB_RECURSE BENCHMARK_FILES "bench/*.cc")
 add_executable(bench-wesos-smartptr ${BENCHMARK_FILES})

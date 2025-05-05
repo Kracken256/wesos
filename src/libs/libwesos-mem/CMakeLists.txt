@@ -15,6 +15,7 @@ file(GLOB_RECURSE TEST_FILES "test/*.cc")
 add_executable(test-wesos-mem ${TEST_FILES})
 target_link_libraries(test-wesos-mem wesos-mem gtest gtest_main)
 install(TARGETS test-wesos-mem)
+add_test(NAME test-wesos-mem COMMAND test-wesos-mem)
 
 file(GLOB_RECURSE BENCHMARK_FILES "bench/*.cc")
 add_executable(bench-wesos-mem ${BENCHMARK_FILES})
