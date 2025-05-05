@@ -28,9 +28,10 @@ namespace wesos::mem {
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }
 
-    auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
-    auto virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void override;
-    auto virt_do_utilize(View<u8> pool) -> void override;
+    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override;
+    [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
+    auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void override;
+    auto virt_utilize(View<u8> pool) -> void override;
 
   public:
     IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool = View<u8>::create_empty());

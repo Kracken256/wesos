@@ -14,21 +14,28 @@ using namespace wesos::mem;
 SYM_EXPORT TracingResource::TracingResource(MemoryResourceProtocol& debugee, PrintCallback print)
     : m_debugee(&debugee), m_print(print) {}
 
-SYM_EXPORT auto TracingResource::virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+SYM_EXPORT auto TracingResource::virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   auto ptr = m_debugee->allocate_bytes(size, align);
-  m_print("do_allocate(%zu, %zu) -> %p\n", size, align.unwrap(), ptr.unwrap());
+  m_print("allocate(%zu, %zu) -> %p\n", size, align.unwrap(), ptr.unwrap());
 
   return ptr;
 }
 
-SYM_EXPORT void TracingResource::virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
-  m_print("do_deallocate(%p, %zu, %zu)\n", ptr.unwrap(), size, align.unwrap());
+SYM_EXPORT void TracingResource::virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
+  m_print("deallocate(%p, %zu, %zu)\n", ptr.unwrap(), size, align.unwrap());
 
   return m_debugee->deallocate_bytes(ptr, size, align);
 }
 
-SYM_EXPORT auto TracingResource::virt_do_utilize(View<u8> pool) -> void {
+SYM_EXPORT auto TracingResource::virt_utilize(View<u8> pool) -> void {
   m_debugee->utilize_bytes(pool);
 
-  m_print("do_utilize(%p, %zu)\n", pool.into_ptr().unwrap(), pool.size());
+  m_print("utilize(%p, %zu)\n", pool.into_ptr().unwrap(), pool.size());
+}
+
+SYM_EXPORT auto TracingResource::virt_embezzle(usize max_size) -> View<u8> {
+  auto embezzled = m_debugee->embezzle(max_size);
+  // printf("embezzle(%zu)\n", max_size, pool.into_ptr().unwrap(), pool.size());
+  /// TODO:
+  return embezzled;
 }

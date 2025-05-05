@@ -21,13 +21,15 @@ namespace wesos::mem {
     /// RAW MEMORY ALLOCATION
     ///=============================================================================================
 
+    [[nodiscard]] auto embezzle(usize max_size) -> View<u8>;
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
     auto utilize_bytes(View<u8> pool) -> void;
 
   private:
-    virtual auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> = 0;
-    virtual auto virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
-    virtual auto virt_do_utilize(View<u8> pool) -> void = 0;
+    [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8> = 0;
+    [[nodiscard]] virtual auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> = 0;
+    virtual auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void = 0;
+    virtual auto virt_utilize(View<u8> pool) -> void = 0;
   };
 }  // namespace wesos::mem

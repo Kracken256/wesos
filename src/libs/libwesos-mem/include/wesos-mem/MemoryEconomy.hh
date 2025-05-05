@@ -8,27 +8,27 @@
 #pragma once
 
 #include <wesos-mem/MemoryResourceProtocol.hh>
+#include <wesos-mem/NullResource.hh>
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
-  class TracingResource final : public MemoryResourceProtocol {
+  class MemoryEconomy final : public MemoryResourceProtocol {
     [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override;
     [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
     void virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) override;
     auto virt_utilize(View<u8> pool) -> void override;
 
   public:
-    using PrintCallback = int (*)(const char* fmt, ...);
+    MemoryEconomy();
+    MemoryEconomy(const MemoryEconomy&) = delete;
+    MemoryEconomy(MemoryEconomy&&) = default;
+    auto operator=(const MemoryEconomy&) -> MemoryEconomy& = delete;
+    auto operator=(MemoryEconomy&&) -> MemoryEconomy& = default;
+    ~MemoryEconomy() override;
 
-    TracingResource(MemoryResourceProtocol& debugee, PrintCallback print);
-    TracingResource(const TracingResource&) = delete;
-    TracingResource(TracingResource&&) = default;
-    auto operator=(const TracingResource&) -> TracingResource& = delete;
-    auto operator=(TracingResource&&) -> TracingResource& = default;
-    ~TracingResource() override = default;
+    [[nodiscard]] constexpr auto operator<=>(const MemoryEconomy&) const = default;
 
-  private:
-    MemoryResourceProtocol* m_debugee;
-    PrintCallback m_print;
+    auto add_resource(MemoryResourceProtocol& child) -> void;
+    auto remove_resource(MemoryResourceProtocol& child) -> void;
   };
 }  // namespace wesos::mem

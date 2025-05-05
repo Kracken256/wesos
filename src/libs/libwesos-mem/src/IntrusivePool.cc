@@ -18,7 +18,7 @@ SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize
       m_object_size(object_size),
       m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
       m_initial_pool(pool) {
-  virt_do_utilize(pool);
+  virt_utilize(pool);
 }
 
 SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
@@ -52,7 +52,12 @@ SYM_EXPORT IntrusivePool::~IntrusivePool() {
   }
 }
 
-SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+SYM_EXPORT auto IntrusivePool::virt_embezzle(usize max_size) -> View<u8> {
+  /// TODO: Implement memory embezzelment
+  return View<u8>::create_empty();
+}
+
+SYM_EXPORT auto IntrusivePool::virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   size = max(size, sizeof(FreeNode));
 
   if (!m_front.isset() || size > object_size() || align > object_align()) [[unlikely]] {
@@ -70,7 +75,7 @@ SYM_EXPORT auto IntrusivePool::virt_do_allocate(usize size, PowerOfTwo<usize> al
   return result.unwrap();
 }
 
-SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
+SYM_EXPORT void IntrusivePool::virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
   assert_invariant(size <= object_size() && max(align.unwrap(), alignof(FreeNode)) == object_align());
 
   const auto node = OwnPtr(bit_cast<FreeNode*>(ptr.unwrap()));
@@ -81,7 +86,7 @@ SYM_EXPORT void IntrusivePool::virt_do_deallocate(OwnPtr<void> ptr, usize size, 
   ASAN_POISON_MEMORY_REGION(ptr.unwrap(), object_size());
 }
 
-SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> void {
+SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> void {
   if (pool.empty()) [[unlikely]] {
     return;
   }
@@ -90,6 +95,6 @@ SYM_EXPORT auto IntrusivePool::virt_do_utilize(View<u8> pool) -> void {
     const auto object_ptr = OwnPtr(object_range.into_ptr().get_unchecked().unwrap());
     assert_invariant(object_range.size() == object_size() && is_aligned_pow2(object_ptr, object_align()));
 
-    virt_do_deallocate(object_ptr.unwrap(), object_size(), object_align());
+    virt_deallocate(object_ptr.unwrap(), object_size(), object_align());
   });
 }

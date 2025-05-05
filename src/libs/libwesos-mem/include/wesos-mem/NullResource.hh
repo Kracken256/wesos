@@ -12,19 +12,21 @@
 
 namespace wesos::mem {
   class NullResource final : public MemoryResourceProtocol {
-    auto virt_do_utilize(View<u8> pool) -> void override { (void)pool; };
+    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override;
 
-    [[nodiscard]] auto virt_do_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override {
+    [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override {
       (void)size;
       (void)align;
       return nullptr;
     };
 
-    void virt_do_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) override {
+    void virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) override {
       (void)ptr;
       (void)size;
       (void)align;
     };
+
+    auto virt_utilize(View<u8> pool) -> void override { (void)pool; };
 
   public:
     NullResource() = default;
