@@ -5,10 +5,6 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include <gtest/gtest.h>
-
-#include <wesos-stream/Stream.hh>
+#include <wesos-stream/StreamProtocol.hh>
 
 /// TODO: Implement streams
-
-TEST(placeholder, placeholder) {}

@@ -5,8 +5,10 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#pragma once
+#include <gtest/gtest.h>
 
-namespace wesos::stream {
-  /// TODO: Implement stream
-}  // namespace wesos::stream
+#include <wesos-stream/StreamProtocol.hh>
+
+/// TODO: Implement streams
+
+TEST(placeholder, placeholder) {}

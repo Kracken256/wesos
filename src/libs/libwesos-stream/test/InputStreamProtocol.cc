@@ -5,6 +5,6 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include <wesos-stream/IStream.hh>
+#include <wesos-stream/InputStreamProtocol.hh>
 
 /// TODO: Implement streams

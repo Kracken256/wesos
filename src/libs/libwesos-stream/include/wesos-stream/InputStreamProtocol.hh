@@ -5,6 +5,10 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include <wesos-stream/Stream.hh>
+#pragma once
 
-/// TODO: Implement streams
+#include <wesos-types/Types.hh>
+
+namespace wesos::stream {
+  /// TODO: Implement stream
+}  // namespace wesos::stream
