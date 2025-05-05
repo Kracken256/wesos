@@ -38,9 +38,9 @@ TEST(Arc, CreateIntArc) {
   const auto value = 42;
 
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Arc<int>::min_alloc_size(), Arc<int>::min_alloc_alignment(), bytes.as_view());
+  auto mm = mem::IntrusivePool(Arc<int>::min_alloc_size(), Arc<int>::min_alloc_alignment(), bytes.as_view());
 
-  auto int_arc_maybe = Arc<int>::create(pmr, value);
+  auto int_arc_maybe = Arc<int>::create(mm, value);
   ASSERT_NE(int_arc_maybe, null);
   auto int_arc = move(int_arc_maybe.value());
 
@@ -56,8 +56,8 @@ TEST(Arc, CreateIntArc) {
 TEST(Arc, ArgumentForwarding) {
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -65,7 +65,7 @@ TEST(Arc, ArgumentForwarding) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Arc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+    auto rc_maybe = Arc<SemanticCounter>::create(mm, SemanticCounter(constructed, moved, copied, destructed));
     ASSERT_NE(rc_maybe, null);
     auto arc = move(rc_maybe.value());
 
@@ -93,8 +93,8 @@ TEST(Arc, NoCopy) {
 
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -102,7 +102,7 @@ TEST(Arc, NoCopy) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Arc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto rc_maybe = Arc<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(rc_maybe, null);
     auto arc = move(rc_maybe.value());
 
@@ -117,8 +117,8 @@ TEST(Arc, NoMove) {
 
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -126,7 +126,7 @@ TEST(Arc, NoMove) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Arc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto rc_maybe = Arc<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(rc_maybe, null);
     auto arc = move(rc_maybe.value());
 
@@ -139,8 +139,8 @@ TEST(Arc, NoMove) {
 TEST(Arc, Lifetime) {
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Arc<SemanticCounter>::min_alloc_size(), Arc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -158,7 +158,7 @@ TEST(Arc, Lifetime) {
         Nullable<Arc<SemanticCounter>> ref_d;
 
         {
-          auto rc_maybe = Arc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+          auto rc_maybe = Arc<SemanticCounter>::create(mm, SemanticCounter(constructed, moved, copied, destructed));
           ASSERT_NE(rc_maybe, null);
           auto rc = move(rc_maybe.value());
 

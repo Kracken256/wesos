@@ -38,9 +38,9 @@ TEST(Box, CreateIntBox) {
   const auto value = 42;
 
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(sizeof(int), alignof(int), bytes.as_view());
+  auto mm = mem::IntrusivePool(sizeof(int), alignof(int), bytes.as_view());
 
-  auto int_box_maybe = Box<int>::create(pmr, value);
+  auto int_box_maybe = Box<int>::create(mm, value);
   ASSERT_NE(int_box_maybe, null);
   auto int_box = move(int_box_maybe.value());
 
@@ -56,7 +56,7 @@ TEST(Box, ArgumentForwarding) {
 
   const auto buf_size = sizeof(SemanticCounter);
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
+  auto mm = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -64,7 +64,7 @@ TEST(Box, ArgumentForwarding) {
   usize destructed = 0;
 
   {
-    auto box_maybe = Box<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+    auto box_maybe = Box<SemanticCounter>::create(mm, SemanticCounter(constructed, moved, copied, destructed));
     ASSERT_NE(box_maybe, null);
     auto box = move(box_maybe.value());
 
@@ -85,7 +85,7 @@ TEST(Box, NoCopy) {
 
   const auto buf_size = sizeof(SemanticCounter);
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
+  auto mm = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -93,7 +93,7 @@ TEST(Box, NoCopy) {
   usize destructed = 0;
 
   {
-    auto box_maybe = Box<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto box_maybe = Box<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(box_maybe, null);
     auto box = move(box_maybe.value());
 
@@ -108,7 +108,7 @@ TEST(Box, NoMove) {
 
   const auto buf_size = sizeof(SemanticCounter);
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
+  auto mm = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -116,7 +116,7 @@ TEST(Box, NoMove) {
   usize destructed = 0;
 
   {
-    auto box_maybe = Box<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto box_maybe = Box<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(box_maybe, null);
     auto box = move(box_maybe.value());
 
@@ -131,7 +131,7 @@ TEST(Box, Disown) {
 
   const auto buf_size = sizeof(SemanticCounter);
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
+  auto mm = mem::IntrusivePool(sizeof(SemanticCounter), alignof(SemanticCounter), bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -139,7 +139,7 @@ TEST(Box, Disown) {
   usize destructed = 0;
 
   {
-    auto box_maybe = Box<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto box_maybe = Box<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(box_maybe, null);
     auto box = move(box_maybe.value());
 

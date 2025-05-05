@@ -38,9 +38,9 @@ TEST(Rc, CreateIntRc) {
   const auto value = 42;
 
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Rc<int>::min_alloc_size(), Rc<int>::min_alloc_alignment(), bytes.as_view());
+  auto mm = mem::IntrusivePool(Rc<int>::min_alloc_size(), Rc<int>::min_alloc_alignment(), bytes.as_view());
 
-  auto int_rc_maybe = Rc<int>::create(pmr, value);
+  auto int_rc_maybe = Rc<int>::create(mm, value);
   ASSERT_NE(int_rc_maybe, null);
   auto int_rc = move(int_rc_maybe.value());
 
@@ -56,8 +56,8 @@ TEST(Rc, CreateIntRc) {
 TEST(Rc, ArgumentForwarding) {
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -65,7 +65,7 @@ TEST(Rc, ArgumentForwarding) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Rc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+    auto rc_maybe = Rc<SemanticCounter>::create(mm, SemanticCounter(constructed, moved, copied, destructed));
     ASSERT_NE(rc_maybe, null);
     auto rc = move(rc_maybe.value());
 
@@ -93,8 +93,8 @@ TEST(Rc, NoCopy) {
 
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -102,7 +102,7 @@ TEST(Rc, NoCopy) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Rc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto rc_maybe = Rc<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(rc_maybe, null);
     auto rc = move(rc_maybe.value());
 
@@ -117,8 +117,8 @@ TEST(Rc, NoMove) {
 
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -126,7 +126,7 @@ TEST(Rc, NoMove) {
   usize destructed = 0;
 
   {
-    auto rc_maybe = Rc<SemanticCounter>::create(pmr, constructed, moved, copied, destructed);
+    auto rc_maybe = Rc<SemanticCounter>::create(mm, constructed, moved, copied, destructed);
     ASSERT_NE(rc_maybe, null);
     auto rc = move(rc_maybe.value());
 
@@ -139,8 +139,8 @@ TEST(Rc, NoMove) {
 TEST(Rc, Lifetime) {
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
-  auto pmr = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
-                                bytes.as_view());
+  auto mm = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
+                               bytes.as_view());
 
   usize constructed = 0;
   usize moved = 0;
@@ -158,7 +158,7 @@ TEST(Rc, Lifetime) {
         Nullable<Rc<SemanticCounter>> ref_d;
 
         {
-          auto rc_maybe = Rc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+          auto rc_maybe = Rc<SemanticCounter>::create(mm, SemanticCounter(constructed, moved, copied, destructed));
           ASSERT_NE(rc_maybe, null);
           auto rc = move(rc_maybe.value());
 

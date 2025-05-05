@@ -15,13 +15,13 @@ namespace wesos::smartptr {
   template <class Object>
   class Box {
     NullableOwnPtr<Object> m_ptr;
-    mem::MemoryResourceProtocol& m_pmr;
+    mem::MemoryResourceProtocol& m_mm;
 
   public:
-    constexpr Box(mem::MemoryResourceProtocol& pmr, OwnPtr<Object> ptr) : m_ptr(ptr), m_pmr(pmr) {}
+    constexpr Box(mem::MemoryResourceProtocol& mm, OwnPtr<Object> ptr) : m_ptr(ptr), m_mm(mm) {}
     constexpr Box(const Box& o) = delete;
     constexpr auto operator=(const Box& o) -> Box& = delete;
-    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_pmr(o.m_pmr) { o.m_ptr = null; };
+    constexpr Box(Box&& o) : m_ptr(o.m_ptr), m_mm(o.m_mm) { o.m_ptr = null; };
 
     constexpr auto operator=(Box&& o) -> Box& {
       if (this != &o) [[likely]] {
@@ -34,7 +34,7 @@ namespace wesos::smartptr {
 
     constexpr ~Box() {
       if (!m_ptr.is_null()) {
-        m_pmr.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+        m_mm.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
       }
     }
 
@@ -43,15 +43,15 @@ namespace wesos::smartptr {
     [[nodiscard]] constexpr auto operator==(types::nullptr_t) const { return is_null(); }
 
     template <class... Args>
-    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& pmr, Args&&... args) -> Nullable<Box> {
-      auto ptr = pmr.allocate_storage<Object>(1);
+    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm, Args&&... args) -> Nullable<Box> {
+      auto ptr = mm.allocate_storage<Object>(1);
       if (!ptr) {
         return null;
       }
 
       ::new (static_cast<void*>(ptr.unwrap())) Object(forward<Args>(args)...);
 
-      return Box(pmr, ptr.unwrap());
+      return Box(mm, ptr.unwrap());
     }
 
     ///=========================================================================================
@@ -60,7 +60,7 @@ namespace wesos::smartptr {
 
     constexpr auto disown() -> void { m_ptr = null; }
 
-    [[nodiscard]] constexpr auto memory_resource() -> mem::MemoryResourceProtocol& { return m_pmr; }
+    [[nodiscard]] constexpr auto memory_resource() -> mem::MemoryResourceProtocol& { return m_mm; }
 
     ///=========================================================================================
     /// POINTER ACCESS
@@ -124,10 +124,10 @@ namespace wesos::smartptr {
   template <class To, class From>
   [[nodiscard]] constexpr auto box_cast(Box<From> box) -> Box<To> {
     auto inner_ptr = box.unwrap();
-    auto& pmr = box.memory_resource();
+    auto& mm = box.memory_resource();
     box.disown();
 
-    return Box<To>(pmr, inner_ptr);
+    return Box<To>(mm, inner_ptr);
   }
 
   static_assert(sizeof(Box<void>) == sizeof(void*) * 2);

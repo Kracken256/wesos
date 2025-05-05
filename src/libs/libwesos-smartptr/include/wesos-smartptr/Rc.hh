@@ -17,9 +17,9 @@ namespace wesos::smartptr {
     struct State {
       usize m_state_rc = 1;
       usize m_data_rc = 1;
-      mem::MemoryResourceProtocol& m_pmr;
+      mem::MemoryResourceProtocol& m_mm;
 
-      constexpr State(mem::MemoryResourceProtocol& pmr) : m_pmr(pmr) {}
+      constexpr State(mem::MemoryResourceProtocol& mm) : m_mm(mm) {}
     };
 
     NullableRefPtr<Object> m_ptr;
@@ -58,14 +58,14 @@ namespace wesos::smartptr {
 
     ~Rc() {
       if (m_state.isset()) {
-        mem::MemoryResourceProtocol& pmr = m_state->m_pmr;
+        mem::MemoryResourceProtocol& mm = m_state->m_mm;
 
         if (m_ptr.isset() && --m_state->m_data_rc == 0) [[unlikely]] {
-          pmr.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+          mm.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
         }
 
         if (--m_state->m_state_rc == 0) [[unlikely]] {
-          pmr.template destroy_and_deallocate<State>(m_state.unwrap(), 1);
+          mm.template destroy_and_deallocate<State>(m_state.unwrap(), 1);
         }
       }
     }
@@ -81,19 +81,19 @@ namespace wesos::smartptr {
     }
 
     template <class... Args>
-    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr, Args&&... args) -> Nullable<Rc> {
-      auto inner_object = pmr.allocate_storage<Object>(1);
+    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& mm, Args&&... args) -> Nullable<Rc> {
+      auto inner_object = mm.allocate_storage<Object>(1);
       if (inner_object.is_null()) [[unlikely]] {
         return null;
       }
 
-      auto state_object = pmr.allocate_storage<State>(1);
+      auto state_object = mm.allocate_storage<State>(1);
       if (state_object.is_null()) [[unlikely]] {
         return null;
       }
 
       ::new (static_cast<void*>(inner_object.unwrap())) Object(forward<Args>(args)...);
-      ::new (static_cast<void*>(state_object.unwrap())) State(pmr);
+      ::new (static_cast<void*>(state_object.unwrap())) State(mm);
 
       return Rc(inner_object.get_unchecked(), state_object.get_unchecked());
     }

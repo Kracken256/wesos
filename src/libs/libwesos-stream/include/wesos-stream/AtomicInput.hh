@@ -19,7 +19,7 @@ namespace wesos::stream {
     smartptr::Box<sync::LockProtocol> m_lock;
     InputStreamProtocol& m_inner;
 
-    AtomicInputRef(mem::MemoryResourceProtocol& pmr, InputStreamProtocol& parent);
+    AtomicInputRef(mem::MemoryResourceProtocol& mm, InputStreamProtocol& parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -34,7 +34,7 @@ namespace wesos::stream {
     constexpr auto operator=(AtomicInputRef&&) -> AtomicInputRef& = delete;
     ~AtomicInputRef() override;
 
-    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr,
+    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& mm,
                                      InputStreamProtocol& parent) -> Nullable<smartptr::Box<AtomicInputRef>>;
   };
 
@@ -44,7 +44,7 @@ namespace wesos::stream {
     smartptr::Box<sync::LockProtocol> m_lock;
     smartptr::Box<InputStreamProtocol> m_owned;
 
-    AtomicInput(mem::MemoryResourceProtocol& pmr, smartptr::Box<InputStreamProtocol> parent);
+    AtomicInput(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -60,11 +60,11 @@ namespace wesos::stream {
     ~AtomicInput() override;
 
     template <class InputStream, typename... Args>
-    [[nodiscard]] static auto create_owned(mem::MemoryResourceProtocol& pmr,
+    [[nodiscard]] static auto create_owned(mem::MemoryResourceProtocol& mm,
                                            Args... args) -> Nullable<smartptr::Box<AtomicInput>> {
-      if (auto stream = smartptr::Box<InputStream>::create(pmr, forward<Args>(args)...)) [[likely]] {
+      if (auto stream = smartptr::Box<InputStream>::create(mm, forward<Args>(args)...)) [[likely]] {
         auto base = smartptr::box_cast<InputStreamProtocol>(move(stream.value()));
-        return smartptr::Box<AtomicInput>::create(pmr, pmr, move(base));
+        return smartptr::Box<AtomicInput>::create(mm, mm, move(base));
       }
 
       return null;
