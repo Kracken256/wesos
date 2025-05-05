@@ -233,5 +233,18 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
 
+  ///===========================================================================
+
+  template <typename From, typename To>
+  auto test_convert(int) -> decltype(static_cast<To>(declval<From>()), true_type{});
+
+  template <typename, typename>
+  auto test_convert(...) -> false_type;
+
+  template <typename From, typename To>
+  struct is_convertible : decltype(test_convert<From, To>(0)) {};
+
+  template <typename From, typename To>
+  inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types
