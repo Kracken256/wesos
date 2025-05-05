@@ -12,20 +12,23 @@
 using namespace wesos::sync;
 
 SYM_EXPORT void SpinLock::virt_lock() {
+  bool expected;
+
   while (true) {
-    bool expected = false;
-    if (m_locked.compare_exchange_strong(expected, true)) {
-      return;  // Successfully locked
+    expected = false;
+    if (m_locked.compare_exchange_weak(expected, true, memory_order_acquire, memory_order_relaxed)) [[likely]] {
+      return;
     }
 
-    // Pause for better performance on hyperthreaded CPUs
-    cpu::ephemeral_pause();
+    while (m_locked.load(memory_order_relaxed)) {
+      cpu::ephemeral_pause();
+    }
   }
 }
 
-SYM_EXPORT void SpinLock::virt_unlock() { m_locked.store(false); }
+SYM_EXPORT void SpinLock::virt_unlock() { m_locked.store(false, memory_order_release); }
 
 SYM_EXPORT auto SpinLock::virt_try_lock() -> bool {
   bool expected = false;
-  return m_locked.compare_exchange_strong(expected, true);
+  return m_locked.compare_exchange_strong(expected, true, memory_order_acquire, memory_order_relaxed);
 }
