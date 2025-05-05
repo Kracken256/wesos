@@ -8,5 +8,11 @@
 #pragma once
 
 namespace wesos::cpu {
-  void ephemeral_pause();
+  static inline void ephemeral_pause() {
+#if defined(__x86_64__)
+    __builtin_ia32_pause();
+#else
+#error "This implementation of ephemeral_pause() does not support your architecure. Sorry.."
+#endif
+  }
 }  // namespace wesos::cpu
