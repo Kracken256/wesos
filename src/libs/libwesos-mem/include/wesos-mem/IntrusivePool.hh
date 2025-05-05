@@ -36,9 +36,9 @@ namespace wesos::mem {
   public:
     IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool = View<u8>::create_empty());
     IntrusivePool(const IntrusivePool&) = delete;
-    IntrusivePool(IntrusivePool&&);
+    IntrusivePool(IntrusivePool&&) = delete;
     auto operator=(const IntrusivePool&) -> IntrusivePool& = delete;
-    auto operator=(IntrusivePool&&) -> IntrusivePool&;
+    auto operator=(IntrusivePool&&) -> IntrusivePool& = delete;
     ~IntrusivePool() override;
 
     [[nodiscard]] static constexpr auto minimum_size() { return sizeof(FreeNode); }

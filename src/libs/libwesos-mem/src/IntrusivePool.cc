@@ -21,29 +21,6 @@ SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize
   virt_utilize(pool);
 }
 
-SYM_EXPORT IntrusivePool::IntrusivePool(IntrusivePool&& o)
-    : m_front(o.m_front),
-      m_object_size(o.m_object_size),
-      m_object_align(o.m_object_align),
-      m_initial_pool(o.m_initial_pool) {
-  o.m_front = nullptr;
-  o.m_initial_pool.clear();
-}
-
-SYM_EXPORT auto IntrusivePool::operator=(IntrusivePool&& o) -> IntrusivePool& {
-  if (this != &o) {
-    m_object_size = o.m_object_size;
-    m_object_align = o.m_object_align;
-    m_front = o.m_front;
-    m_initial_pool = o.m_initial_pool;
-
-    o.m_front = nullptr;
-    o.m_initial_pool.clear();
-  }
-
-  return *this;
-}
-
 SYM_EXPORT IntrusivePool::~IntrusivePool() {
   auto node = m_front;
   while (node.isset()) {

@@ -22,9 +22,9 @@ namespace wesos::mem {
 
     TracingResource(MemoryResourceProtocol& debugee, PrintCallback print);
     TracingResource(const TracingResource&) = delete;
-    TracingResource(TracingResource&&) = default;
+    TracingResource(TracingResource&&) = delete;
     auto operator=(const TracingResource&) -> TracingResource& = delete;
-    auto operator=(TracingResource&&) -> TracingResource& = default;
+    auto operator=(TracingResource&&) -> TracingResource& = delete;
     ~TracingResource() override = default;
 
   private:

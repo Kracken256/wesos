@@ -13,6 +13,11 @@
 namespace wesos::mem {
   class MemoryResourceProtocol {
   public:
+    MemoryResourceProtocol() = default;
+    MemoryResourceProtocol(const MemoryResourceProtocol&) = delete;
+    MemoryResourceProtocol(MemoryResourceProtocol&&) = delete;
+    auto operator=(const MemoryResourceProtocol&) -> MemoryResourceProtocol& = delete;
+    auto operator=(MemoryResourceProtocol&&) -> MemoryResourceProtocol& = delete;
     virtual ~MemoryResourceProtocol() = 0;
 
     ///=============================================================================================

@@ -31,9 +31,9 @@ namespace wesos::mem {
   public:
     NullResource() = default;
     NullResource(const NullResource&) = delete;
-    NullResource(NullResource&&) = default;
+    NullResource(NullResource&&) = delete;
     auto operator=(const NullResource&) -> NullResource& = delete;
-    auto operator=(NullResource&&) -> NullResource& = default;
+    auto operator=(NullResource&&) -> NullResource& = delete;
     ~NullResource() override = default;
   };
 
