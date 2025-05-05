@@ -56,11 +56,15 @@ namespace wesos::smartptr {
     constexpr ~Arc() {
       if (m_state.isset()) {
         if (m_ptr.isset() && --m_state->m_data_rc == 0) [[unlikely]] {
-          m_state->m_mm.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+          auto& mm = m_state->m_mm;
+          unwrap()->~Object();
+          mm.deallocate_bytes(unwrap(), sizeof(Object), alignof(Object));
         }
 
         if (--m_state->m_state_rc == 0) [[unlikely]] {
-          m_state->m_mm.template destroy_and_deallocate<State>(m_state.unwrap(), 1);
+          auto& mm = m_state->m_mm;
+          m_state.unwrap()->~State();
+          mm.deallocate_bytes(m_state.unwrap(), sizeof(State), alignof(State));
         }
       }
     }
@@ -77,20 +81,23 @@ namespace wesos::smartptr {
 
     template <class... Args>
     [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm, Args&&... args) -> Nullable<Arc> {
-      auto inner_object = mm.allocate_storage<Object>(1);
-      if (inner_object.is_null()) [[unlikely]] {
+      const auto object_storage = mm.allocate_bytes(sizeof(Object), alignof(Object));
+      if (object_storage.is_null()) [[unlikely]] {
         return null;
       }
 
-      auto state_object = mm.allocate_storage<State>(1);
-      if (state_object.is_null()) [[unlikely]] {
+      const auto state_storage = mm.allocate_bytes(sizeof(State), alignof(State));
+      if (state_storage.is_null()) [[unlikely]] {
         return null;
       }
 
-      ::new (static_cast<void*>(inner_object.unwrap())) Object(forward<Args>(args)...);
-      ::new (static_cast<void*>(state_object.unwrap())) State(mm);
+      ::new (object_storage.unwrap()) Object(forward<Args>(args)...);
+      const auto object_ptr = OwnPtr(static_cast<Object*>(object_storage.unwrap()));
 
-      return Arc(inner_object.get_unchecked(), state_object.get_unchecked());
+      ::new (state_storage.unwrap()) State(mm);
+      const auto state_ptr = OwnPtr(static_cast<State*>(state_storage.unwrap()));
+
+      return Arc(object_ptr, state_ptr);
     }
 
     ///=========================================================================================

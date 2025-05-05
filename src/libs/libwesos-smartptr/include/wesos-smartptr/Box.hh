@@ -34,7 +34,8 @@ namespace wesos::smartptr {
 
     constexpr ~Box() {
       if (!m_ptr.is_null()) {
-        m_mm.destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+        unwrap()->~Object();
+        m_mm.deallocate_bytes(unwrap(), sizeof(Object), alignof(Object));
       }
     }
 
@@ -44,14 +45,15 @@ namespace wesos::smartptr {
 
     template <class... Args>
     [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm, Args&&... args) -> Nullable<Box> {
-      auto ptr = mm.allocate_storage<Object>(1);
-      if (!ptr) {
+      const auto object_storage = mm.allocate_bytes(sizeof(Object), alignof(Object));
+      if (!object_storage) {
         return null;
       }
 
-      ::new (static_cast<void*>(ptr.unwrap())) Object(forward<Args>(args)...);
+      ::new (object_storage.unwrap()) Object(forward<Args>(args)...);
+      const auto object_ptr = OwnPtr(static_cast<Object*>(object_storage.unwrap()));
 
-      return Box(mm, ptr.unwrap());
+      return Box(mm, object_ptr);
     }
 
     ///=========================================================================================
