@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_WIDE_LIBRARIES
   libwesos-builtin
+  libwesos-types
+  libwesos-cpu
   libwesos-sync
   libwesos-assert
-  libwesos-types
-  libwesos-lambda
   libwesos-mem
   libwesos-smartptr
+  libwesos-lambda
 )
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})
