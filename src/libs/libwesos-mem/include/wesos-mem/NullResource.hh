@@ -35,8 +35,6 @@ namespace wesos::mem {
     auto operator=(const NullResource&) -> NullResource& = delete;
     auto operator=(NullResource&&) -> NullResource& = default;
     ~NullResource() override = default;
-
-    [[nodiscard]] constexpr auto operator<=>(const NullResource&) const = default;
   };
 
   extern ThreadSafe<mem::NullResource> NULL_RESOURCE_GLOBAL;

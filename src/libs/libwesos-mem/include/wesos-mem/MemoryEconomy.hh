@@ -26,8 +26,6 @@ namespace wesos::mem {
     auto operator=(MemoryEconomy&&) -> MemoryEconomy& = default;
     ~MemoryEconomy() override;
 
-    [[nodiscard]] constexpr auto operator<=>(const MemoryEconomy&) const = default;
-
     auto add_resource(MemoryResourceProtocol& child) -> void;
     auto remove_resource(MemoryResourceProtocol& child) -> void;
   };

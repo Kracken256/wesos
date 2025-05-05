@@ -15,8 +15,6 @@ namespace wesos::mem {
   public:
     virtual ~MemoryResourceProtocol() = 0;
 
-    [[nodiscard]] constexpr auto operator<=>(const MemoryResourceProtocol&) const = default;
-
     ///=============================================================================================
     /// RAW MEMORY ALLOCATION
     ///=============================================================================================

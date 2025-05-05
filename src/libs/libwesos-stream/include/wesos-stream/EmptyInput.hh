@@ -26,7 +26,5 @@ namespace wesos::stream {
     constexpr auto operator=(const EmptyInput&) -> EmptyInput& = delete;
     constexpr auto operator=(EmptyInput&&) -> EmptyInput& = delete;
     constexpr ~EmptyInput() override = default;
-
-    [[nodiscard]] constexpr auto operator<=>(const EmptyInput&) const = default;
   };
 }  // namespace wesos::stream

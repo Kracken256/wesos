@@ -29,7 +29,5 @@ namespace wesos::stream {
     constexpr auto operator=(const NullOutput&) -> NullOutput& = delete;
     constexpr auto operator=(NullOutput&&) -> NullOutput& = delete;
     constexpr ~NullOutput() override = default;
-
-    [[nodiscard]] constexpr auto operator<=>(const NullOutput&) const = default;
   };
 }  // namespace wesos::stream

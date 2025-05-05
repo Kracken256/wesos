@@ -49,8 +49,6 @@ namespace wesos::stream {
     constexpr auto operator=(OutputStreamProtocol&&) -> OutputStreamProtocol& = delete;
     constexpr virtual ~OutputStreamProtocol() = default;
 
-    [[nodiscard]] constexpr auto operator<=>(const OutputStreamProtocol&) const = default;
-
     [[nodiscard]] auto write(View<u8> allof) -> bool;
     [[nodiscard]] auto write_some(View<u8> someof) -> WriteResult;
     [[nodiscard]] auto write_byte(u8 b) -> bool;

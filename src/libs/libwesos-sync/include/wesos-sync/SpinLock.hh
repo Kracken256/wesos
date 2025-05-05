@@ -21,7 +21,5 @@ namespace wesos::sync {
 
   public:
     constexpr SpinLock() : m_locked(false) {}
-
-    [[nodiscard]] constexpr auto operator<=>(const SpinLock&) const = default;
   };
 }  // namespace wesos::sync

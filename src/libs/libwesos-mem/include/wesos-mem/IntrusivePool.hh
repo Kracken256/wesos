@@ -41,8 +41,6 @@ namespace wesos::mem {
     auto operator=(IntrusivePool&&) -> IntrusivePool&;
     ~IntrusivePool() override;
 
-    [[nodiscard]] constexpr auto operator<=>(const IntrusivePool&) const = default;
-
     [[nodiscard]] static constexpr auto minimum_size() { return sizeof(FreeNode); }
     [[nodiscard]] static constexpr auto minimum_alignment() { return alignof(FreeNode); }
   };

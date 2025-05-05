@@ -46,8 +46,6 @@ namespace wesos::stream {
     constexpr auto operator=(InputStreamProtocol&&) -> InputStreamProtocol& = delete;
     constexpr virtual ~InputStreamProtocol() = default;
 
-    [[nodiscard]] constexpr auto operator<=>(const InputStreamProtocol&) const = default;
-
     [[nodiscard]] auto read(View<u8> allof) -> bool;
     [[nodiscard]] auto read_some(View<u8> someof) -> ReadResult;
     [[nodiscard]] auto read_byte() -> Nullable<u8>;
