@@ -12,25 +12,25 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
-  class AtomicMemoryEconomy final : public MemoryResourceProtocol {
+  class AtomicMemoryEconomy final {
     friend class MemoryResourceProtocol;
 
     sync::SpinLock m_lock;
 
-    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override;
-    [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override;
-    void virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) override;
-    auto virt_utilize(View<u8> pool) -> void override;
+    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8>;
+    [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    void virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align);
+    auto virt_utilize(View<u8> pool) -> void;
 
     auto add_resource(MemoryResourceProtocol& child) -> void;
     auto remove_resource(MemoryResourceProtocol& child) -> void;
 
   public:
-    AtomicMemoryEconomy() = default;
-    AtomicMemoryEconomy(const AtomicMemoryEconomy&) = delete;
-    AtomicMemoryEconomy(AtomicMemoryEconomy&&) = delete;
-    auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
-    auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
-    ~AtomicMemoryEconomy() override = default;
+    constexpr AtomicMemoryEconomy() = default;
+    constexpr AtomicMemoryEconomy(const AtomicMemoryEconomy&) = delete;
+    constexpr AtomicMemoryEconomy(AtomicMemoryEconomy&&) = delete;
+    constexpr auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
+    constexpr auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
+    constexpr ~AtomicMemoryEconomy() = default;
   };
 }  // namespace wesos::mem
