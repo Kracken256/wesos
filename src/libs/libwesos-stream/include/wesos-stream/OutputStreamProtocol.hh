@@ -36,10 +36,10 @@ namespace wesos::stream {
     [[nodiscard]] virtual auto virt_write_some(View<u8> someof) -> WriteResult = 0;
     [[nodiscard]] virtual auto virt_write_byte(u8 b) -> bool;
     [[nodiscard]] virtual auto virt_write_seek(isize pos) -> bool;
-    [[nodiscard]] virtual auto virt_write_flush() -> bool;
-    [[nodiscard]] virtual auto virt_write_set_cache(usize size) -> usize;
+    [[nodiscard]] virtual auto virt_flush() -> bool;
+    [[nodiscard]] virtual auto virt_set_cache(usize size) -> usize;
     [[nodiscard]] virtual auto virt_write_pos() const -> Nullable<usize>;
-    [[nodiscard]] virtual auto virt_write_cache_size() const -> usize;
+    [[nodiscard]] virtual auto virt_cache_size() const -> usize;
 
   public:
     constexpr OutputStreamProtocol() = default;
@@ -55,9 +55,9 @@ namespace wesos::stream {
     [[nodiscard]] auto write_some(View<u8> someof) -> WriteResult;
     [[nodiscard]] auto write_byte(u8 b) -> bool;
     [[nodiscard]] auto write_seek(isize pos) -> bool;
-    [[nodiscard]] auto write_flush() -> bool;
-    [[nodiscard]] auto write_set_cache(usize size) -> usize;
+    [[nodiscard]] auto flush() -> bool;
+    [[nodiscard]] auto set_cache(usize size) -> usize;
     [[nodiscard]] auto write_pos() const -> Nullable<usize>;
-    [[nodiscard]] auto write_cache_size() const -> usize;
+    [[nodiscard]] auto cache_size() const -> usize;
   };
 }  // namespace wesos::stream

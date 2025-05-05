@@ -7,6 +7,19 @@
 
 #pragma once
 
+#include <wesos-stream/InputStreamProtocol.hh>
+#include <wesos-stream/OutputStreamProtocol.hh>
+
 namespace wesos::stream {
-  /// TODO: Implement stream
+  class StreamProtocol : public InputStreamProtocol, public OutputStreamProtocol {
+  public:
+    constexpr StreamProtocol() = default;
+    constexpr StreamProtocol(const StreamProtocol&) = delete;
+    constexpr StreamProtocol(StreamProtocol&&) = delete;
+    constexpr auto operator=(const StreamProtocol&) -> StreamProtocol& = delete;
+    constexpr auto operator=(StreamProtocol&&) -> StreamProtocol& = delete;
+    constexpr ~StreamProtocol() override = default;
+
+    [[nodiscard]] constexpr auto operator<=>(const StreamProtocol&) const = default;
+  };
 }  // namespace wesos::stream
