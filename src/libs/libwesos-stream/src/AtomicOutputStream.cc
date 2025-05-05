@@ -88,8 +88,8 @@ SYM_EXPORT auto AtomicOutputStream::virt_cache_size() const -> usize {
   return m_lock->critical_section([&] { return m_owned->cache_size(); });
 }
 
-SYM_EXPORT auto AtomicOutputStream::create(mem::MemoryResourceProtocol& mm, smartptr::Box<OutputStreamProtocol> parent)
-    -> Nullable<smartptr::Box<AtomicOutputStream>> {
+SYM_EXPORT auto AtomicOutputStream::create(mem::MemoryResourceProtocol& mm,
+                                           Box<OutputStreamProtocol> parent) -> Nullable<Box<AtomicOutputStream>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
     auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
     return Box<AtomicOutputStream>::create(mm, move(some_lock), move(parent));
