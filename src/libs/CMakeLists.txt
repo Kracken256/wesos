@@ -6,6 +6,7 @@ set(PROJECT_WIDE_LIBRARIES
   libwesos-cpu
   libwesos-sync
   libwesos-assert
+  libwesos-stream
   libwesos-mem
   libwesos-smartptr
   libwesos-lambda
