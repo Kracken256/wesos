@@ -8,6 +8,7 @@ set(WESOS_LIBS_DEPS wesos-builtin wesos-types wesos-cpu)
 add_library(${COMPONENT_NAME} STATIC ${SOURCE_FILES})
 target_include_directories(${COMPONENT_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_libraries(${COMPONENT_NAME} ${WESOS_LIBS_DEPS})
+target_compile_options(${COMPONENT_NAME} PRIVATE -fomit-frame-pointer)
 install(TARGETS ${COMPONENT_NAME})
 install(DIRECTORY "include/" DESTINATION "include")
 
