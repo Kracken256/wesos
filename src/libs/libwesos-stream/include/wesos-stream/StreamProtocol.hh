@@ -21,5 +21,10 @@ namespace wesos::stream {
     constexpr ~StreamProtocol() override = default;
 
     [[nodiscard]] constexpr auto operator<=>(const StreamProtocol&) const = default;
+
+    [[nodiscard]] auto input() -> InputStreamProtocol&;
+    [[nodiscard]] auto input() const -> const InputStreamProtocol&;
+    [[nodiscard]] auto output() -> OutputStreamProtocol&;
+    [[nodiscard]] auto output() const -> const OutputStreamProtocol&;
   };
 }  // namespace wesos::stream
