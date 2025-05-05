@@ -17,8 +17,8 @@ namespace wesos::smartptr {
   template <class Object>
   class Arc {
     struct State {
-      sync::Atomic<usize> m_state_arc = 1;
-      sync::Atomic<usize> m_data_arc = 1;
+      sync::Atomic<usize> m_state_rc = 1;
+      sync::Atomic<usize> m_data_rc = 1;
       mem::MemoryResourceProtocol& m_pmr;
 
       constexpr State(mem::MemoryResourceProtocol& pmr) : m_pmr(pmr) {}
@@ -31,15 +31,15 @@ namespace wesos::smartptr {
 
   public:
     constexpr Arc(const Arc& o) : m_ptr(o.m_ptr), m_state(o.m_state) {
-      ++m_state->m_state_arc;
-      ++m_state->m_data_arc;
+      ++m_state->m_state_rc;
+      ++m_state->m_data_rc;
     }
 
     constexpr auto operator=(const Arc& o) -> Arc& {
       m_ptr = o.m_ptr;
       m_state = o.m_state;
-      ++m_state->m_state_arc;
-      ++m_state->m_data_arc;
+      ++m_state->m_state_rc;
+      ++m_state->m_data_rc;
     }
 
     constexpr Arc(Arc&& o) : m_ptr(o.m_ptr), m_state(o.m_state) {
@@ -54,16 +54,14 @@ namespace wesos::smartptr {
       o.m_state = null;
     };
 
-    ~Arc() {
+    constexpr ~Arc() {
       if (m_state.isset()) {
-        mem::MemoryResourceProtocol& pmr = m_state->m_pmr;
-
-        if (m_ptr.isset() && --m_state->m_data_arc == 0) [[unlikely]] {
-          pmr.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
+        if (m_ptr.isset() && --m_state->m_data_rc == 0) [[unlikely]] {
+          m_state->m_pmr.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
         }
 
-        if (--m_state->m_state_arc == 0) [[unlikely]] {
-          pmr.template destroy_and_deallocate<State>(m_state.unwrap(), 1);
+        if (--m_state->m_state_rc == 0) [[unlikely]] {
+          m_state->m_pmr.template destroy_and_deallocate<State>(m_state.unwrap(), 1);
         }
       }
     }
@@ -79,7 +77,7 @@ namespace wesos::smartptr {
     }
 
     template <class... Args>
-    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& pmr, Args&&... args) -> Nullable<Arc> {
+    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& pmr, Args&&... args) -> Nullable<Arc> {
       auto inner_object = pmr.allocate_storage<Object>(1);
       if (inner_object.is_null()) [[unlikely]] {
         return null;
@@ -100,18 +98,7 @@ namespace wesos::smartptr {
     /// LIFETIME MANAGEMENT
     ///=========================================================================================
 
-    [[nodiscard]] constexpr auto ref_count() const -> usize { return m_state.isset() ? m_state->m_data_arc.load() : 0; }
-
-    constexpr auto disown() -> void {
-      mem::MemoryResourceProtocol& pmr = m_state->m_pmr;
-
-      if (m_state->m_data_arc > 0) {
-        m_state->m_data_arc = 0;
-        pmr.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
-      }
-
-      m_ptr = null;
-    }
+    [[nodiscard]] constexpr auto ref_count() const -> usize { return m_state.isset() ? m_state->m_data_rc.load() : 0; }
 
     ///=========================================================================================
     /// POINTER ACCESS

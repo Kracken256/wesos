@@ -105,17 +105,6 @@ namespace wesos::smartptr {
 
     [[nodiscard]] constexpr auto ref_count() const -> usize { return m_state.isset() ? m_state->m_data_rc : 0; }
 
-    constexpr auto disown() -> void {
-      mem::MemoryResourceProtocol& pmr = m_state->m_pmr;
-
-      if (m_state->m_data_rc > 0) {
-        m_state->m_data_rc = 0;
-        pmr.template destroy_and_deallocate<Object>(m_ptr.unwrap(), 1);
-      }
-
-      m_ptr = null;
-    }
-
     ///=========================================================================================
     /// POINTER ACCESS
     ///=========================================================================================

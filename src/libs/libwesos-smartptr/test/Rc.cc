@@ -136,7 +136,7 @@ TEST(Rc, NoMove) {
   EXPECT_EQ(moved, 0);
 }
 
-TEST(Rc, Disown) {
+TEST(Rc, Lifetime) {
   const auto buf_size = 64;
   auto bytes = Array<u8, buf_size>();
   auto pmr = mem::IntrusivePool(Rc<SemanticCounter>::min_alloc_size(), Rc<SemanticCounter>::min_alloc_alignment(),
@@ -147,34 +147,46 @@ TEST(Rc, Disown) {
   usize copied = 0;
   usize destructed = 0;
 
-  Nullable<Rc<SemanticCounter>> ref_a;
-
   {
+    Nullable<Rc<SemanticCounter>> ref_a;
     Nullable<Rc<SemanticCounter>> ref_b;
 
     {
       Nullable<Rc<SemanticCounter>> ref_c;
 
       {
-        auto rc_maybe = Rc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
-        ASSERT_NE(rc_maybe, null);
-        auto rc = move(rc_maybe.value());
+        Nullable<Rc<SemanticCounter>> ref_d;
 
-        EXPECT_EQ(rc.ref_count(), 1);
+        {
+          auto rc_maybe = Rc<SemanticCounter>::create(pmr, SemanticCounter(constructed, moved, copied, destructed));
+          ASSERT_NE(rc_maybe, null);
+          auto rc = move(rc_maybe.value());
 
-        ref_a = rc;
-        ref_b = rc;
-        ref_c = rc;
+          EXPECT_EQ(rc.ref_count(), 1);
 
-        EXPECT_EQ(rc.ref_count(), 4);
-        EXPECT_EQ(ref_a.value().ref_count(), 4);
-        EXPECT_EQ(ref_b.value().ref_count(), 4);
-        EXPECT_EQ(ref_c.value().ref_count(), 4);
+          ref_a = rc;
+          ref_c = rc;
+          ref_d = rc;
+
+          EXPECT_EQ(rc.ref_count(), 4);
+          EXPECT_EQ(ref_a.value().ref_count(), 4);
+          EXPECT_EQ(ref_c.value().ref_count(), 4);
+          EXPECT_EQ(ref_d.value().ref_count(), 4);
+
+          EXPECT_EQ(constructed, 1);
+          EXPECT_EQ(copied, 0);
+          EXPECT_EQ(moved, 1);
+          EXPECT_EQ(destructed, 1);
+        }
 
         EXPECT_EQ(constructed, 1);
         EXPECT_EQ(copied, 0);
         EXPECT_EQ(moved, 1);
         EXPECT_EQ(destructed, 1);
+
+        EXPECT_EQ(ref_a.value().ref_count(), 3);
+        EXPECT_EQ(ref_c.value().ref_count(), 3);
+        EXPECT_EQ(ref_d.value().ref_count(), 3);
       }
 
       EXPECT_EQ(constructed, 1);
@@ -182,26 +194,16 @@ TEST(Rc, Disown) {
       EXPECT_EQ(moved, 1);
       EXPECT_EQ(destructed, 1);
 
-      EXPECT_EQ(ref_a.value().ref_count(), 3);
-      EXPECT_EQ(ref_b.value().ref_count(), 3);
-      EXPECT_EQ(ref_c.value().ref_count(), 3);
+      EXPECT_EQ(ref_a.value().ref_count(), 2);
+      EXPECT_EQ(ref_c.value().ref_count(), 2);
     }
 
-    EXPECT_EQ(constructed, 1);
-    EXPECT_EQ(copied, 0);
-    EXPECT_EQ(moved, 1);
-    EXPECT_EQ(destructed, 1);
+    EXPECT_EQ(ref_a.value().ref_count(), 1);
+
+    ref_b = ref_a.value();
 
     EXPECT_EQ(ref_a.value().ref_count(), 2);
-    EXPECT_EQ(ref_b.value().ref_count(), 2);
-
-    ref_b->disown();
-
-    EXPECT_EQ(ref_a.value().ref_count(), 0);
-    EXPECT_EQ(ref_b.value().ref_count(), 0);
   }
-
-  EXPECT_EQ(ref_a.value().ref_count(), 0);
 
   EXPECT_EQ(constructed, 1);
   EXPECT_EQ(copied, 0);
