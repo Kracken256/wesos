@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <wesos-builtin/Move.hh>
+#include <wesos-types/Move.hh>
 
 namespace wesos::types {
   template <class T>

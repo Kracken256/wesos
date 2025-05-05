@@ -8,8 +8,8 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
-#include <wesos-builtin/Move.hh>
 #include <wesos-types/Bitcast.hh>
+#include <wesos-types/Move.hh>
 #include <wesos-types/Null.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/PowerOfTwo.hh>

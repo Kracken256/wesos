@@ -164,4 +164,7 @@ namespace wesos::types {
       static_assert(is_same_v<T, T>, "Unsupported type");
     }
   }
+
+  [[nodiscard]] constexpr static auto min(auto a, auto b) { return a < b ? a : b; }
+  [[nodiscard]] constexpr static auto max(auto a, auto b) { return a > b ? a : b; }
 }  // namespace wesos::types

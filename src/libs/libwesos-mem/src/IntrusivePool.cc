@@ -8,7 +8,6 @@
 #include <sanitizer/asan_interface.h>
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-builtin/Range.hh>
 #include <wesos-mem/IntrusivePool.hh>
 
 using namespace wesos;

@@ -8,7 +8,7 @@
 #pragma once
 
 #include <wesos-assert/Assert.hh>
-#include <wesos-builtin/Move.hh>
+#include <wesos-types/Move.hh>
 #include <wesos-types/NullableRefPtr.hh>
 #include <wesos-types/Numeric.hh>
 #include <wesos-types/Ptr.hh>

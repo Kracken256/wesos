@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <wesos-builtin/Move.hh>
+#include <wesos-types/Move.hh>
 
 TEST(Lambda, Lambda) {
   /// TODO: Test lambda implementation

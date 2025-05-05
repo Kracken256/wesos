@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <wesos-builtin/Move.hh>
 #include <wesos-sync/MemoryOrder.hh>
 #include <wesos-sync/arch/AtomicBackend.hh>
+#include <wesos-types/Move.hh>
 
 #if defined(__x86_64__)
 #include <wesos-sync/arch/x86-64/Atomic.hh>
