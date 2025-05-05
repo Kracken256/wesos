@@ -13,7 +13,7 @@
 #include <wesos-sync/LockProtocol.hh>
 
 namespace wesos::stream {
-  class AtomicInputStreamRef : public InputStreamProtocol {
+  class AtomicInputStreamRef final : public InputStreamProtocol {
     friend smartptr::Box<AtomicInputStreamRef>;
 
     mutable smartptr::Box<sync::LockProtocol> m_lock;
@@ -38,7 +38,7 @@ namespace wesos::stream {
                                      InputStreamProtocol& parent) -> Nullable<smartptr::Box<AtomicInputStreamRef>>;
   };
 
-  class AtomicInputStream : public InputStreamProtocol {
+  class AtomicInputStream final : public InputStreamProtocol {
     friend smartptr::Box<AtomicInputStream>;
 
     mutable smartptr::Box<sync::LockProtocol> m_lock;
@@ -60,8 +60,8 @@ namespace wesos::stream {
     constexpr ~AtomicInputStream() override = default;
 
     template <class InputStream, typename... Args>
-    [[nodiscard]] static auto create_owned(mem::MemoryResourceProtocol& mm,
-                                           Args... args) -> Nullable<smartptr::Box<AtomicInputStream>> {
+    [[nodiscard]] static auto create_from(mem::MemoryResourceProtocol& mm,
+                                          Args... args) -> Nullable<smartptr::Box<AtomicInputStream>> {
       if (auto stream = smartptr::Box<InputStream>::create(mm, forward<Args>(args)...)) [[likely]] {
         auto base = smartptr::box_cast<InputStreamProtocol>(move(stream.value()));
         return smartptr::Box<AtomicInputStream>::create(mm, mm, move(base));
@@ -69,5 +69,8 @@ namespace wesos::stream {
 
       return null;
     }
+
+    [[nodiscard]] static auto create(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent)
+        -> Nullable<smartptr::Box<AtomicInputStream>>;
   };
 }  // namespace wesos::stream

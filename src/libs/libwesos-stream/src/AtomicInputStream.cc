@@ -63,3 +63,13 @@ SYM_EXPORT auto AtomicInputStream::virt_read_seek(isize pos) -> bool {
 SYM_EXPORT auto AtomicInputStream::virt_read_pos() const -> Nullable<usize> {
   return m_lock->critical_section([&] { return m_owned->read_pos(); });
 }
+
+SYM_EXPORT auto AtomicInputStream::create(mem::MemoryResourceProtocol& mm, smartptr::Box<InputStreamProtocol> parent)
+    -> Nullable<smartptr::Box<AtomicInputStream>> {
+  if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
+    auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
+    return Box<AtomicInputStream>::create(mm, move(some_lock), move(parent));
+  }
+
+  return null;
+}
