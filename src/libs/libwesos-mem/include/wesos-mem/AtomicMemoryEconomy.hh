@@ -18,9 +18,6 @@ namespace wesos::mem {
     sync::SpinLock m_lock;
     NullableRefPtr<MemoryResourceProtocol> m_front;
 
-    [[nodiscard]] auto allocate(usize size) -> NullableOwnPtr<void>;
-    auto utilize(View<u8> pool) -> void;
-
     auto add_resource(MemoryResourceProtocol& child) -> void;
     auto remove_resource(MemoryResourceProtocol& child) -> void;
 
@@ -31,6 +28,9 @@ namespace wesos::mem {
     auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
     auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
     ~AtomicMemoryEconomy() = default;
+
+    [[nodiscard]] auto allocate(usize size) -> NullableOwnPtr<void>;
+    auto utilize(View<u8> pool) -> void;
   };
 
   extern AtomicMemoryEconomy MEMORY_ECONOMY_GLOBAL;
