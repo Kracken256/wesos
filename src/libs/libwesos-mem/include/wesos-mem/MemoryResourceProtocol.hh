@@ -17,8 +17,8 @@ namespace wesos::mem {
   class MemoryResourceProtocol {
     friend class TracingResource;
 
-    sync::Atomic<bool> m_yield_requested;
     sync::Atomic<usize> m_embezzlement_request;
+    sync::Atomic<bool> m_yield_requested;
 
   protected:
     [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8>;
