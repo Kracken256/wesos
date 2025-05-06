@@ -5,6 +5,10 @@ project(${THIS_PROJECT_NAME})
 ################################################################################
 # USER CONFIGURATION SECTION
 ################################################################################
+option(WESOS_BUILD_TESTING ON)
+option(WESOS_BUILD_BENCHMARKING ON)
+
+set(WESOS_TARGET_TRIPLE x86_64-pc-none-gnu)
 
 ################################################################################
 # GLOBAL VARIABLE SECTION
