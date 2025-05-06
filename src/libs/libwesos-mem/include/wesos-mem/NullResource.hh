@@ -12,7 +12,10 @@
 
 namespace wesos::mem {
   class NullResource final : public MemoryResourceProtocol {
-    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override;
+    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8> override {
+      (void)max_size;
+      return View<u8>::create_empty();
+    }
 
     [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> override {
       (void)size;

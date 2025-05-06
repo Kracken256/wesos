@@ -18,7 +18,7 @@ SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize
       m_object_size(object_size),
       m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
       m_initial_pool(pool) {
-  virt_utilize(pool);
+  IntrusivePool::virt_utilize(pool);
 }
 
 SYM_EXPORT IntrusivePool::~IntrusivePool() {
@@ -73,6 +73,6 @@ SYM_EXPORT auto IntrusivePool::virt_utilize(View<u8> pool) -> void {
     const auto object_ptr = OwnPtr(object_range.into_ptr().get_unchecked().unwrap());
     assert_invariant(object_range.size() == object_size() && is_aligned_pow2(object_ptr, object_align()));
 
-    virt_deallocate(object_ptr.unwrap(), object_size(), object_align());
+    IntrusivePool::virt_deallocate(object_ptr.unwrap(), object_size(), object_align());
   });
 }
