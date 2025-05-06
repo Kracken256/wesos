@@ -32,4 +32,6 @@ namespace wesos::mem {
     auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
     ~AtomicMemoryEconomy() = default;
   };
+
+  extern AtomicMemoryEconomy MEMORY_ECONOMY_GLOBAL;
 }  // namespace wesos::mem

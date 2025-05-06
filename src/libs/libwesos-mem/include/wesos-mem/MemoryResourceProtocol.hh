@@ -8,7 +8,6 @@
 #pragma once
 
 #include <wesos-sync/Atomic.hh>
-#include <wesos-sync/SpinLock.hh>
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
