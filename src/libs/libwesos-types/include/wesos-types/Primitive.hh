@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <wesos-cpu/Target.hh>
+
 namespace wesos::types::detail {
   enum class PrimitiveTypeSize : unsigned char {
     Empty = 0,
@@ -36,7 +38,12 @@ namespace wesos::types::detail {
   using __u32 = unsigned int;
   static_assert(sizeof(__u32) == static_cast<int>(PrimitiveTypeSize::U32), "__u32 is not 4 bytes");
 
+#if ADDRESS_SIZE == 4
   using __u64 = unsigned long long;
+#else
+  using __u64 = unsigned long;
+#endif
+
   static_assert(sizeof(__u64) == static_cast<int>(PrimitiveTypeSize::U64), "__u64 is not 8 bytes");
 
   using __i8 = signed char;
@@ -48,7 +55,12 @@ namespace wesos::types::detail {
   using __i32 = signed int;
   static_assert(sizeof(__i32) == static_cast<int>(PrimitiveTypeSize::I32), "__i32 is not 4 bytes");
 
+#if ADDRESS_SIZE == 4
   using __i64 = signed long long;
+#else
+  using __i64 = signed long;
+#endif
+
   static_assert(sizeof(__i64) == static_cast<int>(PrimitiveTypeSize::I64), "__i64 is not 8 bytes");
 
   using __f32 = float;
