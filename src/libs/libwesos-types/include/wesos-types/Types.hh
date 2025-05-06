@@ -70,10 +70,6 @@ namespace wesos {
   using types::RefPtr;
   using types::View;
 
-  using types::bytes_until_next_aligned_pow2;
-  using types::is_aligned_pow2;
-  using types::next_aligned_pow2;
-
   using types::ClampLeast;
   using types::ClampMost;
   using types::Least;
