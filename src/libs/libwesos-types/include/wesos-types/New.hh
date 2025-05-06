@@ -13,7 +13,5 @@
 
 inline auto operator new(wesos::types::usize, void *p) noexcept -> void * { return p; }
 inline auto operator new[](wesos::types::usize, void *p) noexcept -> void * { return p; }
-inline void operator delete(void *, void *) noexcept {};
-inline void operator delete[](void *, void *) noexcept {};
 
 #endif
