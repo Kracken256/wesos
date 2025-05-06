@@ -28,6 +28,10 @@ target_link_options(${COMPONENT_NAME} PRIVATE
   -Wl,--no-warn-rwx-segments
 )
 
+if(WESOS_TARGET_TRIPLE)
+  target_link_options(${COMPONENT_NAME} PRIVATE -target ${WESOS_TARGET_TRIPLE})
+endif()
+
 foreach(dep ${WESOS_KERN_DEPENDENCIES})
   target_link_libraries(${COMPONENT_NAME} PRIVATE ${dep})
   add_dependencies(${COMPONENT_NAME} ${dep})
