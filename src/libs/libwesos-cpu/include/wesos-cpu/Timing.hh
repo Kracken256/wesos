@@ -22,11 +22,9 @@ namespace wesos::cpu {
 /// TODO: Suport target
 #error "Not implement yet"
 #elif ARCH_RISCV_64
-/// TODO: Suport target
-#error "Not implement yet"
+    asm volatile("fence");
 #elif ARCH_RISCV_32
-/// TODO: Suport target
-#error "Not implement yet"
+    asm volatile("fence");
 #else
 #error "This implementation of ephemeral_pause() does not support your architecure. Sorry.."
 #endif
