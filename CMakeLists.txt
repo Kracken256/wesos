@@ -8,7 +8,7 @@ project(${THIS_PROJECT_NAME})
 option(WESOS_BUILD_TESTING ON)
 option(WESOS_BUILD_BENCHMARKING ON)
 
-set(WESOS_TARGET_TRIPLE x86_64-pc-none-gnu)
+set(WESOS_TARGET_TRIPLE x86_64-pc-linux-gnu)
 
 ################################################################################
 # GLOBAL VARIABLE SECTION
