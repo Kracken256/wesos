@@ -1,18 +1,24 @@
-project(wesos-kernel LANGUAGES CXX ASM)
+set(COMPONENT_NAME wesos-kernel)
+project(${COMPONENT_NAME} LANGUAGES CXX ASM)
 
 file(GLOB_RECURSE KERNEL_CXX_SOURCES "src/*.cc")
 file(GLOB_RECURSE KERNEL_ASM_SOURCES "src/*.s")
 
 set(WESOS_KERN_DEPENDENCIES
+  wesos-builtin
   wesos-types
+  wesos-cpu
+  wesos-sync
+  wesos-assert
+  wesos-stream
+  wesos-mem
+  wesos-smartptr
+  wesos-lambda
 )
 
-add_executable(wesos-kernel ${KERNEL_CXX_SOURCES} ${KERNEL_ASM_SOURCES})
-target_include_directories(wesos-kernel PRIVATE
-  "${CMAKE_CURRENT_SOURCE_DIR}/include"
-  "${CMAKE_CURRENT_SOURCE_DIR}/src"
-)
-target_link_options(wesos-kernel PRIVATE
+add_executable(${COMPONENT_NAME} ${KERNEL_CXX_SOURCES} ${KERNEL_ASM_SOURCES})
+target_include_directories(${COMPONENT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_options(${COMPONENT_NAME} PRIVATE
   -nostdlib
   -static
   -T${CMAKE_CURRENT_SOURCE_DIR}/linker.ld
@@ -23,9 +29,9 @@ target_link_options(wesos-kernel PRIVATE
 )
 
 foreach(dep ${WESOS_KERN_DEPENDENCIES})
-  target_link_libraries(wesos-kernel PRIVATE ${dep})
-  add_dependencies(wesos-kernel ${dep})
+  target_link_libraries(${COMPONENT_NAME} PRIVATE ${dep})
+  add_dependencies(${COMPONENT_NAME} ${dep})
 endforeach()
 
-install(TARGETS wesos-kernel)
+install(TARGETS ${COMPONENT_NAME})
 install(DIRECTORY "include/" DESTINATION "include")
