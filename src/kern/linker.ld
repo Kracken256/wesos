@@ -1,3 +1,5 @@
+ENTRY(_start)
+
 SECTIONS
 {
   . = 0x100000; /* Load at 1MB */
@@ -11,6 +13,11 @@ SECTIONS
 
   wesos_kern_rodata_start = .;
   .rodata : {
+    BEG_CXX_CTORS_GLOBAL = .;
+    KEEP(*( .init_array ));
+    KEEP(*(SORT_BY_INIT_PRIORITY( .init_array.* )));
+    END_CXX_CTORS_GLOBAL = .;
+
     *(.rodata)
   }
   wesos_kern_rodata_end = .;
