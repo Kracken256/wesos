@@ -15,9 +15,14 @@ foreach(LIB ${PROJECT_WIDE_LIBRARIES})
   message(STATUS "Added include directory: ${CMAKE_CURRENT_SOURCE_DIR}/${LIB}/include")
 endforeach()
 
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-  add_compile_options(-fsanitize=address,undefined)
-  add_link_options(-fsanitize=address,undefined)
+if(WESOS_ADDRESS_SANITIZER)
+  add_compile_options(-fsanitize=address)
+  add_link_options(-fsanitize=address)
+endif()
+
+if(WESOS_UNDEFINED_SANITIZER)
+  add_compile_options(-fsanitize=undefined)
+  add_link_options(-fsanitize=undefined)
 endif()
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})

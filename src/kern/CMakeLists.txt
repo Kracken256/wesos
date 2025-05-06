@@ -33,5 +33,15 @@ foreach(dep ${WESOS_KERN_DEPENDENCIES})
   add_dependencies(${COMPONENT_NAME} ${dep})
 endforeach()
 
+if(WESOS_ADDRESS_SANITIZER)
+  target_compile_options(${COMPONENT_NAME} PRIVATE -fsanitize=address)
+  target_link_options(${COMPONENT_NAME} PRIVATE -fsanitize=address)
+endif()
+
+if(WESOS_UNDEFINED_SANITIZER)
+  target_compile_options(${COMPONENT_NAME} PRIVATE -fsanitize=undefined)
+  target_link_options(${COMPONENT_NAME} PRIVATE -fsanitize=undefined)
+endif()
+
 install(TARGETS ${COMPONENT_NAME})
 install(DIRECTORY "include/" DESTINATION "include")

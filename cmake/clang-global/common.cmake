@@ -20,7 +20,10 @@ add_compile_options(-fno-rtti -fno-exceptions -fno-strict-aliasing) # Because I 
 add_compile_options(-nostdlib -fno-asynchronous-unwind-tables -fno-unwind-tables)
 add_compile_options(-Wno-unused-command-line-argument)
 add_compile_options(-fvisibility=hidden -fvisibility-inlines-hidden)
-add_compile_options(-target ${WESOS_TARGET_TRIPLE})
+
+if(WESOS_TARGET_TRIPLE)
+  add_compile_options(-target ${WESOS_TARGET_TRIPLE})
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
