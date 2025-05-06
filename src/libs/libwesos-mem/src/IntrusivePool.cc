@@ -5,7 +5,14 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#if __SANITIZE_ADDRESS__ || (defined(__has_feature) && __has_feature(address_sanitizer))
 #include <sanitizer/asan_interface.h>
+#elif !defined(__SANITIZE_ADDRESS__)
+// #warning "Building memory allocator without address -fsanitize=address enabled"
+
+#define ASAN_POISON_MEMORY_REGION(addr, size) ((void)(addr), (void)(size))
+#define ASAN_UNPOISON_MEMORY_REGION(addr, size) ((void)(addr), (void)(size))
+#endif
 
 #include <wesos-builtin/Export.hh>
 #include <wesos-mem/IntrusivePool.hh>
