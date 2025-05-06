@@ -38,6 +38,18 @@ namespace wesos::sync::detail::atomic {
   }
 
   template <class Atom>
+  auto compare_exchange_strong_explicit(Atom* ptr, Atom* expected, Atom desired, MemoryOrder success,
+                                        MemoryOrder failure) -> bool {
+    return __atomic_compare_exchange_n(ptr, expected, desired, false, success, failure);
+  }
+
+  template <class Atom>
+  auto compare_exchange_weak_explicit(Atom* ptr, Atom* expected, Atom desired, MemoryOrder success,
+                                      MemoryOrder failure) -> bool {
+    return __atomic_compare_exchange_n(ptr, expected, desired, true, success, failure);
+  }
+
+  template <class Atom>
   auto fetch_add(Atom* ptr, Atom val, MemoryOrder order) -> Atom {
     return __atomic_fetch_add(ptr, val, order);
   }

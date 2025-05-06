@@ -11,7 +11,7 @@
 
 using namespace wesos::sync;
 
-SYM_EXPORT void SpinLock::virt_lock() {
+SYM_EXPORT void SpinLock::lock() {
   bool expected;
 
   while (true) {
@@ -26,9 +26,9 @@ SYM_EXPORT void SpinLock::virt_lock() {
   }
 }
 
-SYM_EXPORT void SpinLock::virt_unlock() { m_locked.store(false, memory_order_release); }
+SYM_EXPORT void SpinLock::unlock() { m_locked.store(false, memory_order_release); }
 
-SYM_EXPORT auto SpinLock::virt_try_lock() -> bool {
+SYM_EXPORT auto SpinLock::try_lock() -> bool {
   bool expected = false;
   return m_locked.compare_exchange_strong(expected, true, memory_order_acquire, memory_order_relaxed);
 }

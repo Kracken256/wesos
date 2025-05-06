@@ -48,6 +48,26 @@ namespace wesos::sync {
       return compare_exchange_weak(expected, desired, order, order);
     }
 
+    auto compare_exchange_strong_explicit(Atom& expected, Atom desired, MemoryOrder success,
+                                          MemoryOrder failure) -> bool {
+      return detail::atomic::compare_exchange_strong_explicit(&m_value, &expected, desired, success, failure);
+    }
+
+    auto compare_exchange_strong_explicit(Atom& expected, Atom desired,
+                                          MemoryOrder order = memory_order_seq_cst) -> bool {
+      return compare_exchange_strong_explicit(expected, desired, order, order);
+    }
+
+    auto compare_exchange_weak_explicit(Atom& expected, Atom desired, MemoryOrder success,
+                                        MemoryOrder failure) -> bool {
+      return detail::atomic::compare_exchange_weak_explicit(&m_value, &expected, desired, success, failure);
+    }
+
+    auto compare_exchange_weak_explicit(Atom& expected, Atom desired,
+                                        MemoryOrder order = memory_order_seq_cst) -> bool {
+      return compare_exchange_weak_explicit(expected, desired, order, order);
+    }
+
     auto fetch_add(Atom val, MemoryOrder order = memory_order_seq_cst) -> Atom {
       return detail::atomic::fetch_add(&m_value, val, order);
     }

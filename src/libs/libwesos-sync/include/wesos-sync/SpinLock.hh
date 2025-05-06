@@ -11,13 +11,8 @@
 #include <wesos-sync/LockProtocol.hh>
 
 namespace wesos::sync {
-  class SpinLock final : public LockProtocol {
+  class SpinLock final {
     Atomic<bool> m_locked;
-
-  protected:
-    auto virt_lock() -> void override;
-    auto virt_unlock() -> void override;
-    auto virt_try_lock() -> bool override;
 
   public:
     constexpr SpinLock() : m_locked(false) {}
@@ -25,6 +20,12 @@ namespace wesos::sync {
     constexpr SpinLock(SpinLock&&) = delete;
     constexpr auto operator=(const SpinLock&) -> SpinLock& = delete;
     constexpr auto operator=(SpinLock&&) -> SpinLock& = delete;
-    constexpr ~SpinLock() override = default;
+    constexpr ~SpinLock() = default;
+
+    auto lock() -> void;
+    auto unlock() -> void;
+    auto try_lock() -> bool;
+
+    W_LOCK_PROTOCOL_IMPLEMENT(SpinLock);
   };
 }  // namespace wesos::sync
