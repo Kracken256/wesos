@@ -18,9 +18,5 @@ namespace wesos::kern {
     (void)settings;
 
     /// TODO: Implement the kernel
-
-    while (true) {
-      asm volatile("nop");
-    }
   }
 }  // namespace wesos::kern
