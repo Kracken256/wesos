@@ -14,14 +14,12 @@ using namespace wesos;
 using namespace wesos::mem;
 
 namespace wesos::kern {
-  void main(Untrusted<boot::Options> boot_settings) {
-    const auto& settings = boot_settings.trust_and_unwrap();
+  void main(boot::Options settings) {
     (void)settings;
 
     /// TODO: Implement the kernel
 
     while (true) {
-      asm volatile("syscall");
       asm volatile("nop");
     }
   }
