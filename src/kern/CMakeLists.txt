@@ -19,13 +19,13 @@ set(WESOS_KERN_DEPENDENCIES
 add_executable(${COMPONENT_NAME} ${KERNEL_CXX_SOURCES} ${KERNEL_ASM_SOURCES})
 target_include_directories(${COMPONENT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_link_options(${COMPONENT_NAME} PRIVATE
+  -fuse-ld=lld
   -nostdlib
   -static
   -T${CMAKE_CURRENT_SOURCE_DIR}/linker.ld
   -Wl,--build-id=none
   -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/kernel.map
   -Wl,--fatal-warnings
-  -Wl,--no-warn-rwx-segments
 )
 
 if(WESOS_TARGET_TRIPLE)
