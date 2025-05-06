@@ -14,7 +14,7 @@ using namespace wesos::stream;
 using namespace wesos::smartptr;
 using namespace wesos::sync;
 
-SYM_EXPORT AtomicOutputStreamRef::AtomicOutputStreamRef(Box<LockProtocol> lock, OutputStreamProtocol& parent)
+SYM_EXPORT AtomicOutputStreamRef::AtomicOutputStreamRef(Box<SpinLock> lock, OutputStreamProtocol& parent)
     : m_lock(move(lock)), m_inner(parent) {}
 
 SYM_EXPORT auto AtomicOutputStreamRef::virt_write_some(View<u8> someof) -> WriteResult {
@@ -48,7 +48,7 @@ SYM_EXPORT auto AtomicOutputStreamRef::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicOutputStreamRef::create(mem::MemoryResourceProtocol& mm,
                                               OutputStreamProtocol& parent) -> Nullable<Box<AtomicOutputStreamRef>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
+    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
     return Box<AtomicOutputStreamRef>::create(mm, move(some_lock), parent);
   }
 
@@ -57,7 +57,7 @@ SYM_EXPORT auto AtomicOutputStreamRef::create(mem::MemoryResourceProtocol& mm,
 
 ///===============================================================================================================
 
-SYM_EXPORT AtomicOutputStream::AtomicOutputStream(Box<LockProtocol> lock, Box<OutputStreamProtocol> parent)
+SYM_EXPORT AtomicOutputStream::AtomicOutputStream(Box<SpinLock> lock, Box<OutputStreamProtocol> parent)
     : m_lock(move(lock)), m_owned(move(parent)) {}
 
 SYM_EXPORT auto AtomicOutputStream::virt_write_some(View<u8> someof) -> WriteResult {
@@ -91,7 +91,7 @@ SYM_EXPORT auto AtomicOutputStream::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicOutputStream::create(mem::MemoryResourceProtocol& mm,
                                            Box<OutputStreamProtocol> parent) -> Nullable<Box<AtomicOutputStream>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
+    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
     return Box<AtomicOutputStream>::create(mm, move(some_lock), move(parent));
   }
 

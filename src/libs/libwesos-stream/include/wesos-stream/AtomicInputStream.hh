@@ -10,16 +10,16 @@
 #include <wesos-mem/MemoryResourceProtocol.hh>
 #include <wesos-smartptr/Box.hh>
 #include <wesos-stream/InputStreamProtocol.hh>
-#include <wesos-sync/LockProtocol.hh>
+#include <wesos-sync/SpinLock.hh>
 
 namespace wesos::stream {
   class AtomicInputStreamRef final : public InputStreamProtocol {
     friend smartptr::Box<AtomicInputStreamRef>;
 
-    mutable smartptr::Box<sync::LockProtocol> m_lock;
+    mutable smartptr::Box<sync::SpinLock> m_lock;
     InputStreamProtocol& m_inner;
 
-    AtomicInputStreamRef(smartptr::Box<sync::LockProtocol> lock, InputStreamProtocol& parent);
+    AtomicInputStreamRef(smartptr::Box<sync::SpinLock> lock, InputStreamProtocol& parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;
@@ -41,10 +41,10 @@ namespace wesos::stream {
   class AtomicInputStream final : public InputStreamProtocol {
     friend smartptr::Box<AtomicInputStream>;
 
-    mutable smartptr::Box<sync::LockProtocol> m_lock;
+    mutable smartptr::Box<sync::SpinLock> m_lock;
     smartptr::Box<InputStreamProtocol> m_owned;
 
-    AtomicInputStream(smartptr::Box<sync::LockProtocol> lock, smartptr::Box<InputStreamProtocol> parent);
+    AtomicInputStream(smartptr::Box<sync::SpinLock> lock, smartptr::Box<InputStreamProtocol> parent);
 
   protected:
     [[nodiscard]] auto virt_read_some(View<u8> someof) -> ReadResult override;

@@ -9,16 +9,16 @@
 
 #include <wesos-smartptr/Box.hh>
 #include <wesos-stream/OutputStreamProtocol.hh>
-#include <wesos-sync/LockProtocol.hh>
+#include <wesos-sync/SpinLock.hh>
 
 namespace wesos::stream {
   class AtomicOutputStreamRef final : public OutputStreamProtocol {
     friend smartptr::Box<AtomicOutputStreamRef>;
 
-    mutable smartptr::Box<sync::LockProtocol> m_lock;
+    mutable smartptr::Box<sync::SpinLock> m_lock;
     OutputStreamProtocol& m_inner;
 
-    AtomicOutputStreamRef(smartptr::Box<sync::LockProtocol> lock, OutputStreamProtocol& parent);
+    AtomicOutputStreamRef(smartptr::Box<sync::SpinLock> lock, OutputStreamProtocol& parent);
 
   protected:
     [[nodiscard]] auto virt_write_some(View<u8> someof) -> WriteResult override;
@@ -43,10 +43,10 @@ namespace wesos::stream {
   class AtomicOutputStream final : public OutputStreamProtocol {
     friend smartptr::Box<AtomicOutputStream>;
 
-    mutable smartptr::Box<sync::LockProtocol> m_lock;
+    mutable smartptr::Box<sync::SpinLock> m_lock;
     smartptr::Box<OutputStreamProtocol> m_owned;
 
-    AtomicOutputStream(smartptr::Box<sync::LockProtocol> lock, smartptr::Box<OutputStreamProtocol> parent);
+    AtomicOutputStream(smartptr::Box<sync::SpinLock> lock, smartptr::Box<OutputStreamProtocol> parent);
 
   protected:
     [[nodiscard]] auto virt_write_some(View<u8> someof) -> WriteResult override;

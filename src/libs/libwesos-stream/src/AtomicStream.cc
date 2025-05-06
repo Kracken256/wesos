@@ -14,7 +14,7 @@ using namespace wesos::stream;
 using namespace wesos::smartptr;
 using namespace wesos::sync;
 
-SYM_EXPORT AtomicStreamRef::AtomicStreamRef(Box<LockProtocol> lock, StreamProtocol& parent)
+SYM_EXPORT AtomicStreamRef::AtomicStreamRef(Box<SpinLock> lock, StreamProtocol& parent)
     : m_lock(move(lock)), m_inner(parent) {}
 
 SYM_EXPORT auto AtomicStreamRef::virt_read_some(View<u8> someof) -> ReadResult {
@@ -64,7 +64,7 @@ SYM_EXPORT auto AtomicOutputStreamRef::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicStreamRef::create(mem::MemoryResourceProtocol& mm,
                                         StreamProtocol& parent) -> Nullable<Box<AtomicStreamRef>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
+    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
     return Box<AtomicStreamRef>::create(mm, move(some_lock), parent);
   }
 
@@ -73,7 +73,7 @@ SYM_EXPORT auto AtomicStreamRef::create(mem::MemoryResourceProtocol& mm,
 
 ///===============================================================================================================
 
-SYM_EXPORT AtomicStream::AtomicStream(Box<LockProtocol> lock, Box<StreamProtocol> parent)
+SYM_EXPORT AtomicStream::AtomicStream(Box<SpinLock> lock, Box<StreamProtocol> parent)
     : m_lock(move(lock)), m_owned(move(parent)) {}
 
 SYM_EXPORT auto AtomicStream::virt_read_some(View<u8> someof) -> ReadResult {
@@ -123,7 +123,7 @@ SYM_EXPORT auto AtomicOutputStream::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicStream::create(mem::MemoryResourceProtocol& mm,
                                      Box<StreamProtocol> parent) -> Nullable<Box<AtomicStream>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<LockProtocol>(move(basic_spinlock.value()));
+    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
     return Box<AtomicStream>::create(mm, move(some_lock), move(parent));
   }
 
