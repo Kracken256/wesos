@@ -40,10 +40,10 @@ SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> void {
 }
 
 SYM_EXPORT void MemoryResourceProtocol::eco_yield() {
-  if (const auto should_yield = m_yield_requested.load(sync::memory_order_acquire)) [[unlikely]] {
-    m_yield_requested.store(false, sync::memory_order_relaxed);
+  if (const auto should_yield = m_eco_should_yield.load(sync::memory_order_acquire)) [[unlikely]] {
+    m_eco_should_yield.store(false, sync::memory_order_relaxed);
 
-    auto desired_size = m_embezzlement_request.exchange(0, sync::memory_order_acq_rel);
+    auto desired_size = m_eco_request_size.exchange(0, sync::memory_order_acq_rel);
 
     do {
       const auto relinquished_memory = virt_embezzle(desired_size);

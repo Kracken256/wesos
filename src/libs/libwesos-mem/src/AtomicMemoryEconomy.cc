@@ -11,34 +11,50 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size) -> NullableOwnPtr<void> {
   m_lock.critical_section([&] {
-    /// TODO: allocate from a child
+    /// TODO: allocate memory from any child
   });
 
   return null;
 }
 
-SYM_EXPORT void AtomicMemoryEconomy::deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
-  m_lock.critical_section([&] {
-    /// TODO: deallocate from a child
-  });
-}
-
 SYM_EXPORT auto AtomicMemoryEconomy::utilize(View<u8> pool) -> void {
   m_lock.critical_section([&] {
-    /// TODO: supply more memory
+    /// TODO: distribute memory across children (uniformly?)
   });
 }
 
 SYM_EXPORT auto AtomicMemoryEconomy::add_resource(MemoryResourceProtocol& child) -> void {
   m_lock.critical_section([&] {
-    /// TODO: add child node
+    assert_invariant(child.m_eco_chain_next.is_null());
+
+    child.m_eco_chain_next = m_front;
+    m_front = &child;
   });
 }
 
 SYM_EXPORT auto AtomicMemoryEconomy::remove_resource(MemoryResourceProtocol& child) -> void {
   m_lock.critical_section([&] {
-    /// TODO: remove child node
+    NullableRefPtr<MemoryResourceProtocol> node = m_front;
+    NullableRefPtr<MemoryResourceProtocol> prev = null;
+
+    while (node.isset()) {
+      if (node.unwrap() == &child) [[unlikely]] {
+        const auto next = node->m_eco_chain_next;
+        child.m_eco_chain_next = null;
+
+        if (prev.isset()) {
+          prev->m_eco_chain_next = next;
+        } else {
+          m_front = next;
+        }
+
+        return;
+      }
+
+      prev = node;
+      node = node->m_eco_chain_next;
+    }
   });
 }

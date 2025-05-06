@@ -16,9 +16,9 @@ namespace wesos::mem {
     friend class MemoryResourceProtocol;
 
     sync::SpinLock m_lock;
+    NullableRefPtr<MemoryResourceProtocol> m_front;
 
-    [[nodiscard]] auto allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
-    void deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align);
+    [[nodiscard]] auto allocate(usize size) -> NullableOwnPtr<void>;
     auto utilize(View<u8> pool) -> void;
 
     auto add_resource(MemoryResourceProtocol& child) -> void;
