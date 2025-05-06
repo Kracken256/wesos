@@ -17,10 +17,9 @@ namespace wesos::mem {
 
     sync::SpinLock m_lock;
 
-    [[nodiscard]] auto virt_embezzle(usize max_size) -> View<u8>;
-    [[nodiscard]] auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
-    void virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align);
-    auto virt_utilize(View<u8> pool) -> void;
+    [[nodiscard]] auto allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    void deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align);
+    auto utilize(View<u8> pool) -> void;
 
     auto add_resource(MemoryResourceProtocol& child) -> void;
     auto remove_resource(MemoryResourceProtocol& child) -> void;

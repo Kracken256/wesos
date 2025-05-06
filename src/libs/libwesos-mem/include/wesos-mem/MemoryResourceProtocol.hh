@@ -7,12 +7,24 @@
 
 #pragma once
 
+#include <wesos-sync/Atomic.hh>
 #include <wesos-sync/SpinLock.hh>
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
+  class AtomicMemoryEconomy;
+
   class MemoryResourceProtocol {
     friend class TracingResource;
+
+    sync::Atomic<bool> m_yield_requested;
+    sync::Atomic<usize> m_embezzlement_request;
+
+  protected:
+    [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8>;
+    [[nodiscard]] virtual auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    virtual auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
+    virtual auto virt_utilize(View<u8> pool) -> void;
 
   public:
     MemoryResourceProtocol();
@@ -30,10 +42,10 @@ namespace wesos::mem {
     auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
     auto utilize_bytes(View<u8> pool) -> void;
 
-  private:
-    [[nodiscard]] virtual auto virt_embezzle(usize max_size) -> View<u8>;
-    [[nodiscard]] virtual auto virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
-    virtual auto virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
-    virtual auto virt_utilize(View<u8> pool) -> void;
+    ///=============================================================================================
+    /// MEMORY ECONOMY MANAGEMENT
+    ///=============================================================================================
+
+    void eco_yield();
   };
 }  // namespace wesos::mem

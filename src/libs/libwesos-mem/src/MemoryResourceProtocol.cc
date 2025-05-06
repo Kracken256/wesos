@@ -12,24 +12,52 @@
 using namespace wesos::mem;
 
 namespace wesos::mem {
-  static AtomicMemoryEconomy ECONOMY_GLOBAL;
+  static AtomicMemoryEconomy ATOMIC_ECONOMY_GLOBAL;
 }  // namespace wesos::mem
 
-SYM_EXPORT MemoryResourceProtocol::MemoryResourceProtocol() { ECONOMY_GLOBAL.add_resource(*this); };
-SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() { ECONOMY_GLOBAL.remove_resource(*this); };
+SYM_EXPORT MemoryResourceProtocol::MemoryResourceProtocol() { ATOMIC_ECONOMY_GLOBAL.add_resource(*this); };
+SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() { ATOMIC_ECONOMY_GLOBAL.remove_resource(*this); };
 
 SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+  eco_yield();
+
   return virt_allocate(size, align);
 }
 
 SYM_EXPORT auto MemoryResourceProtocol::deallocate_bytes(NullableOwnPtr<void> ptr, usize size,
                                                          PowerOfTwo<usize> align) -> void {
+  eco_yield();
+
   if (ptr.isset()) [[likely]] {
     virt_deallocate(ptr.get_unchecked(), size, align);
   }
 }
 
-SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> void { virt_utilize(pool); }
+SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> void {
+  eco_yield();
+
+  virt_utilize(pool);
+}
+
+SYM_EXPORT void MemoryResourceProtocol::eco_yield() {
+  if (const auto should_yield = m_yield_requested.load(sync::memory_order_acquire)) [[unlikely]] {
+    m_yield_requested.store(false, sync::memory_order_relaxed);
+
+    auto desired_size = m_embezzlement_request.exchange(0, sync::memory_order_acq_rel);
+
+    do {
+      const auto relinquished_memory = virt_embezzle(desired_size);
+      assert_invariant(relinquished_memory.size() <= desired_size);
+
+      if (relinquished_memory.empty()) {
+        return;
+      }
+
+      ATOMIC_ECONOMY_GLOBAL.utilize(relinquished_memory);
+      desired_size -= relinquished_memory.size();
+    } while (desired_size > 0);
+  }
+}
 
 SYM_EXPORT auto MemoryResourceProtocol::virt_embezzle(usize) -> View<u8> { return View<u8>::create_empty(); }
 SYM_EXPORT auto MemoryResourceProtocol::virt_allocate(usize, PowerOfTwo<usize>) -> NullableOwnPtr<void> { return null; }
