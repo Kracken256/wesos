@@ -101,7 +101,7 @@ namespace wesos::kern {
     }
     }
 
-    void cxx_destructors() {}
+    void cxx_destructors() { __cxa_finalize(nullptr); }
 
     ///============================================================================================
 
