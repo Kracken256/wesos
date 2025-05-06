@@ -7,15 +7,21 @@
 
 #include <wesos-builtin/Export.hh>
 #include <wesos-kern/boot/Options.hh>
+#include <wesos-mem/AtomicMemoryEconomy.hh>
+#include <wesos-types/Types.hh>
+
+using namespace wesos;
+using namespace wesos::mem;
 
 namespace wesos::kern {
-  [[gnu::section(".text._start"), noreturn]] SYM_EXPORT void start(Untrusted<boot::Options> boot_settings) {
+  void main(Untrusted<boot::Options> boot_settings) {
     const auto& settings = boot_settings.trust_and_unwrap();
     (void)settings;
 
     /// TODO: Implement the kernel
 
     while (true) {
+      asm volatile("syscall");
       asm volatile("nop");
     }
   }
