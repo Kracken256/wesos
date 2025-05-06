@@ -51,22 +51,22 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto front() const -> const T& {
-      static_assert(length() > 0, "Cannot access front of an empty array");
+      static_assert(Count > 0, "Cannot access front of an empty array");
       return m_data[0];
     }
 
     [[nodiscard]] constexpr auto front() -> T& {
-      static_assert(length() > 0, "Cannot access front of an empty array");
+      static_assert(Count > 0, "Cannot access front of an empty array");
       return m_data[0];
     }
 
     [[nodiscard]] constexpr auto back() const -> const T& {
-      static_assert(length() > 0, "Cannot access back of an empty array");
+      static_assert(Count > 0, "Cannot access back of an empty array");
       return m_data[length() - 1];
     }
 
     [[nodiscard]] constexpr auto back() -> T& {
-      static_assert(length() > 0, "Cannot access back of an empty array");
+      static_assert(Count > 0, "Cannot access back of an empty array");
       return m_data[length() - 1];
     }
 
