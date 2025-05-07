@@ -104,7 +104,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto isset() const -> bool { return m_isset; }
     [[nodiscard]] constexpr auto is_null() const -> bool { return !isset(); }
-    [[nodiscard]] constexpr operator bool() { return isset(); }
+    [[nodiscard]] constexpr operator bool() const { return isset(); }
 
     [[nodiscard]] constexpr auto value() const -> const T& {
       assert_always(isset());
