@@ -7,4 +7,10 @@
 
 #include <gtest/gtest.h>
 
-TEST(placeholder, placeholder) {}
+#include <wesos-kernconf/Parser.hh>
+
+using namespace wesos::kernconf;
+
+TEST(Parser, EmptyFile) {  //
+  EXPECT_FALSE(parse_kernel_config({}));
+}
