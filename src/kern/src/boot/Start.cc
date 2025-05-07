@@ -43,67 +43,6 @@ namespace wesos::kern {
         : "esp", "ebp");
   }
 
-#elif ARCH_ARM_64
-
-  SYM_EXPORT extern "C" [[gnu::section(".text._start"), noreturn, gnu::naked]]  /// TODO: Test code
-  void
-  _start() {  // NOLINT(readability-identifier-naming)
-    asm volatile(
-        "mov x29, xzr\n\t"                            // Clear frame pointer
-        "ldr x0, =KERNEL_STACK_GLOBAL + %[size]\n\t"  // Load address into x0
-        "bic sp, x0, #15\n\t"                         // Align to 16 bytes
-        "call cxx_genesis\n\t"                        // Call to C++ runtime setup
-        :
-        : [size] "I"(KERNEL_STACK_SIZE - 1)
-        : "sp", "x0", "x29");
-  }
-
-#elif ARCH_ARM_32
-
-  // Note: This version assumes KERNEL_STACK_GLOBAL is linked in a way that makes address arithmetic legal in ldr
-  // pseudo-instruction.
-  SYM_EXPORT extern "C" [[gnu::section(".text._start"), noreturn, gnu::naked]]  /// TODO: Test code
-  void
-  _start() {  // NOLINT(readability-identifier-naming)
-    asm volatile(
-        "mov r7, #0\n\t"                              // Clear frame pointer
-        "ldr r0, =KERNEL_STACK_GLOBAL + %[size]\n\t"  // Load address into r0
-        "bic sp, r0, #15\n\t"                         // Align to 16 bytes
-        "call cxx_genesis\n\t"                        // Call to C++ runtime setup
-        :
-        : [size] "I"(KERNEL_STACK_SIZE - 1)
-        : "sp", "r0", "r7");
-  }
-
-#elif ARCH_RISCV_64
-
-  SYM_EXPORT extern "C" [[gnu::section(".text._start"), noreturn, gnu::naked]]
-  void _start() {  /// TODO: Test code
-    asm volatile(
-        "li s0, 0\n\t"             // Clear frame pointer
-        "la sp, %[stack_top]\n\t"  // Set sp to stack top
-        "andi sp, sp, -16\n\t"     // Align stack to 16 bytes
-        "call cxx_genesis\n\t"     // Call to C++ runtime setup
-        :
-        : [stack_top] "i"(KERNEL_STACK_GLOBAL + KERNEL_STACK_SIZE - 1)
-        : "sp", "s0");
-  }
-
-#elif ARCH_RISCV_32
-
-  SYM_EXPORT extern "C" [[gnu::section(".text._start"), noreturn, gnu::naked]]  /// TODO: Test code
-  void
-  _start() {
-    asm volatile(
-        "li s0, 0\n\t"             // Clear frame pointer
-        "la sp, %[stack_top]\n\t"  // Set sp to stack top
-        "andi sp, sp, -16\n\t"     // Align stack to 16 bytes
-        "call cxx_genesis\n\t"     // Call to C++ runtime setup
-        :
-        : [stack_top] "i"(KERNEL_STACK_GLOBAL + KERNEL_STACK_SIZE - 1)
-        : "sp", "s0");
-  }
-
 #else
 #error "Architecture not supported"
 #endif

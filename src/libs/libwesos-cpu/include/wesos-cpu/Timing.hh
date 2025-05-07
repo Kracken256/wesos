@@ -15,16 +15,6 @@ namespace wesos::cpu {
     __builtin_ia32_pause();
 #elif ARCH_X86_32
     __builtin_ia32_pause();
-#elif ARCH_ARM_64
-/// TODO: Suport target
-#error "Not implement yet"
-#elif ARCH_ARM_32
-/// TODO: Suport target
-#error "Not implement yet"
-#elif ARCH_RISCV_64
-    asm volatile("fence");
-#elif ARCH_RISCV_32
-    asm volatile("fence");
 #else
 #error "This implementation of ephemeral_pause() does not support your architecure. Sorry.."
 #endif

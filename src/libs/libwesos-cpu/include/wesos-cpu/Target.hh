@@ -13,18 +13,6 @@
 #elif defined(__i386__)
 #define ARCH_X86_32 1
 #define ADDRESS_SIZE 4
-#elif defined(__aarch64__)
-#define ARCH_ARM_64 1
-#define ADDRESS_SIZE 8
-#elif defined(__arm__)
-#define ARCH_ARM_32 1
-#define ADDRESS_SIZE 4
-#elif defined(__riscv) && (__riscv_xlen == 64)
-#define ARCH_RISCV_64 1
-#define ADDRESS_SIZE 8
-#elif defined(__riscv) && (__riscv_xlen == 32)
-#define ARCH_RISCV_32 1
-#define ADDRESS_SIZE 4
 #else
 #error "Sorry, WesOS does not currently support your target architecture"
 #endif
