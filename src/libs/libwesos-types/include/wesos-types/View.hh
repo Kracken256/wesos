@@ -131,6 +131,30 @@ namespace wesos::types {
       m_size = 0;
       return *this;
     }
+
+    constexpr auto remove_prefix(usize i) -> View& {
+      assert_always(i <= size());
+      m_base = m_base.unwrap() + i;
+      return *this;
+    }
+
+    constexpr auto remove_prefix_unchecked(usize i) -> View& {
+      assert_invariant(i <= size());
+      m_base = m_base.unwrap() + i;
+      return *this;
+    }
+
+    constexpr auto remove_suffix(usize i) -> View& {
+      assert_always(i <= size());
+      m_size -= i;
+      return *this;
+    }
+
+    constexpr auto remove_suffix_unchecked(usize i) -> View& {
+      assert_invariant(i <= size());
+      m_size -= i;
+      return *this;
+    }
   };
 
   using ChunkAlignedRemaining = View<u8>;
