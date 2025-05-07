@@ -16,122 +16,147 @@
 void operator delete(void *) { assert_always(false && "Calling C++ operator delete is not allowed"); }
 
 namespace wesos::kern {
-  namespace detail {
-    ///============================================================================================
-    using ConstructorFunc = void (*)();
+  extern "C" [[noreturn]] void __stack_chk_fail() {  // NOLINT(readability-identifier-naming)
+    assert_always(false && "Stack smashing detected");
+    __builtin_unreachable();
+  }
 
-    extern "C" ConstructorFunc BEG_CXX_CTORS_GLOBAL[];
-    extern "C" ConstructorFunc END_CXX_CTORS_GLOBAL[];
+  struct AtexitFuncEntry {
+    void (*m_destructor_func)(void *);
+    void *m_obj_ptr;
+    void *m_dso_handle;
+  };
 
-    static void globals_init() {
-      for (auto *i = BEG_CXX_CTORS_GLOBAL; i != END_CXX_CTORS_GLOBAL; i++) {
-        (*i)();
-      }
+  static const auto W_ATEXIT_MAX_FUNCS = 128;
+  static Array<AtexitFuncEntry, W_ATEXIT_MAX_FUNCS> ATEXIT_FUNCS_GLOBAL;
+  static usize ATEXIT_FUNC_COUNT_GLOBAL = 0;
+
+  extern "C" void *__dso_handle = nullptr;  // NOLINT(readability-identifier-naming)
+
+  extern "C" auto __cxa_atexit(void (*f)(void *), void *objptr,  // NOLINT(readability-identifier-naming)
+                               void *dso) -> int {
+    if (ATEXIT_FUNC_COUNT_GLOBAL >= W_ATEXIT_MAX_FUNCS) [[unlikely]] {
+      return -1;
     }
 
-    ///============================================================================================
+    auto &entry = ATEXIT_FUNCS_GLOBAL.get_unchecked(ATEXIT_FUNC_COUNT_GLOBAL);
+    entry.m_destructor_func = f;
+    entry.m_obj_ptr = objptr;
+    entry.m_dso_handle = dso;
 
-    static const auto W_ATEXIT_MAX_FUNCS = 128;
+    ATEXIT_FUNC_COUNT_GLOBAL++;
 
-    extern "C" {
-    struct AtexitFuncEntry {
-      void (*m_destructor_func)(void *);
-      void *m_obj_ptr;
-      void *m_dso_handle;
-    };
+    return 0;
+  }
 
-    static Array<AtexitFuncEntry, W_ATEXIT_MAX_FUNCS> ATEXIT_FUNCS_GLOBAL;
-    static usize ATEXIT_FUNC_COUNT_GLOBAL = 0;
+  extern "C" void __cxa_finalize(void *f) {  // NOLINT(readability-identifier-naming)
+    usize i = ATEXIT_FUNC_COUNT_GLOBAL;
 
-    void *__dso_handle = nullptr;  // NOLINT(readability-identifier-naming)
+    if (f == nullptr) {
+      /**
+       * According to the Itanium C++ ABI, if __cxa_finalize is called without a
+       * function ptr, then it means that we should destroy EVERYTHING MUAHAHAHA!!
+       */
 
-    auto __cxa_atexit(void (*f)(void *), void *objptr, void *dso) -> int {  // NOLINT(readability-identifier-naming)
-      if (ATEXIT_FUNC_COUNT_GLOBAL >= W_ATEXIT_MAX_FUNCS) [[unlikely]] {
-        return -1;
-      }
-
-      auto &entry = ATEXIT_FUNCS_GLOBAL.get_unchecked(ATEXIT_FUNC_COUNT_GLOBAL);
-      entry.m_destructor_func = f;
-      entry.m_obj_ptr = objptr;
-      entry.m_dso_handle = dso;
-
-      ATEXIT_FUNC_COUNT_GLOBAL++;
-
-      return 0;
-    }
-
-    void __cxa_finalize(void *f) {  // NOLINT(readability-identifier-naming)
-      usize i = ATEXIT_FUNC_COUNT_GLOBAL;
-
-      if (f == nullptr) {
-        /**
-         * According to the Itanium C++ ABI, if __cxa_finalize is called without a
-         * function ptr, then it means that we should destroy EVERYTHING MUAHAHAHA!!
-         */
-
-        while (i-- != 0) {
-          if (auto &entry = ATEXIT_FUNCS_GLOBAL.get_unchecked(i); entry.m_destructor_func != nullptr) {
-            /**
-             * Avoid calling any entries that have already been called and unset
-             * at runtime.
-             */
-            (*entry.m_destructor_func)(entry.m_obj_ptr);
-          }
-        }
-
-        return;
-      }
-
-      while (i < ATEXIT_FUNC_COUNT_GLOBAL) {
-        if (auto &entry = ATEXIT_FUNCS_GLOBAL.get(i); bit_cast<void *>(entry.m_destructor_func) == f) {
+      while (i-- != 0) {
+        if (auto &entry = ATEXIT_FUNCS_GLOBAL.get_unchecked(i); entry.m_destructor_func != nullptr) {
+          /**
+           * Avoid calling any entries that have already been called and unset
+           * at runtime.
+           */
           (*entry.m_destructor_func)(entry.m_obj_ptr);
-          entry.m_destructor_func = nullptr;
-
-          usize remaining = ATEXIT_FUNC_COUNT_GLOBAL - i - 1;
-          if (remaining > 0) {
-            __builtin_memmove(&entry, &ATEXIT_FUNCS_GLOBAL.get(i + 1), remaining * sizeof(decltype(entry)));
-          }
-
-          --ATEXIT_FUNC_COUNT_GLOBAL;
-        } else {
-          ++i;
         }
       }
+
+      return;
     }
+
+    while (i < ATEXIT_FUNC_COUNT_GLOBAL) {
+      if (auto &entry = ATEXIT_FUNCS_GLOBAL.get(i); bit_cast<void *>(entry.m_destructor_func) == f) {
+        (*entry.m_destructor_func)(entry.m_obj_ptr);
+        entry.m_destructor_func = nullptr;
+
+        usize remaining = ATEXIT_FUNC_COUNT_GLOBAL - i - 1;
+        if (remaining > 0) {
+          __builtin_memmove(&entry, &ATEXIT_FUNCS_GLOBAL.get(i + 1), remaining * sizeof(decltype(entry)));
+        }
+
+        --ATEXIT_FUNC_COUNT_GLOBAL;
+      } else {
+        ++i;
+      }
     }
+  }
 
-    static void globals_deinit() { __cxa_finalize(nullptr); }
+  ///============================================================================================
+  using ConstructorFunc = void (*)();
 
-    ///============================================================================================
+  extern "C" ConstructorFunc BEG_CXX_CTORS_GLOBAL[];
+  extern "C" ConstructorFunc END_CXX_CTORS_GLOBAL[];
 
-    extern "C" void __cxa_pure_virtual() {  // NOLINT(readability-identifier-naming)
-      assert_always(false && "Calling into C++ pure virtual functions is not allowed");
+  static void globals_init() {
+    for (auto *i = BEG_CXX_CTORS_GLOBAL; i != END_CXX_CTORS_GLOBAL; i++) {
+      (*i)();
     }
-  }  // namespace detail
+  }
 
-  auto main(kernconf::KernelConfig settings) -> int;
+  static void globals_deinit() { __cxa_finalize(nullptr); }
+
+  ///============================================================================================
+
+  extern "C" void __cxa_pure_virtual() {  // NOLINT(readability-identifier-naming)
+    assert_always(false && "Calling into C++ pure virtual functions is not allowed");
+  }
+
+  ///============================================================================================
+
+  auto main(const kernconf::KernelConfig &config) -> int;
+
+  // #if ARCH_X86_64
+  //   void stdio_output_handler(void *, const char *message, SourceLocation source) {
+  //     usize len = 0;
+  //     for (const auto *x = message; *x; len++, x++) {
+  //     }
+
+  //     asm volatile(
+  //         "mov $1, %%rax\n"
+  //         "mov $1, %%rdi\n"
+  //         "mov %[buf_ptr], %%rsi\n"
+  //         "movq %[buf_size], %%rdx\n"
+  //         "syscall"  // Call sys_write()
+  //         :
+  //         : [buf_ptr] "r"(message), [buf_size] "r"(len)
+  //         : "rax", "rdi", "rsi", "rdx");
+
+  //     while (true) {
+  //       cpu::ephemeral_pause();
+  //     }
+  //   }
+  // #endif
 
   extern "C" [[noreturn, gnu::used]] void cxx_genesis(const u8 *configuration, usize configuration_len) {
-    const auto cxx_runtime = [&] {
-      assert_always(configuration != nullptr || configuration_len == 0);
+    const auto cxx_runtime = [](const kernconf::KernelConfig &config) -> int {
+      int rc;
 
-      const auto configuration_text = View<const u8>(configuration, configuration_len);
-      if (auto settings = kernconf::parse_kernel_config(configuration_text)) {
-        /// TODO: Initialize usable memory regions
+      globals_init();
+      rc = main(config);
+      globals_deinit();
 
-        { /** C++ standard(-ish) program semantics */
-          int rc;
-
-          detail::globals_init();
-          rc = main(move(settings.value()));
-          detail::globals_deinit();
-
-          (void)rc;  // discard
-        }
-      }
+      return rc;
     };
 
-    cxx_runtime();
+    // #if ARCH_X86_64
+    //     assert::register_output_callback(nullptr, stdio_output_handler);
+    // #endif
+
+    auto config_opt = kernconf::parse_kernel_config({configuration, configuration_len});
+    assert_always(config_opt.isset() && "Failed to parse kernel config options");
+
+    const auto config = move(config_opt.value());
+
+    /// TODO: Initialize usable memory regions
+
+    (void)cxx_runtime(config);
 
     while (true) {
       cpu::ephemeral_pause();
