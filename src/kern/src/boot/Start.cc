@@ -9,7 +9,7 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::kern {
-  extern "C" [[noreturn]] void cxx_genesis(const char *configuration, u64 configuration_len);
+  extern "C" [[noreturn]] void cxx_genesis(const u8 *configuration, usize configuration_len);
 
   static const auto KERNEL_STACK_SIZE = 0xffff;
   static const auto KERNEL_STACK_ALIGNMENT = 16;

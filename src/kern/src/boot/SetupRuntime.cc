@@ -8,15 +8,14 @@
 #include <wesos-builtin/Export.hh>
 #include <wesos-cpu/Target.hh>
 #include <wesos-cpu/Timing.hh>
-#include <wesos-kern/boot/Options.hh>
+#include <wesos-kern/boot/KernSettings.hh>
+#include <wesos-mem/AtomicMemoryEconomy.hh>
 #include <wesos-sync/MemoryOrder.hh>
 #include <wesos-types/Types.hh>
 
 void operator delete(void *) { assert_always(false && "Calling C++ operator delete is not allowed"); }
 
 namespace wesos::kern {
-  extern void main(boot::Options settings);
-
   namespace detail {
     ///============================================================================================
     using ConstructorFunc = void (*)();
@@ -24,7 +23,7 @@ namespace wesos::kern {
     extern "C" ConstructorFunc BEG_CXX_CTORS_GLOBAL[];
     extern "C" ConstructorFunc END_CXX_CTORS_GLOBAL[];
 
-    void cxx_constructors() {
+    static void globals_init() {
       for (auto *i = BEG_CXX_CTORS_GLOBAL; i != END_CXX_CTORS_GLOBAL; i++) {
         (*i)();
       }
@@ -101,32 +100,35 @@ namespace wesos::kern {
     }
     }
 
-    void cxx_destructors() { __cxa_finalize(nullptr); }
+    static void globals_deinit() { __cxa_finalize(nullptr); }
 
     ///============================================================================================
 
     extern "C" void __cxa_pure_virtual() {  // NOLINT(readability-identifier-naming)
       assert_always(false && "Calling into C++ pure virtual functions is not allowed");
     }
-
-    ///============================================================================================
   }  // namespace detail
 
-  extern "C" [[noreturn, gnu::used]] void cxx_genesis(const char *configuration, u64 configuration_len) {
+  auto main(boot::KernSettings settings) -> int;
+
+  extern "C" [[noreturn, gnu::used]] void cxx_genesis(const u8 *configuration, usize configuration_len) {
     const auto cxx_runtime = [&] {
-      detail::cxx_constructors();
+      assert_always(configuration != nullptr || configuration_len == 0);
 
-      {
-        boot::Options settings;
+      const auto configuration_text = View<const u8>(configuration, configuration_len);
+      if (auto settings = boot::KernSettings::parse_config(configuration_text)) {
+        /// TODO: Initialize usable memory regions
 
-        /// TODO: Parse the kernel configuration
-        (void)configuration;
-        (void)configuration_len;
+        { /** C++ standard(-ish) program semantics */
+          int rc;
 
-        main(settings);
+          detail::globals_init();
+          rc = main(move(settings.value()));
+          detail::globals_deinit();
+
+          (void)rc;  // discard
+        }
       }
-
-      detail::cxx_destructors();
     };
 
     cxx_runtime();

@@ -6,17 +6,17 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-kern/boot/Options.hh>
-#include <wesos-mem/AtomicMemoryEconomy.hh>
+#include <wesos-kern/boot/KernSettings.hh>
 #include <wesos-types/Types.hh>
 
 using namespace wesos;
-using namespace wesos::mem;
 
 namespace wesos::kern {
-  void main(boot::Options settings) {
+  auto main(boot::KernSettings settings) -> int {
     (void)settings;
 
     /// TODO: Implement the kernel
+
+    return 0;
   }
 }  // namespace wesos::kern
