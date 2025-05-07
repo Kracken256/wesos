@@ -15,7 +15,7 @@ option(WESOS_ADDRESS_SANITIZER "Enable the -fsanitize=address compiler flag" OFF
 option(WESOS_UNDEFINED_SANITIZER "Enable the -fsanitize=undefined compiler flag" OFF)
 option(WESOS_WORLD_LTO "Enable Link Time Optimization (LTO) for the entire build" ON)
 
-set(WESOS_TARGET_TRIPLE x86_64-pc-linux-gnu)
+set(WESOS_TARGET_TRIPLE i386-pc-linux-gnu)
 
 ################################################################################
 # GLOBAL VARIABLE SECTION
