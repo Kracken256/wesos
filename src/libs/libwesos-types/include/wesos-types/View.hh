@@ -121,13 +121,15 @@ namespace wesos::types {
 
     constexpr auto remove_prefix(usize i) -> View& {
       assert_always(i <= size());
-      m_base = m_base + i;
+      m_base += i;
+      m_size--;
       return *this;
     }
 
     constexpr auto remove_prefix_unchecked(usize i) -> View& {
       assert_invariant(i <= size());
-      m_base = m_base + i;
+      m_base += i;
+      m_size--;
       return *this;
     }
 
