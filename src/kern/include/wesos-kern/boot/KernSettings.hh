@@ -11,8 +11,7 @@
 
 namespace wesos::kern::boot {
   class KernSettings {
-    using StringView = View<const char>;
-    using OptionString = Pair<StringView, StringView>;
+    void insert(View<const u8> key, View<const u8> value);
 
   public:
     constexpr KernSettings() = default;
