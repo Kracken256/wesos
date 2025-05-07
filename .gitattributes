@@ -1,0 +1,2 @@
+# This config format is custom. Settings it to '.ini' makes it display nicer
+src/kern/src/boot/KernelSettings.example.conf linguist-language=ini
