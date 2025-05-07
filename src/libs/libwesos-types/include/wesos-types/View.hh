@@ -25,7 +25,7 @@ namespace wesos::types {
   public:
     constexpr View() : m_base(nullptr), m_size(0){};
     constexpr View(Pointer base, usize count) : m_base(base), m_size(count) {}
-    constexpr View(Pointer base, Pointer end) : m_base(base), m_size(usize(end - base)) {}
+    constexpr View(Pointer base, Pointer end) : m_base(base), m_size(usize(end.as_uptr() - base.as_uptr())) {}
     constexpr View(const View&) = default;
     constexpr View(View&&) = default;
     constexpr auto operator=(const View&) -> View& = default;
