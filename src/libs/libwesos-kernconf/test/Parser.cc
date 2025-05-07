@@ -9,8 +9,19 @@
 
 #include <wesos-kernconf/Parser.hh>
 
+using namespace wesos;
 using namespace wesos::kernconf;
 
-TEST(Parser, EmptyFile) {  //
-  EXPECT_FALSE(parse_kernel_config({}));
+static auto get_view(const char* s) -> View<const u8> { return {bit_cast<const u8*>(s), strlen(s)}; }
+
+TEST(Parser, EmptyFile) {
+  const auto text = get_view("");
+
+  EXPECT_TRUE(parse_kernel_config(text));
+}
+
+TEST(Parser, NewLine) {
+  const auto text = get_view("\n");
+
+  EXPECT_TRUE(parse_kernel_config(text));
 }
