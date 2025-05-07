@@ -12,8 +12,8 @@
 using namespace wesos;
 
 namespace wesos::kern {
-  auto main(kernconf::KernelConfig settings) -> int {
-    (void)settings;
+  auto main(const kernconf::KernelConfig& config) -> int {
+    (void)config;
 
     /// TODO: Implement the kernel
 
