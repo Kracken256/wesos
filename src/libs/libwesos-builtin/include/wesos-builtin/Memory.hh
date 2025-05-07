@@ -7,7 +7,14 @@
 
 #pragma once
 
-extern "C" {
-/// NOLINTBEGIN(readability-identifier-naming)
-/// NOLINTEND(readability-identifier-naming)
-}
+#include <wesos-types/Types.hh>
+
+namespace wesos {
+  /// NOLINTBEGIN(readability-identifier-naming)
+
+  extern "C" auto memcpy(void *dest, const void *src, usize n) -> void *;
+  extern "C" auto memset(void *dest, int value, usize n) -> void *;
+  extern "C" auto memmove(void *dest, const void *src, usize n) -> void *;
+
+  /// NOLINTEND(readability-identifier-naming)
+}  // namespace wesos
