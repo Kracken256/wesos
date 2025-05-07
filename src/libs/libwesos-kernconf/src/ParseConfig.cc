@@ -5,11 +5,12 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#include <wesos-assert/Assert.hh>
 #include <wesos-builtin/Export.hh>
 #include <wesos-kernconf/Parser.hh>
 
 namespace wesos::kernconf {
-  static auto peek_byte(const View<const u8> &ss) -> Nullable<u8> {
+  [[nodiscard]] static auto peek_byte(const View<const u8> &ss) -> Nullable<u8> {
     if (ss.empty()) [[unlikely]] {
       return null;
     }
@@ -17,7 +18,7 @@ namespace wesos::kernconf {
     return ss.get(0);
   }
 
-  static auto next_byte(View<const u8> &ss) -> Nullable<u8> {
+  [[nodiscard]] static auto next_byte(View<const u8> &ss) -> Nullable<u8> {
     if (ss.empty()) [[unlikely]] {
       return null;
     }
@@ -28,7 +29,7 @@ namespace wesos::kernconf {
     return ch;
   }
 
-  static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
+  [[nodiscard]] static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
     constexpr auto hex_chars = []() {
       Array<bool, 256> tab;
       tab.fill(false);
@@ -61,7 +62,7 @@ namespace wesos::kernconf {
         break;
       }
 
-      next_byte(ss);
+      (void)next_byte(ss);
     }
 
     if (start == ss.begin()) [[unlikely]] {
@@ -71,11 +72,9 @@ namespace wesos::kernconf {
     return View<const u8>(start - 2, ss.begin());  // -2 to include 0x prefix
   }
 
-  static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
+  [[nodiscard]] static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
     const auto quote = next_byte(ss);
-    if (quote.is_null() || quote.value() != '"') [[unlikely]] {
-      return null;
-    }
+    assert_invariant(quote.isset() && quote.value() == '"');
 
     const auto *start = ss.begin();
 
@@ -93,7 +92,7 @@ namespace wesos::kernconf {
     return View<const u8>(start, ss.begin() - 1);  // -1 to exclude closing quote
   }
 
-  static auto read_value(View<const u8> &ss) -> Nullable<View<const u8>> {
+  [[nodiscard]] static auto read_value(View<const u8> &ss) -> Nullable<View<const u8>> {
     const auto ch = peek_byte(ss);
     if (ch.is_null()) [[unlikely]] {
       return null;
@@ -123,7 +122,7 @@ namespace wesos::kernconf {
     return literal;
   }
 
-  static auto skip_whitespace(View<const u8> &ss) -> void {
+  [[nodiscard]] static auto skip_whitespace(View<const u8> &ss) -> bool {
     constexpr auto whitespace = []() {
       Array<bool, 256> tab;
       tab.fill(false);
@@ -139,7 +138,7 @@ namespace wesos::kernconf {
     while (true) {
       const auto ch = peek_byte(ss);
       if (ch.is_null()) [[unlikely]] {
-        return;
+        return false;
       }
 
       const auto c = ch.value();
@@ -147,43 +146,70 @@ namespace wesos::kernconf {
         break;
       }
 
-      next_byte(ss);
+      (void)next_byte(ss);
     }
+
+    return true;
   }
 
-  static void skip_comment(View<const u8> &ss) {
-    if (const auto ch = peek_byte(ss); ch.is_null() || ch.value() != '#') {
-      return;
+  [[nodiscard]] static auto skip_comment(View<const u8> &ss) -> bool {
+    const auto pound = peek_byte(ss);
+    if (pound.is_null()) [[unlikely]] {
+      return false;
     }
 
-    next_byte(ss);  // Skip '#'
+    if (pound.value() == '#') {
+      (void)next_byte(ss);  // Skip '#'
 
-    while (true) {
-      const auto ch = next_byte(ss);
-      if (ch.is_null() || ch.value() == '\n') [[unlikely]] {
-        return;
+      while (true) {
+        const auto ch = next_byte(ss);
+        if (ch.is_null()) [[unlikely]] {
+          return false;
+        }
+
+        if (ch.value() == '\n') {
+          return true;
+        }
       }
+    } else {
+      return true;
     }
   }
 
-  static auto read_config_pair(View<const u8> &ss) -> Nullable<Pair<View<const u8>, View<const u8>>> {
+  [[nodiscard]] static auto read_config_pair(View<const u8> &ss) -> Nullable<Pair<View<const u8>, View<const u8>>> {
     const auto key = read_value(ss);
     if (key.is_null()) [[unlikely]] {
       return null;
     }
 
-    skip_whitespace(ss);
-    skip_comment(ss);
-    skip_whitespace(ss);
+    if (!skip_whitespace(ss)) [[unlikely]] {
+      return null;
+    }
+
+    if (!skip_comment(ss)) [[unlikely]] {
+      return null;
+    }
+
+    if (!skip_whitespace(ss)) [[unlikely]] {
+      return null;
+    }
 
     const auto ch = next_byte(ss);
     if (ch.is_null() || ch.value() != '=') [[unlikely]] {
       return null;
     }
 
-    skip_whitespace(ss);
-    skip_comment(ss);
-    skip_whitespace(ss);
+    if (!skip_whitespace(ss)) [[unlikely]] {
+      return null;
+    }
+
+    if (!skip_comment(ss)) [[unlikely]] {
+      return null;
+    }
+
+    if (!skip_whitespace(ss)) [[unlikely]] {
+      return null;
+    }
 
     const auto value = read_value(ss);
     if (value.is_null()) [[unlikely]] {
@@ -201,12 +227,17 @@ SYM_EXPORT auto wesos::kernconf::parse_kernel_config(View<const u8> config_text)
 
   while (true) {
     while (true) {
-      const auto *old_pos = ss.begin();
+      const auto old_size = ss.size();
 
-      skip_whitespace(ss);
-      skip_comment(ss);
+      if (!skip_whitespace(ss)) [[unlikely]] {
+        return null;
+      }
 
-      if (ss.begin() == old_pos) {
+      if (!skip_comment(ss)) [[unlikely]] {
+        return null;
+      }
+
+      if (old_size == ss.size()) {
         break;
       }
     }
