@@ -35,8 +35,6 @@ namespace wesos::assert {
 }  // namespace wesos::assert
 
 SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback cb) {
-  assert_invariant(cb != nullptr);
-
   OUTPUT_LOCK_GLOBAL.critical_section([&] {
     OUTPUT_GLOBAL.m_func = cb;
     OUTPUT_GLOBAL.m_data = m;
@@ -44,8 +42,6 @@ SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback 
 }
 
 SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb) {
-  assert_invariant(cb != nullptr);
-
   ABORT_LOCK_GLOBAL.critical_section([&] {
     ABORT_GLOBAL.m_func = cb;
     ABORT_GLOBAL.m_data = m;
@@ -58,6 +54,13 @@ SYM_EXPORT void wesos::assert::assert_failure(const char* message, SourceLocatio
   auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
   auto abort_copy = ABORT_LOCK_GLOBAL.critical_section([] { return ABORT_GLOBAL; });
 
-  output_copy.m_func(output_copy.m_data, message, source);
-  abort_copy.m_func(abort_copy.m_data);
+  if (output_copy.m_func != nullptr) {
+    output_copy.m_func(output_copy.m_data, message, source);
+  }
+
+  if (abort_copy.m_func != nullptr) {
+    abort_copy.m_func(abort_copy.m_data);
+  }
+
+  default_abort_callback(nullptr);
 }
