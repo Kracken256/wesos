@@ -11,8 +11,6 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT AtomicMemoryEconomy wesos::mem::MEMORY_ECONOMY_GLOBAL;
-
 SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size) -> NullableOwnPtr<void> {
   m_lock.critical_section([&] {
     /// TODO: allocate memory from any child
@@ -59,4 +57,9 @@ SYM_EXPORT auto AtomicMemoryEconomy::remove_resource(MemoryResourceProtocol& chi
       node = node->m_eco_chain_next;
     }
   });
+}
+
+SYM_EXPORT auto wesos::mem::global_memory_economy() -> AtomicMemoryEconomy& {
+  static AtomicMemoryEconomy INSTANCE_STATIC;
+  return INSTANCE_STATIC;
 }

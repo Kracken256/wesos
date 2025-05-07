@@ -11,8 +11,9 @@
 
 using namespace wesos::mem;
 
-SYM_EXPORT MemoryResourceProtocol::MemoryResourceProtocol() { MEMORY_ECONOMY_GLOBAL.add_resource(*this); };
-SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() { MEMORY_ECONOMY_GLOBAL.remove_resource(*this); };
+SYM_EXPORT MemoryResourceProtocol::MemoryResourceProtocol() { global_memory_economy().add_resource(*this); }
+
+SYM_EXPORT MemoryResourceProtocol::~MemoryResourceProtocol() { global_memory_economy().remove_resource(*this); };
 
 SYM_EXPORT auto MemoryResourceProtocol::allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   eco_yield();
@@ -49,7 +50,7 @@ SYM_EXPORT void MemoryResourceProtocol::eco_yield() {
         return;
       }
 
-      MEMORY_ECONOMY_GLOBAL.utilize(relinquished_memory);
+      global_memory_economy().utilize(relinquished_memory);
       desired_size -= relinquished_memory.size();
     } while (desired_size > 0);
   }

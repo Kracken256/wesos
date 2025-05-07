@@ -33,5 +33,5 @@ namespace wesos::mem {
     auto utilize(View<u8> pool) -> void;
   };
 
-  extern AtomicMemoryEconomy MEMORY_ECONOMY_GLOBAL;
+  [[nodiscard]] auto global_memory_economy() -> AtomicMemoryEconomy&;
 }  // namespace wesos::mem
