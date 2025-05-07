@@ -14,6 +14,7 @@ set(WESOS_KERN_DEPENDENCIES
   wesos-mem
   wesos-smartptr
   wesos-lambda
+  wesos-kernconf
 )
 
 add_executable(${COMPONENT_NAME} ${KERNEL_CXX_SOURCES} ${KERNEL_ASM_SOURCES})

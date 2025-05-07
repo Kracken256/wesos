@@ -5,10 +5,10 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
-#include <wesos-kern/boot/KernSettings.hh>
+#include <wesos-kernconf/Parser.hh>
 
 using namespace wesos;
-using namespace wesos::kern::boot;
+using namespace wesos::kernconf;
 
 static auto peek_byte(const View<const u8> &ss) -> Nullable<u8> {
   if (ss.empty()) [[unlikely]] {
@@ -49,14 +49,7 @@ static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
     return tab;
   }();
 
-  {
-    const auto ch = next_byte(ss);
-    if (ch.is_null() || ch.value() != 'x') [[unlikely]] {
-      return null;
-    }
-  }
-
-  const auto start = ss.begin();
+  const auto *start = ss.begin();
 
   while (true) {
     const auto ch = peek_byte(ss);
@@ -76,7 +69,7 @@ static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
     return null;  // '0x' is not valid
   }
 
-  return View<const u8>(start, ss.begin());
+  return View<const u8>(start - 2, ss.begin());  // -2 to include 0x prefix
 }
 
 static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
@@ -85,7 +78,7 @@ static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> 
     return null;
   }
 
-  const auto start = ss.begin();
+  const auto *start = ss.begin();
 
   while (true) {
     const auto ch = next_byte(ss);
@@ -111,7 +104,10 @@ static auto read_value(View<const u8> &ss) -> Nullable<View<const u8>> {
 
   switch (ch.value()) {
     case '0': {
-      literal = read_hex_literal(ss);
+      if (ss.size() >= 2 && ss.get(1) == 'x') {
+        ss.remove_prefix(2);
+        literal = read_hex_literal(ss);
+      }
       break;
     }
 
@@ -198,14 +194,18 @@ static auto read_config_pair(View<const u8> &ss) -> Nullable<Pair<View<const u8>
   return {{key.value(), value.value()}};
 }
 
-auto KernSettings::parse_config(View<const u8> config_text) -> Nullable<KernSettings> {
+void KernelConfig::insert(View<const u8> key, View<const u8> value) {
+  /// TODO: Do dynamic allocation for storage
+}
+
+auto kernconf::parse_kernel_config(View<const u8> config_text) -> Nullable<KernelConfig> {
   auto ss = config_text;
 
-  KernSettings settings;
+  KernelConfig settings;
 
   while (true) {
     while (true) {
-      const auto old_pos = ss.begin();
+      const auto *old_pos = ss.begin();
 
       skip_whitespace(ss);
       skip_comment(ss);
@@ -228,8 +228,4 @@ auto KernSettings::parse_config(View<const u8> config_text) -> Nullable<KernSett
   }
 
   return settings;
-}
-
-void KernSettings::insert(View<const u8> key, View<const u8> value) {
-  /// TODO: Do dynamic allocation for storage
 }

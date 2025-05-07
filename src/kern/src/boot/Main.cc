@@ -6,13 +6,13 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-kern/boot/KernSettings.hh>
+#include <wesos-kernconf/Config.hh>
 #include <wesos-types/Types.hh>
 
 using namespace wesos;
 
 namespace wesos::kern {
-  auto main(boot::KernSettings settings) -> int {
+  auto main(kernconf::KernelConfig settings) -> int {
     (void)settings;
 
     /// TODO: Implement the kernel

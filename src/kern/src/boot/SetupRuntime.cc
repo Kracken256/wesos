@@ -8,7 +8,7 @@
 #include <wesos-builtin/Export.hh>
 #include <wesos-cpu/Target.hh>
 #include <wesos-cpu/Timing.hh>
-#include <wesos-kern/boot/KernSettings.hh>
+#include <wesos-kernconf/Parser.hh>
 #include <wesos-mem/AtomicMemoryEconomy.hh>
 #include <wesos-sync/MemoryOrder.hh>
 #include <wesos-types/Types.hh>
@@ -109,14 +109,14 @@ namespace wesos::kern {
     }
   }  // namespace detail
 
-  auto main(boot::KernSettings settings) -> int;
+  auto main(kernconf::KernelConfig settings) -> int;
 
   extern "C" [[noreturn, gnu::used]] void cxx_genesis(const u8 *configuration, usize configuration_len) {
     const auto cxx_runtime = [&] {
       assert_always(configuration != nullptr || configuration_len == 0);
 
       const auto configuration_text = View<const u8>(configuration, configuration_len);
-      if (auto settings = boot::KernSettings::parse_config(configuration_text)) {
+      if (auto settings = kernconf::parse_kernel_config(configuration_text)) {
         /// TODO: Initialize usable memory regions
 
         { /** C++ standard(-ish) program semantics */
