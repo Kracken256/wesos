@@ -39,14 +39,14 @@ if(WESOS_BUILD_LIBS)
   add_subdirectory(src/libs)
 endif()
 
-if(WESOS_BUILD_BOOT)
-  add_subdirectory(src/boot)
-endif()
-
 if(WESOS_BUILD_KERN)
   add_subdirectory(src/kern)
 endif()
 
 if(WESOS_BUILD_USER)
   add_subdirectory(src/user)
+endif()
+
+if(WESOS_BUILD_BOOT)
+  add_subdirectory(src/boot)
 endif()
