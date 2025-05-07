@@ -112,13 +112,16 @@ namespace wesos::kern {
     ///============================================================================================
   }  // namespace detail
 
-  extern "C" [[noreturn]] void cxx_start() {
-    constexpr auto cxx_runtime = [] {
+  extern "C" [[noreturn, gnu::used]] void cxx_genesis(const char *configuration, u64 configuration_len) {
+    const auto cxx_runtime = [&] {
       detail::cxx_constructors();
 
       {
-        /// TODO: Get kernel options from somewhere
         boot::Options settings;
+
+        /// TODO: Parse the kernel configuration
+        (void)configuration;
+        (void)configuration_len;
 
         main(settings);
       }
