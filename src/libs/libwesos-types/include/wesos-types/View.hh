@@ -17,9 +17,8 @@ namespace wesos::types {
   template <class T>
   class View {
     using Pointer = NullableRefPtr<T>;
-    using ConstPointer = NullableRefPtr<const T>;
 
-    Pointer m_base;
+    T* m_base;
     usize m_size;
 
   public:
@@ -35,62 +34,50 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto size() const -> usize { return m_size; }
     [[nodiscard]] constexpr auto empty() const -> bool { return size() == 0; }
 
-    [[nodiscard]] constexpr auto begin() -> Pointer { return m_base; }
-    [[nodiscard]] constexpr auto end() -> Pointer { return m_base.unwrap() + size(); }
-    [[nodiscard]] constexpr auto cbegin() const -> ConstPointer { return m_base; }
-    [[nodiscard]] constexpr auto cend() const -> ConstPointer { return m_base.unwrap() + size(); }
+    [[nodiscard]] constexpr auto begin() -> T* { return m_base; }
+    [[nodiscard]] constexpr auto end() -> T* { return m_base + size(); }
+    [[nodiscard]] constexpr auto cbegin() const -> const T* { return m_base; }
+    [[nodiscard]] constexpr auto cend() const -> const T* { return m_base + size(); }
 
-    [[nodiscard]] constexpr auto into_ptr() const { return m_base; }
+    [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<T> { return m_base; }
+
+    ///====================================================================================
 
     [[nodiscard]] constexpr auto get(usize i) const -> const T& {
       assert_always(i < size());
-      return *(m_base.unwrap() + i);
+      return *(m_base + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const T& { return *(m_base.unwrap() + i); }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) const -> const T& { return *(m_base + i); }
 
     [[nodiscard]] constexpr auto get(usize i) -> T& {
       assert_always(i < size());
-      return *(m_base.unwrap() + i);
+      return *(m_base + i);
     }
 
-    [[nodiscard]] constexpr auto get_unchecked(usize i) -> T& { return *(m_base.unwrap() + i); }
+    [[nodiscard]] constexpr auto get_unchecked(usize i) -> T& { return *(m_base + i); }
 
     [[nodiscard]] constexpr auto subview(usize i, usize count) const -> View {
       assert_always(i <= size() && count <= size() - i);
-      return {m_base.unwrap() + i, count};
+      return {m_base + i, count};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i, usize count) const -> View {
       assert_invariant(i <= size() && count <= size() - i);
-      return {m_base.unwrap() + i, count};
+      return {m_base + i, count};
     }
 
     [[nodiscard]] constexpr auto subview(usize i) const -> View {
       assert_always(i <= size());
-      return {m_base.unwrap() + i, size() - i};
+      return {m_base + i, size() - i};
     }
 
     [[nodiscard]] constexpr auto subview_unchecked(usize i) const -> View {
       assert_invariant(i <= size());
-      return {m_base.unwrap() + i, size() - i};
+      return {m_base + i, size() - i};
     }
 
-    [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
-
-    constexpr auto operator<=>(const View& o) const -> std::strong_ordering
-      requires requires { get(0) <=> o.get(0); }
-    {
-      const usize min_size = size() < o.size() ? size() : o.size();
-
-      for (usize i = 0; i < min_size; ++i) {
-        if (auto cmp = get_unchecked(i) <=> o.get_unchecked(i); cmp != 0) {
-          return cmp;
-        }
-      }
-
-      return size() <=> o.size();
-    }
+    ///====================================================================================
 
     [[nodiscard]] constexpr auto operator==(const View& o) const -> bool {
       if (size() != o.size()) {
@@ -110,13 +97,13 @@ namespace wesos::types {
 
     constexpr auto set(usize i, T x) -> View& {
       assert_always(i <= size());
-      m_base.unwrap()[i] = move(x);
+      m_base[i] = move(x);
       return *this;
     }
 
     constexpr auto set_unchecked(usize i, T x) -> View& {
       assert_invariant(i <= size());
-      m_base.unwrap()[i] = move(x);
+      m_base[i] = move(x);
       return *this;
     }
 
@@ -134,13 +121,13 @@ namespace wesos::types {
 
     constexpr auto remove_prefix(usize i) -> View& {
       assert_always(i <= size());
-      m_base = m_base.unwrap() + i;
+      m_base = m_base + i;
       return *this;
     }
 
     constexpr auto remove_prefix_unchecked(usize i) -> View& {
       assert_invariant(i <= size());
-      m_base = m_base.unwrap() + i;
+      m_base = m_base + i;
       return *this;
     }
 
@@ -154,6 +141,24 @@ namespace wesos::types {
       assert_invariant(i <= size());
       m_size -= i;
       return *this;
+    }
+
+    ///========================================================================================
+
+    [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
+
+    constexpr auto operator<=>(const View& o) const -> std::strong_ordering
+      requires requires { get(0) <=> o.get(0); }
+    {
+      const usize min_size = size() < o.size() ? size() : o.size();
+
+      for (usize i = 0; i < min_size; ++i) {
+        if (auto cmp = get_unchecked(i) <=> o.get_unchecked(i); cmp != 0) {
+          return cmp;
+        }
+      }
+
+      return size() <=> o.size();
     }
   };
 
