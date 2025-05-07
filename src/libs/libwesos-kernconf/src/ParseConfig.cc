@@ -5,200 +5,196 @@
  * it under the terms of the Unlicense(https://unlicense.org/).
  */
 
+#include <wesos-builtin/Export.hh>
 #include <wesos-kernconf/Parser.hh>
 
-using namespace wesos;
-using namespace wesos::kernconf;
-
-static auto peek_byte(const View<const u8> &ss) -> Nullable<u8> {
-  if (ss.empty()) [[unlikely]] {
-    return null;
-  }
-
-  return ss.get(0);
-}
-
-static auto next_byte(View<const u8> &ss) -> Nullable<u8> {
-  if (ss.empty()) [[unlikely]] {
-    return null;
-  }
-
-  const auto ch = ss.get(0);
-  ss.remove_prefix(1);
-
-  return ch;
-}
-
-static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
-  constexpr auto hex_chars = []() {
-    Array<bool, 256> tab;
-    tab.fill(false);
-
-    for (u8 c = '0'; c <= '9'; ++c) {
-      tab.set(c, true);
-    }
-
-    for (u8 c = 'a'; c <= 'f'; ++c) {
-      tab.set(c, true);
-    }
-
-    for (u8 c = 'A'; c <= 'F'; ++c) {
-      tab.set(c, true);
-    }
-
-    return tab;
-  }();
-
-  const auto *start = ss.begin();
-
-  while (true) {
-    const auto ch = peek_byte(ss);
-    if (ch.is_null()) {
+namespace wesos::kernconf {
+  static auto peek_byte(const View<const u8> &ss) -> Nullable<u8> {
+    if (ss.empty()) [[unlikely]] {
       return null;
     }
 
-    const auto c = ch.value();
-    if (!hex_chars.get(c)) {
-      break;
-    }
-
-    next_byte(ss);
+    return ss.get(0);
   }
 
-  if (start == ss.begin()) [[unlikely]] {
-    return null;  // '0x' is not valid
-  }
-
-  return View<const u8>(start - 2, ss.begin());  // -2 to include 0x prefix
-}
-
-static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
-  const auto quote = next_byte(ss);
-  if (quote.is_null() || quote.value() != '"') [[unlikely]] {
-    return null;
-  }
-
-  const auto *start = ss.begin();
-
-  while (true) {
-    const auto ch = next_byte(ss);
-    if (ch.is_null()) {
+  static auto next_byte(View<const u8> &ss) -> Nullable<u8> {
+    if (ss.empty()) [[unlikely]] {
       return null;
     }
 
-    if (ch.value() == '"') {
-      break;
-    }
+    const auto ch = ss.get(0);
+    ss.remove_prefix(1);
+
+    return ch;
   }
 
-  return View<const u8>(start, ss.begin() - 1);  // -1 to exclude closing quote
-}
+  static auto read_hex_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
+    constexpr auto hex_chars = []() {
+      Array<bool, 256> tab;
+      tab.fill(false);
 
-static auto read_value(View<const u8> &ss) -> Nullable<View<const u8>> {
-  const auto ch = peek_byte(ss);
-  if (ch.is_null()) [[unlikely]] {
-    return null;
-  }
-
-  Nullable<View<const u8>> literal;
-
-  switch (ch.value()) {
-    case '0': {
-      if (ss.size() >= 2 && ss.get(1) == 'x') {
-        ss.remove_prefix(2);
-        literal = read_hex_literal(ss);
+      for (u8 c = '0'; c <= '9'; ++c) {
+        tab.set(c, true);
       }
-      break;
+
+      for (u8 c = 'a'; c <= 'f'; ++c) {
+        tab.set(c, true);
+      }
+
+      for (u8 c = 'A'; c <= 'F'; ++c) {
+        tab.set(c, true);
+      }
+
+      return tab;
+    }();
+
+    const auto *start = ss.begin();
+
+    while (true) {
+      const auto ch = peek_byte(ss);
+      if (ch.is_null()) {
+        return null;
+      }
+
+      const auto c = ch.value();
+      if (!hex_chars.get(c)) {
+        break;
+      }
+
+      next_byte(ss);
     }
 
-    case '"': {
-      literal = read_string_literal(ss);
-      break;
+    if (start == ss.begin()) [[unlikely]] {
+      return null;  // '0x' is not valid
     }
 
-    default: {
-      break;
-    }
+    return View<const u8>(start - 2, ss.begin());  // -2 to include 0x prefix
   }
 
-  return literal;
-}
+  static auto read_string_literal(View<const u8> &ss) -> Nullable<View<const u8>> {
+    const auto quote = next_byte(ss);
+    if (quote.is_null() || quote.value() != '"') [[unlikely]] {
+      return null;
+    }
 
-static auto skip_whitespace(View<const u8> &ss) -> void {
-  constexpr auto whitespace = []() {
-    Array<bool, 256> tab;
-    tab.fill(false);
+    const auto *start = ss.begin();
 
-    tab.set(' ', true);
-    tab.set('\t', true);
-    tab.set('\r', true);
-    tab.set('\n', true);
+    while (true) {
+      const auto ch = next_byte(ss);
+      if (ch.is_null()) {
+        return null;
+      }
 
-    return tab;
-  }();
+      if (ch.value() == '"') {
+        break;
+      }
+    }
 
-  while (true) {
+    return View<const u8>(start, ss.begin() - 1);  // -1 to exclude closing quote
+  }
+
+  static auto read_value(View<const u8> &ss) -> Nullable<View<const u8>> {
     const auto ch = peek_byte(ss);
     if (ch.is_null()) [[unlikely]] {
+      return null;
+    }
+
+    Nullable<View<const u8>> literal;
+
+    switch (ch.value()) {
+      case '0': {
+        if (ss.size() >= 2 && ss.get(1) == 'x') {
+          ss.remove_prefix(2);
+          literal = read_hex_literal(ss);
+        }
+        break;
+      }
+
+      case '"': {
+        literal = read_string_literal(ss);
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+
+    return literal;
+  }
+
+  static auto skip_whitespace(View<const u8> &ss) -> void {
+    constexpr auto whitespace = []() {
+      Array<bool, 256> tab;
+      tab.fill(false);
+
+      tab.set(' ', true);
+      tab.set('\t', true);
+      tab.set('\r', true);
+      tab.set('\n', true);
+
+      return tab;
+    }();
+
+    while (true) {
+      const auto ch = peek_byte(ss);
+      if (ch.is_null()) [[unlikely]] {
+        return;
+      }
+
+      const auto c = ch.value();
+      if (!whitespace.get(c)) {
+        break;
+      }
+
+      next_byte(ss);
+    }
+  }
+
+  static void skip_comment(View<const u8> &ss) {
+    if (const auto ch = peek_byte(ss); ch.is_null() || ch.value() != '#') {
       return;
     }
 
-    const auto c = ch.value();
-    if (!whitespace.get(c)) {
-      break;
+    next_byte(ss);  // Skip '#'
+
+    while (true) {
+      const auto ch = next_byte(ss);
+      if (ch.is_null() || ch.value() == '\n') [[unlikely]] {
+        return;
+      }
+    }
+  }
+
+  static auto read_config_pair(View<const u8> &ss) -> Nullable<Pair<View<const u8>, View<const u8>>> {
+    const auto key = read_value(ss);
+    if (key.is_null()) [[unlikely]] {
+      return null;
     }
 
-    next_byte(ss);
-  }
-}
+    skip_whitespace(ss);
+    skip_comment(ss);
+    skip_whitespace(ss);
 
-static void skip_comment(View<const u8> &ss) {
-  if (const auto ch = peek_byte(ss); ch.is_null() || ch.value() != '#') {
-    return;
-  }
-
-  next_byte(ss);  // Skip '#'
-
-  while (true) {
     const auto ch = next_byte(ss);
-    if (ch.is_null() || ch.value() == '\n') [[unlikely]] {
-      return;
+    if (ch.is_null() || ch.value() != '=') [[unlikely]] {
+      return null;
     }
+
+    skip_whitespace(ss);
+    skip_comment(ss);
+    skip_whitespace(ss);
+
+    const auto value = read_value(ss);
+    if (value.is_null()) [[unlikely]] {
+      return null;
+    }
+
+    return {{key.value(), value.value()}};
   }
-}
+}  // namespace wesos::kernconf
 
-static auto read_config_pair(View<const u8> &ss) -> Nullable<Pair<View<const u8>, View<const u8>>> {
-  const auto key = read_value(ss);
-  if (key.is_null()) [[unlikely]] {
-    return null;
-  }
-
-  skip_whitespace(ss);
-  skip_comment(ss);
-  skip_whitespace(ss);
-
-  const auto ch = next_byte(ss);
-  if (ch.is_null() || ch.value() != '=') [[unlikely]] {
-    return null;
-  }
-
-  skip_whitespace(ss);
-  skip_comment(ss);
-  skip_whitespace(ss);
-
-  const auto value = read_value(ss);
-  if (value.is_null()) [[unlikely]] {
-    return null;
-  }
-
-  return {{key.value(), value.value()}};
-}
-
-void KernelConfig::insert(View<const u8> key, View<const u8> value) {
-  /// TODO: Do dynamic allocation for storage
-}
-
-auto kernconf::parse_kernel_config(View<const u8> config_text) -> Nullable<KernelConfig> {
+SYM_EXPORT auto wesos::kernconf::parse_kernel_config(View<const u8> config_text) -> Nullable<KernelConfig> {
   auto ss = config_text;
 
   KernelConfig settings;

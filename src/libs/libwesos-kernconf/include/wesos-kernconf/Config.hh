@@ -20,5 +20,9 @@ namespace wesos::kernconf {
     constexpr ~KernelConfig() = default;
 
     void insert(View<const u8> key, View<const u8> value);
+
+    [[nodiscard]] auto contains(const char* key) const -> bool;
+    [[nodiscard]] auto get_uint64(const char* key) const -> Nullable<u64>;
+    [[nodiscard]] auto get_string(const char* key) const -> Nullable<View<const u8>>;
   };
 }  // namespace wesos::kernconf
