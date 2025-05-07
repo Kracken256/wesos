@@ -122,7 +122,7 @@ namespace wesos::kernconf {
     return literal;
   }
 
-  [[nodiscard]] static auto skip_whitespace(View<const u8> &ss) -> bool {
+  static auto skip_whitespace(View<const u8> &ss) -> void {
     constexpr auto whitespace = []() {
       Array<bool, 256> tab;
       tab.fill(false);
@@ -138,7 +138,7 @@ namespace wesos::kernconf {
     while (true) {
       const auto ch = peek_byte(ss);
       if (ch.is_null()) [[unlikely]] {
-        return false;
+        return;
       }
 
       const auto c = ch.value();
@@ -148,31 +148,29 @@ namespace wesos::kernconf {
 
       (void)next_byte(ss);
     }
-
-    return true;
   }
 
-  [[nodiscard]] static auto skip_comment(View<const u8> &ss) -> bool {
+  static auto skip_comment(View<const u8> &ss) -> void {
     const auto pound = peek_byte(ss);
     if (pound.is_null()) [[unlikely]] {
-      return false;
+      return;
     }
 
-    if (pound.value() == '#') {
-      (void)next_byte(ss);  // Skip '#'
+    if (pound.value() != '#') {
+      return;
+    }
 
-      while (true) {
-        const auto ch = next_byte(ss);
-        if (ch.is_null()) [[unlikely]] {
-          return false;
-        }
+    (void)next_byte(ss);  // Skip '#'
 
-        if (ch.value() == '\n') {
-          return true;
-        }
+    while (true) {
+      const auto ch = next_byte(ss);
+      if (ch.is_null()) [[unlikely]] {
+        return;
       }
-    } else {
-      return true;
+
+      if (ch.value() == '\n') {
+        return;
+      }
     }
   }
 
@@ -182,34 +180,18 @@ namespace wesos::kernconf {
       return null;
     }
 
-    if (!skip_whitespace(ss)) [[unlikely]] {
-      return null;
-    }
-
-    if (!skip_comment(ss)) [[unlikely]] {
-      return null;
-    }
-
-    if (!skip_whitespace(ss)) [[unlikely]] {
-      return null;
-    }
+    skip_whitespace(ss);
+    skip_comment(ss);
+    skip_whitespace(ss);
 
     const auto ch = next_byte(ss);
     if (ch.is_null() || ch.value() != '=') [[unlikely]] {
       return null;
     }
 
-    if (!skip_whitespace(ss)) [[unlikely]] {
-      return null;
-    }
-
-    if (!skip_comment(ss)) [[unlikely]] {
-      return null;
-    }
-
-    if (!skip_whitespace(ss)) [[unlikely]] {
-      return null;
-    }
+    skip_whitespace(ss);
+    skip_comment(ss);
+    skip_whitespace(ss);
 
     const auto value = read_value(ss);
     if (value.is_null()) [[unlikely]] {
@@ -229,20 +211,15 @@ SYM_EXPORT auto wesos::kernconf::parse_kernel_config(View<const u8> config_text)
     while (true) {
       const auto old_size = ss.size();
 
-      if (!skip_whitespace(ss)) [[unlikely]] {
-        return null;
-      }
-
-      if (!skip_comment(ss)) [[unlikely]] {
-        return null;
-      }
+      skip_whitespace(ss);
+      skip_comment(ss);
 
       if (old_size == ss.size()) {
         break;
       }
     }
 
-    if (peek_byte(ss).is_null()) {
+    if (ss.empty()) {
       break;  // EOF
     }
 
