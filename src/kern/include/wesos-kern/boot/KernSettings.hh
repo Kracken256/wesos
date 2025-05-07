@@ -22,9 +22,6 @@ namespace wesos::kern::boot {
     constexpr auto operator=(KernSettings&&) -> KernSettings& = default;
     constexpr ~KernSettings() = default;
 
-    static auto parse_config(View<const u8> config_text) -> Nullable<KernSettings> {
-      /// TODO: Implement config parsing
-      return null;
-    }
+    static auto parse_config(View<const u8> config_text) -> Nullable<KernSettings>;
   };
 }  // namespace wesos::kern::boot
