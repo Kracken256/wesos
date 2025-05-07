@@ -23,7 +23,7 @@ namespace wesos::kern {
         "xor %%rbp, %%rbp\n\t"         // Clear base pointer
         "lea %[stack_top], %%rsp\n\t"  // Set rsp to stack top
         "and $-16, %%rsp\n\t"          // Align rsp to 16 bytes
-        "jmp cxx_genesis\n\t"          // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"         // Call to C++ runtime setup
         :
         : [stack_top] "m"(KERNEL_STACK_GLOBAL[KERNEL_STACK_SIZE - 1])
         : "rsp", "rbp");
@@ -37,7 +37,7 @@ namespace wesos::kern {
         "xor %%ebp, %%ebp\n\t"         // Clear base pointer
         "lea %[stack_top], %%esp\n\t"  // Set esp to stack top
         "and $-16, %%esp\n\t"          // Align esp to 16 bytes
-        "jmp cxx_genesis\n\t"          // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"         // Call to C++ runtime setup
         :
         : [stack_top] "m"(KERNEL_STACK_GLOBAL[KERNEL_STACK_SIZE - 1])
         : "esp", "ebp");
@@ -52,7 +52,7 @@ namespace wesos::kern {
         "mov x29, xzr\n\t"                            // Clear frame pointer
         "ldr x0, =KERNEL_STACK_GLOBAL + %[size]\n\t"  // Load address into x0
         "bic sp, x0, #15\n\t"                         // Align to 16 bytes
-        "b cxx_genesis\n\t"                           // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"                        // Call to C++ runtime setup
         :
         : [size] "I"(KERNEL_STACK_SIZE - 1)
         : "sp", "x0", "x29");
@@ -69,7 +69,7 @@ namespace wesos::kern {
         "mov r7, #0\n\t"                              // Clear frame pointer
         "ldr r0, =KERNEL_STACK_GLOBAL + %[size]\n\t"  // Load address into r0
         "bic sp, r0, #15\n\t"                         // Align to 16 bytes
-        "b cxx_genesis\n\t"                           // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"                        // Call to C++ runtime setup
         :
         : [size] "I"(KERNEL_STACK_SIZE - 1)
         : "sp", "r0", "r7");
@@ -83,7 +83,7 @@ namespace wesos::kern {
         "li s0, 0\n\t"             // Clear frame pointer
         "la sp, %[stack_top]\n\t"  // Set sp to stack top
         "andi sp, sp, -16\n\t"     // Align stack to 16 bytes
-        "j cxx_genesis\n\t"        // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"     // Call to C++ runtime setup
         :
         : [stack_top] "i"(KERNEL_STACK_GLOBAL + KERNEL_STACK_SIZE - 1)
         : "sp", "s0");
@@ -98,7 +98,7 @@ namespace wesos::kern {
         "li s0, 0\n\t"             // Clear frame pointer
         "la sp, %[stack_top]\n\t"  // Set sp to stack top
         "andi sp, sp, -16\n\t"     // Align stack to 16 bytes
-        "j cxx_genesis\n\t"        // Jump to C++ runtime setup
+        "call cxx_genesis\n\t"     // Call to C++ runtime setup
         :
         : [stack_top] "i"(KERNEL_STACK_GLOBAL + KERNEL_STACK_SIZE - 1)
         : "sp", "s0");
