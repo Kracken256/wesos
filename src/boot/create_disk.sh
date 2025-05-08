@@ -3,7 +3,7 @@
 ISO_NAME="WesOS Live.iso"
 
 # Create zeroed 40MB raw image
-dd if=/dev/zero of=drive.hdd bs=1000 count=8000 status=none
+dd if=/dev/zero of=drive.hdd bs=1000 count=40000 status=none
 if [ $? -ne 0 ]; then
   echo "Failed to create image file"
   exit 1
@@ -17,44 +17,44 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Create a GPT partition table
-parted -s $DEVICE_PATH mklabel gpt
-if [ $? -ne 0 ]; then
-  echo "Failed to create partition table"
-  losetup -d $DEVICE_PATH
-  rm -f drive.hdd
-  exit 1
-fi
+# # Create a GPT partition table
+# parted -s $DEVICE_PATH mklabel gpt
+# if [ $? -ne 0 ]; then
+#   echo "Failed to create partition table"
+#   losetup -d $DEVICE_PATH
+#   rm -f drive.hdd
+#   exit 1
+# fi
 
-# Create a EFI FAT32 partition
-parted -s $DEVICE_PATH mkpart primary fat32 1MiB 100%
-if [ $? -ne 0 ]; then
-  echo "Failed to create FAT32 partition"
-  losetup -d $DEVICE_PATH
-  rm -f drive.hdd
-  exit 1
-fi
+# # Create a EFI FAT32 partition
+# parted -s $DEVICE_PATH mkpart primary fat16 1MiB 100%
+# if [ $? -ne 0 ]; then
+#   echo "Failed to create FAT32 partition"
+#   losetup -d $DEVICE_PATH
+#   rm -f drive.hdd
+#   exit 1
+# fi
 
-# Set the partition name to "EFI"
-parted -s $DEVICE_PATH name 1 "EFI"
-if [ $? -ne 0 ]; then
-  echo "Failed to set partition name to EFI"
-  losetup -d $DEVICE_PATH
-  rm -f drive.hdd
-  exit 1
-fi
+# # Set the partition name to "EFI"
+# parted -s $DEVICE_PATH name 1 "EFI"
+# if [ $? -ne 0 ]; then
+#   echo "Failed to set partition name to EFI"
+#   losetup -d $DEVICE_PATH
+#   rm -f drive.hdd
+#   exit 1
+# fi
 
-# Set the partition type to "EFI System"
-parted -s $DEVICE_PATH set 1 esp on
-if [ $? -ne 0 ]; then
-  echo "Failed to set partition type to EFI System"
-  losetup -d $DEVICE_PATH
-  rm -f drive.hdd
-  exit 1
-fi
+# # Set the partition type to "EFI System"
+# parted -s $DEVICE_PATH set 1 esp on
+# if [ $? -ne 0 ]; then
+#   echo "Failed to set partition type to EFI System"
+#   losetup -d $DEVICE_PATH
+#   rm -f drive.hdd
+#   exit 1
+# fi
 
 # Format the partition with FAT32
-mkdosfs -F 32 ${DEVICE_PATH}p1 >/dev/null
+mkfs.fat -F16 ${DEVICE_PATH} >/dev/null
 if [ $? -ne 0 ]; then
   echo "Failed to format partition with FAT32"
   losetup -d $DEVICE_PATH
@@ -72,7 +72,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Mount the partition
-mount ${DEVICE_PATH}p1 $TEMP_MOUNT_POINT
+mount ${DEVICE_PATH} $TEMP_MOUNT_POINT
 if [ $? -ne 0 ]; then
   echo "Failed to mount partition"
   rmdir $TEMP_MOUNT_POINT
