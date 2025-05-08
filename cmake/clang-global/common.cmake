@@ -10,7 +10,7 @@ add_compile_options(-Wno-error=deprecated -g3)
 # SECURITY
 ################################################################################
 add_compile_options(-fstack-protector) # Ensure stack canaries are present
-add_compile_options(-fno-pic)
+add_compile_options(-fPIC)
 
 ################################################################################
 # OTHER
