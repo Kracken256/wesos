@@ -2,8 +2,9 @@
 
 ISO_NAME="WesOS Live.iso"
 
-# Create zeroed 40MB raw image
-dd if=/dev/zero of=drive.hdd bs=1000 count=40000 status=none
+# Create zeroed 32MB raw image
+# WARNING: The EFI File System type depends on the size of the image file.
+dd if=/dev/zero of=drive.hdd bs=1k count=32000 status=none
 if [ $? -ne 0 ]; then
   echo "Failed to create image file"
   exit 1
@@ -53,10 +54,10 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-# Format the partition with FAT32
+# Format the partition with FAT16
 mkfs.fat -F16 ${DEVICE_PATH}p1 >/dev/null
 if [ $? -ne 0 ]; then
-  echo "Failed to format partition with FAT32"
+  echo "Failed to format partition with FAT16"
   losetup -d $DEVICE_PATH
   rm -f drive.hdd
   exit 1
@@ -82,7 +83,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Setup the EFI directory structure
-mkdir -p $TEMP_MOUNT_POINT/EFI/boot
+mkdir -p $TEMP_MOUNT_POINT/EFI/BOOT
 if [ $? -ne 0 ]; then
   echo "Failed to create EFI directory structure"
   umount $TEMP_MOUNT_POINT
@@ -93,7 +94,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Copy the bootloader to the EFI directory
-cp wesos-boot-efi $TEMP_MOUNT_POINT/EFI/boot/bootx64.efi
+cp wesos-boot-efi $TEMP_MOUNT_POINT/EFI/BOOT/BOOTx64.EFI
 if [ $? -ne 0 ]; then
   echo "Failed to copy bootloader to EFI directory"
   umount $TEMP_MOUNT_POINT
