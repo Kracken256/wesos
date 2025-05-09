@@ -2,3 +2,7 @@
 	path = third_party/benchmark
 	url = https://github.com/google/benchmark.git
 	branch = main
+[submodule "third_party/elf2efi"]
+	path = third_party/elf2efi
+	url = https://github.com/davmac314/elf2efi
+	branch = main
