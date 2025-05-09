@@ -5,3 +5,14 @@ if(WESOS_BUILD_BENCHMARKING)
 
   add_subdirectory(benchmark)
 endif()
+
+if(WESOS_BUILD_BOOT)
+  add_custom_target(elf2efi ALL
+    COMMAND make -C ${CMAKE_CURRENT_SOURCE_DIR}/elf2efi
+    COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/elf2efi
+    COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/elf2efi/elf2efi32 ${CMAKE_CURRENT_BINARY_DIR}/elf2efi/elf2efi32
+    COMMAND mv ${CMAKE_CURRENT_SOURCE_DIR}/elf2efi/elf2efi64 ${CMAKE_CURRENT_BINARY_DIR}/elf2efi/elf2efi64
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/elf2efi
+    VERBATIM
+  )
+endif()
