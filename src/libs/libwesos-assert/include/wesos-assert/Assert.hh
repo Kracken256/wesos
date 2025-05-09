@@ -29,7 +29,7 @@ namespace wesos::assert {
   }((__VA_ARGS__), #__VA_ARGS__)
 
 #ifdef NDEBUG
-#define assert_invariant(...)
+#define assert_invariant(...) (void)(__VA_ARGS__)
 #else
 #define assert_invariant(...) assert_always(__VA_ARGS__)
 #endif

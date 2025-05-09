@@ -14,6 +14,7 @@ using namespace wesos::mem;
 SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size) -> NullableOwnPtr<void> {
   m_lock.critical_section([&] {
     /// TODO: allocate memory from any child
+    (void)size;
   });
 
   return null;
@@ -22,6 +23,7 @@ SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size) -> NullableOwnPtr<void
 SYM_EXPORT auto AtomicMemoryEconomy::utilize(View<u8> pool) -> void {
   m_lock.critical_section([&] {
     /// TODO: distribute memory across children (uniformly?)
+    (void)pool;
   });
 }
 
