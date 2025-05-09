@@ -1,19 +1,19 @@
 set(PROJECT_WIDE_LIBRARIES
-  libwesos-builtin
-  libwesos-types
-  libwesos-cpu
-  libwesos-sync
-  libwesos-assert
-  libwesos-stream
-  libwesos-mem
-  libwesos-smartptr
-  libwesos-lambda
-  libwesos-kernconf
+  wesos-builtin
+  wesos-types
+  wesos-cpu
+  wesos-sync
+  wesos-assert
+  wesos-stream
+  wesos-mem
+  wesos-smartptr
+  wesos-lambda
+  wesos-kernconf
 )
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})
-  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/${LIB}/include")
-  message(STATUS "Added include directory: ${CMAKE_CURRENT_SOURCE_DIR}/${LIB}/include")
+  include_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib${LIB}/include")
+  message(STATUS "Added include directory: ${CMAKE_CURRENT_SOURCE_DIR}/lib${LIB}/include")
 endforeach()
 
 if(WESOS_ADDRESS_SANITIZER)
@@ -27,6 +27,7 @@ if(WESOS_UNDEFINED_SANITIZER)
 endif()
 
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})
-  message(STATUS "Adding subdirectory: ${LIB}")
-  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/${LIB}")
+  message(STATUS "Adding subdirectory: lib${LIB}")
+  set(COMPONENT_NAME "${LIB}")
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/lib${LIB}")
 endforeach()

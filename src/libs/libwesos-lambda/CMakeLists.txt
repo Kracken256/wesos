@@ -1,4 +1,3 @@
-set(COMPONENT_NAME wesos-lambda)
 project(lib${COMPONENT_NAME} LANGUAGES CXX)
 
 file(GLOB_RECURSE SOURCE_FILES "src/*.cc")
