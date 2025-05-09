@@ -13,10 +13,10 @@
 namespace wesos::types {
   template <class TypeA, class TypeB>
   class Pair {
+  public:
     TypeA m_a{};
     TypeB m_b{};
 
-  public:
     constexpr Pair() = default;
     constexpr Pair(TypeA a, TypeB b) : m_a(move(a)), m_b(move(b)) {}
     constexpr Pair(const Pair&) = default;
@@ -40,11 +40,11 @@ namespace wesos::types {
 
   template <class TypeA, class TypeB, class TypeC>
   class Triplet {
+  public:
     TypeA m_a{};
     TypeB m_b{};
     TypeC m_c{};
 
-  public:
     constexpr Triplet() = default;
     constexpr Triplet(TypeA a, TypeB b, TypeC c) : m_a(move(a)), m_b(move(b)), m_c(move(c)) {}
     constexpr Triplet(const Triplet&) = default;
@@ -71,12 +71,12 @@ namespace wesos::types {
 
   template <class TypeA, class TypeB, class TypeC, class TypeD>
   class Quadlet {
+  public:
     TypeA m_a{};
     TypeB m_b{};
     TypeC m_c{};
     TypeD m_d{};
 
-  public:
     constexpr Quadlet() = default;
     constexpr Quadlet(TypeA a, TypeB b, TypeC c, TypeD d) : m_a(move(a)), m_b(move(b)), m_c(move(c)), m_d(move(d)) {}
     constexpr Quadlet(const Quadlet&) = default;
