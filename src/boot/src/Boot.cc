@@ -28,11 +28,13 @@ namespace wesos::boot::efi {
       return EFI_FAILURE;
     }
 
-    INFO << u"WesOS EFI Bootloader" << u"\n";
-    INFO << u"UEFI Firmware Vendor: " << SYSTEM_TABLE_GLOBAL->firmware_vendor() << u"\n";
-    INFO << u"UEFI Firmware Revision: " << SYSTEM_TABLE_GLOBAL->firmware_revision() << u"\n";
+    (void)SYSTEM_TABLE_GLOBAL->con_out().clear_screen();
 
-    HELP << u"Loading KERNEL/PRELOAD.CONF from the EFI partition..." << u"\n";
+    INFO << u"WesOS EFI Bootloader" << ENDL;
+    INFO << u"UEFI Firmware Vendor: " << SYSTEM_TABLE_GLOBAL->firmware_vendor() << ENDL;
+    INFO << u"UEFI Firmware Revision: " << SYSTEM_TABLE_GLOBAL->firmware_revision() << ENDL;
+
+    HELP << u"Loading KERNEL/PRELOAD.CONF from the EFI partition..." << ENDL;
 
     /** TODO: Outline the steps to load the kernel:
      *  1.  Load KERNEL/PRELOAD.CONF from the EFI partition.
