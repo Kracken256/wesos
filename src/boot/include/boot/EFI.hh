@@ -54,6 +54,36 @@ namespace wesos::boot::efi {
   static constexpr auto EFI_RUNTIME_SERVICES_SIGNATURE = 0x56524553544e5552;
   static constexpr auto EFI_SYSTEM_TABLE_SIGNATURE = 0x5453595320494249;
 
+  //*******************************************************
+  // Attributes
+  //*******************************************************
+  constexpr auto BLACK = 0x00;
+  constexpr auto BLUE = 0x01;
+  constexpr auto GREEN = 0x02;
+  constexpr auto CYAN = 0x03;
+  constexpr auto RED = 0x04;
+  constexpr auto MAGENTA = 0x05;
+  constexpr auto BROWN = 0x06;
+  constexpr auto LIGHTGRAY = 0x07;
+  constexpr auto BRIGHT = 0x08;
+  constexpr auto DARKGRAY = 0x08;
+  constexpr auto LIGHTBLUE = 0x09;
+  constexpr auto LIGHTGREEN = 0x0A;
+  constexpr auto LIGHTCYAN = 0x0B;
+  constexpr auto LIGHTRED = 0x0C;
+  constexpr auto LIGHTMAGENTA = 0x0D;
+  constexpr auto YELLOW = 0x0E;
+  constexpr auto WHITE = 0x0F;
+
+  constexpr auto BACKGROUND_BLACK = 0x00;
+  constexpr auto BACKGROUND_BLUE = 0x10;
+  constexpr auto BACKGROUND_GREEN = 0x20;
+  constexpr auto BACKGROUND_CYAN = 0x30;
+  constexpr auto BACKGROUND_RED = 0x40;
+  constexpr auto BACKGROUND_MAGENTA = 0x50;
+  constexpr auto BACKGROUND_BROWN = 0x60;
+  constexpr auto BACKGROUND_LIGHTGRAY = 0x70;
+
   class InputKey {
     u16 m_scan_code;
     u16 m_unicode_char;
