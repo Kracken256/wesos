@@ -84,6 +84,7 @@ namespace wesos::boot::efi {
   }
 
   static inline auto operator<<(LoggerChannel log, const char16_t *str) -> LoggerChannel {
+    static_assert(sizeof(char16_t) == sizeof(u16), "Expected char16_t to be 2 bytes");
     return log << bit_cast<const u16 *>(str);
   }
 
