@@ -721,5 +721,7 @@ namespace wesos::boot::efi {
     return bit_cast<const u16 *>(str);
   }
 
+  extern SystemTable *SYSTEM_TABLE_GLOBAL;
+
 #pragma GCC diagnostic pop
 }  // namespace wesos::boot::efi

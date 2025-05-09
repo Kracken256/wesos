@@ -35,6 +35,7 @@ foreach(dep ${WESOS_EFI_BOOT_DEPENDENCIES})
 endforeach()
 
 install(TARGETS ${COMPONENT_NAME})
+install(DIRECTORY "include/" DESTINATION "include")
 
 ##################################################################################################
 # BUILD ISO IMAGE
