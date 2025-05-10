@@ -13,6 +13,7 @@
 namespace wesos::boot::efi {
   namespace detail {
     enum class LoggerLevel {
+      DUMP,
       NOTE,
       INFO,
       WARN,
@@ -41,6 +42,12 @@ namespace wesos::boot::efi {
       (void)SYSTEM_TABLE_GLOBAL->con_out().output_string(u"[ "_u16);
 
       switch (level) {
+        case detail::LoggerLevel::DUMP: {
+          (void)SYSTEM_TABLE_GLOBAL->con_out().set_attribute(help_color);
+          (void)SYSTEM_TABLE_GLOBAL->con_out().output_string(u"DUMP"_u16);
+          break;
+        }
+
         case detail::LoggerLevel::NOTE: {
           (void)SYSTEM_TABLE_GLOBAL->con_out().set_attribute(help_color);
           (void)SYSTEM_TABLE_GLOBAL->con_out().output_string(u"NOTE"_u16);
@@ -129,6 +136,7 @@ namespace wesos::boot::efi {
     return log;
   }
 
+  static constexpr auto DUMP = LoggerTarget(detail::LoggerLevel::DUMP);
   static constexpr auto NOTE = LoggerTarget(detail::LoggerLevel::NOTE);
   static constexpr auto INFO = LoggerTarget(detail::LoggerLevel::INFO);
   static constexpr auto WARN = LoggerTarget(detail::LoggerLevel::WARN);

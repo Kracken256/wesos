@@ -16,11 +16,11 @@ namespace wesos::boot::efi {
   using Handle = void *;
   using Event = void *;
 
-  static constexpr auto EFI_SUCCESS = 0x0000000000000000;
-  static constexpr auto EFI_FAILURE = 0x8000000000000000;
-  static constexpr auto EFI_BUFFER_TOO_SMALL = 0x8000000000000005;
+  using Status = usize;
 
-  using Status = u64;
+  static constexpr Status EFI_SUCCESS = 0x0000000000000000;
+  static constexpr Status EFI_FAILURE = 0x8000000000000000;
+  static constexpr Status EFI_BUFFER_TOO_SMALL = 0x8000000000000005;
 
   class OpStatus {
     usize m_status;
