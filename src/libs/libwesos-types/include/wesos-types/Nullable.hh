@@ -127,12 +127,12 @@ namespace wesos::types {
     }
 
     [[nodiscard]] constexpr auto operator->() -> T* {
-      assert_always(isset());
+      assert_invariant(isset());
       return &get();
     }
 
     [[nodiscard]] constexpr auto operator->() const -> const T* {
-      assert_always(isset());
+      assert_invariant(isset());
       return &get();
     }
 
