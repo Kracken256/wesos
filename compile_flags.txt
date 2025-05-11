@@ -1,1 +1,12 @@
--I./install/include
+-Isrc/libs/libwesos-assert/include
+-Isrc/libs/libwesos-builtin/include
+-Isrc/libs/libwesos-cpu/include
+-Isrc/libs/libwesos-kernconf/include
+-Isrc/libs/libwesos-lambda/include
+-Isrc/libs/libwesos-mem/include
+-Isrc/libs/libwesos-smartptr/include
+-Isrc/libs/libwesos-stream/include
+-Isrc/libs/libwesos-sync/include
+-Isrc/libs/libwesos-types/include
+-Isrc/boot/include
+-Isrc/kern/include
