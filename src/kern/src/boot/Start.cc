@@ -6,6 +6,7 @@
  */
 
 #include <wesos-builtin/Export.hh>
+#include <wesos-cpu/Target.hh>
 #include <wesos-types/Types.hh>
 
 namespace wesos::kern {
