@@ -11,6 +11,11 @@
 using namespace wesos;
 using namespace wesos::boot::efi;
 
+/// SHOULD: Generate documentation for these APIs
+/// SHOULD: Strictly verify this code is compliant with the UEFI spec
+/// SHOULD: This code has been tested on limited real hardware (but some),
+///         check it on more hardware.
+
 auto MemoryMap::initialize_memory_map_details(MemoryMap &mmap) -> bool {
   usize mmap_size = 0;
   usize map_key = 0;
@@ -19,8 +24,8 @@ auto MemoryMap::initialize_memory_map_details(MemoryMap &mmap) -> bool {
 
   NOTE << u"Requesting the size of the memory map..." << ENDL;
 
-  const auto mmap_api = SYSTEM_TABLE_GLOBAL->boot_services().m_get_memory_map;
-  const auto status = mmap_api(&mmap_size, nullptr, &map_key, &desc_size, &desc_ver);
+  const auto get_mmap_api = SYSTEM_TABLE_GLOBAL->boot_services().m_get_memory_map;
+  const auto status = get_mmap_api(&mmap_size, nullptr, &map_key, &desc_size, &desc_ver);
 
   if (status != EFI_BUFFER_TOO_SMALL && status != EFI_SUCCESS) [[unlikely]] {
     FAIL << u"Unable to determine the size of the UEFI memory map." << ENDL;
@@ -30,9 +35,8 @@ auto MemoryMap::initialize_memory_map_details(MemoryMap &mmap) -> bool {
   NOTE << u"The minimum buffer size needed to hold the UEFI memory map is " << mmap_size << u" bytes." << ENDL;
 
   { /**
-     * Double the memory map size to minimize the chances
-     * that the reported minimum buffer size becomes inadequate
-     * due to changes in the memory map (by firmware threads?).
+     * Double the memory map size to reduce the likehood of a
+     * UEFI TOCTOU bug manifesting.
      */
 
     mmap_size *= 2;
@@ -73,8 +77,8 @@ auto MemoryMap::retrieve_memory_map(MemoryMap &mmap) -> bool {
   NOTE << u"Retrieving the UEFI memory map..." << ENDL;
 
   usize map_key = 0;
-  const auto mmap_api = SYSTEM_TABLE_GLOBAL->boot_services().m_get_memory_map;
-  const auto status = mmap_api(&mmap.m_mmap_size, mmap.m_mmap, &map_key, &mmap.m_desc_size, &mmap.m_desc_version);
+  const auto get_mmap_api = SYSTEM_TABLE_GLOBAL->boot_services().m_get_memory_map;
+  const auto status = get_mmap_api(&mmap.m_mmap_size, mmap.m_mmap, &map_key, &mmap.m_desc_size, &mmap.m_desc_version);
 
   if (status != EFI_SUCCESS) {
     FAIL << u"Failed to retrive the UEFI memory map." << ENDL;
