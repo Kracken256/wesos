@@ -113,7 +113,7 @@ namespace wesos::boot::efi {
     if (num == 0) {
       log << u"0";
     } else {
-      static const auto *HEXTABLE_STATIC = u"0123456789ABCDEF"_u16;
+      const auto *hextable = u"0123456789ABCDEF"_u16;
 
       const auto base = 16;
       const usize max_digits = 16;  // Maximum digits for u64 in base 16
@@ -129,7 +129,7 @@ namespace wesos::boot::efi {
       u16 str[max_digits + 1] = {0};  // +1 for null terminator
       usize index = max_digits;
       while (num > 0) {
-        str[--index] = HEXTABLE_STATIC[num % base];
+        str[--index] = hextable[num % base];
         num /= base;
       }
 
