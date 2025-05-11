@@ -18,7 +18,7 @@ set(WESOS_EFI_BOOT_DEPENDENCIES
 
 add_executable(${COMPONENT_NAME} ${EFI_BOOT_CXX_SOURCES} ${EFI_BOOT_ASM_SOURCES})
 target_include_directories(${COMPONENT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_compile_options(${COMPONENT_NAME} PRIVATE -fno-lto -fno-pic --target=x86_64-unknown-windows)
+target_compile_options(${COMPONENT_NAME} PRIVATE -fno-lto -fno-pic --target=x86_64-unknown-windows -fno-stack-protector)
 target_link_options(${COMPONENT_NAME} PRIVATE
   -fuse-ld=lld
   -nostdlib
