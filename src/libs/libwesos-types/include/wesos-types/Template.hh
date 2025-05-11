@@ -354,5 +354,55 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_unsigned_v = is_unsigned<T>::value;
 
+  ///===========================================================================
+
+  template <typename T>
+  struct make_unsigned;
+
+  template <>
+  struct make_unsigned<signed char> {
+    using type = unsigned char;
+  };
+  template <>
+  struct make_unsigned<short> {
+    using type = unsigned short;
+  };
+  template <>
+  struct make_unsigned<int> {
+    using type = unsigned int;
+  };
+  template <>
+  struct make_unsigned<long> {
+    using type = unsigned long;
+  };
+  template <>
+  struct make_unsigned<long long> {
+    using type = unsigned long long;
+  };
+
+  template <>
+  struct make_unsigned<unsigned char> {
+    using type = unsigned char;
+  };
+  template <>
+  struct make_unsigned<unsigned short> {
+    using type = unsigned short;
+  };
+  template <>
+  struct make_unsigned<unsigned int> {
+    using type = unsigned int;
+  };
+  template <>
+  struct make_unsigned<unsigned long> {
+    using type = unsigned long;
+  };
+  template <>
+  struct make_unsigned<unsigned long long> {
+    using type = unsigned long long;
+  };
+
+  template <typename T>
+  using make_unsigned_t = typename make_unsigned<T>::type;
+
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos::types

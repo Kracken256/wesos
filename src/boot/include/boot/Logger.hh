@@ -99,38 +99,41 @@ namespace wesos::boot::efi {
   static inline auto operator<<(LoggerChannel log, const T &value) -> LoggerChannel
     requires(types::is_integral_v<T>)
   {
-    if constexpr (types::is_integral_v<T>) {
-      const auto base_10 = 10;
-
-      auto [num, is_negative] = [value]() -> Pair<u64, bool> {
-        if constexpr (types::is_signed_v<T>) {
-          if (value < 0) {
-            return {static_cast<u64>(-value), true};
-          }
+    auto [num, is_negative] = [value]() -> Pair<u64, bool> {
+      if constexpr (types::is_signed_v<T>) {
+        if (value < 0) {
+          using UT = types::make_unsigned_t<T>;
+          return {static_cast<u64>(static_cast<UT>(0) - static_cast<UT>(value)), true};
         }
-
-        return {static_cast<u64>(value), false};
-      }();
-
-      if (num == 0) {
-        log << u"0";
-      } else {
-        if (is_negative) {
-          (void)SYSTEM_TABLE_GLOBAL->con_out().output_string(u"-"_u16);
-        }
-
-        const usize max_digits = 20;    // Maximum digits for u64 in base 10
-        u16 str[max_digits + 1] = {0};  // +1 for null terminator
-        usize index = max_digits;
-        while (num > 0) {
-          str[--index] = static_cast<u16>((num % base_10) + '0');
-          num /= base_10;
-        }
-
-        (void)SYSTEM_TABLE_GLOBAL->con_out().output_string(str + index);
       }
+
+      return {static_cast<u64>(value), false};
+    }();
+
+    if (num == 0) {
+      log << u"0";
     } else {
-      static_assert(!types::is_same_v<T, T>, "Unsupported type for LoggerChannel");
+      static const auto *HEXTABLE_STATIC = u"0123456789ABCDEF"_u16;
+
+      const auto base = 16;
+      const usize max_digits = 16;  // Maximum digits for u64 in base 16
+
+      auto &con_out = SYSTEM_TABLE_GLOBAL->con_out();
+
+      if (is_negative) {
+        (void)con_out.output_string(u"-0x"_u16);
+      } else {
+        (void)con_out.output_string(u"0x"_u16);
+      }
+
+      u16 str[max_digits + 1] = {0};  // +1 for null terminator
+      usize index = max_digits;
+      while (num > 0) {
+        str[--index] = HEXTABLE_STATIC[num % base];
+        num /= base;
+      }
+
+      (void)con_out.output_string(str + index);
     }
 
     return log;
