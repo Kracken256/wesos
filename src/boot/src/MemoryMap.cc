@@ -34,7 +34,7 @@ auto MemoryMap::initialize_memory_map_details(MemoryMap &mmap) -> bool {
 
   NOTE << u"The minimum buffer size needed to hold the UEFI memory map is " << mmap_size << u" bytes." << ENDL;
 
-  { /**
+  { /*
      * Double the memory map size to reduce the likehood of a
      * UEFI TOCTOU bug manifesting.
      */

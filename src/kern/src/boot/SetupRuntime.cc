@@ -53,14 +53,14 @@ namespace wesos::kern {
     usize i = ATEXIT_FUNC_COUNT_GLOBAL;
 
     if (f == nullptr) {
-      /**
+      /*
        * According to the Itanium C++ ABI, if __cxa_finalize is called without a
        * function ptr, then it means that we should destroy EVERYTHING MUAHAHAHA!!
        */
 
       while (i-- != 0) {
         if (auto &entry = ATEXIT_FUNCS_GLOBAL.get_unchecked(i); entry.m_destructor_func != nullptr) {
-          /**
+          /*
            * Avoid calling any entries that have already been called and unset
            * at runtime.
            */

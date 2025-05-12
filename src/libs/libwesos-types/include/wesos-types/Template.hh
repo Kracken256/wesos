@@ -8,7 +8,7 @@
 #pragma once
 
 namespace wesos::types {
-  /**
+  /*
    * Most magic in this file was generated with ChatGPT 2025.
    * I don't know what it does and I don't want to. Hopefully,
    * and bugs fail as compile time?!...
