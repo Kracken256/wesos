@@ -18,7 +18,7 @@ namespace wesos::assert {
     (void)source;
   }
 
-  static void default_abort_callback(void*) { __builtin_trap(); }
+  [[noreturn]] static void default_abort_callback(void*) { __builtin_trap(); }
 
   static struct OutputConfig {
     OutputCallback m_func = default_output_callback;
