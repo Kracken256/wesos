@@ -55,7 +55,7 @@ SYM_EXPORT auto AtomicOutputStreamRef::create(mem::MemoryResourceProtocol& mm,
   return null;
 }
 
-///===============================================================================================================
+//===============================================================================================================
 
 SYM_EXPORT AtomicOutputStream::AtomicOutputStream(Box<SpinLock> lock, Box<OutputStreamProtocol> parent)
     : m_lock(move(lock)), m_owned(move(parent)) {}

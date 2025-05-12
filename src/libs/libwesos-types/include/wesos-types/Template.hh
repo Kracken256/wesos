@@ -29,7 +29,7 @@ namespace wesos::types {
   using false_type = integral_constant<bool, false>;
   using true_type = integral_constant<bool, true>;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename Tp, typename Up>
   inline constexpr bool is_same_v = __is_same(Tp, Up);
@@ -52,7 +52,7 @@ namespace wesos::types {
   template <typename T>
   using remove_reference_t = typename remove_reference<T>::type;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct remove_pointer {
@@ -82,7 +82,7 @@ namespace wesos::types {
   template <typename T>
   using remove_pointer_t = typename remove_pointer<T>::type;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_pointer : false_type {};
@@ -102,7 +102,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_pointer_v = is_pointer<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_reference : false_type {};
@@ -116,7 +116,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_reference_v = is_reference<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <bool Cond, typename T, typename F>
   struct conditional {
@@ -131,7 +131,7 @@ namespace wesos::types {
   template <bool Cond, typename T, typename F>
   using conditional_t = typename conditional<Cond, T, F>::type;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_lvalue_reference : false_type {};
@@ -142,7 +142,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_lvalue_reference_v = is_lvalue_reference<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   constexpr auto forward(remove_reference_t<T>& t) -> T&& {
@@ -155,7 +155,7 @@ namespace wesos::types {
     return static_cast<T&&>(t);
   }
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   auto lvalue_ref_helper(T&) -> T&;
@@ -182,7 +182,7 @@ namespace wesos::types {
   template <typename T>
   using add_lvalue_reference_t = typename add_lvalue_reference<T>::type;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <bool Condition, typename T = void>
   struct enable_if {};
@@ -195,7 +195,7 @@ namespace wesos::types {
   template <bool Condition, typename T = void>
   using enable_if_t = typename enable_if<Condition, T>::type;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_move_constructible {
@@ -233,7 +233,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename From, typename To>
   auto test_convert(int) -> decltype(static_cast<To>(declval<From>()), true_type{});
@@ -247,7 +247,7 @@ namespace wesos::types {
   template <typename From, typename To>
   inline constexpr bool is_convertible_v = is_convertible<From, To>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_integral {
@@ -318,7 +318,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_integral_v = is_integral<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_signed : false_type {};
@@ -336,7 +336,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_signed_v = is_signed<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct is_unsigned : false_type {};
@@ -354,7 +354,7 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_unsigned_v = is_unsigned<T>::value;
 
-  ///===========================================================================
+  //===========================================================================
 
   template <typename T>
   struct make_unsigned;

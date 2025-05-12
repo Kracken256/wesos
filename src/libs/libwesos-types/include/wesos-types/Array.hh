@@ -78,7 +78,7 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto into_ptr() -> RefPtr<T> { return m_data; }
     [[nodiscard]] constexpr auto as_view() { return View<T>(into_ptr().unwrap(), length()); }
 
-    ///=========================================================================
+    //=========================================================================
 
     constexpr void set(usize i, T value) {
       assert_always(i < length());

@@ -41,7 +41,7 @@ namespace wesos::types {
 
     [[nodiscard]] constexpr auto into_ptr() const -> NullableRefPtr<T> { return m_base; }
 
-    ///====================================================================================
+    //====================================================================================
 
     [[nodiscard]] constexpr auto get(usize i) const -> const T& {
       assert_always(i < size());
@@ -77,7 +77,7 @@ namespace wesos::types {
       return {m_base + i, size() - i};
     }
 
-    ///====================================================================================
+    //====================================================================================
 
     [[nodiscard]] constexpr auto operator==(const View& o) const -> bool {
       if (size() != o.size()) {
@@ -93,7 +93,7 @@ namespace wesos::types {
       return true;
     }
 
-    ///========================================================================================
+    //========================================================================================
 
     constexpr auto set(usize i, T x) -> View& {
       assert_always(i <= size());
@@ -145,7 +145,7 @@ namespace wesos::types {
       return *this;
     }
 
-    ///========================================================================================
+    //========================================================================================
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
 

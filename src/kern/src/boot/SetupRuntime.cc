@@ -88,7 +88,7 @@ namespace wesos::kern {
     }
   }
 
-  ///============================================================================================
+  //============================================================================================
   using ConstructorFunc = void (*)();
 
   extern "C" ConstructorFunc BEG_CXX_CTORS_GLOBAL[];
@@ -102,13 +102,13 @@ namespace wesos::kern {
 
   static void globals_deinit() { __cxa_finalize(nullptr); }
 
-  ///============================================================================================
+  //============================================================================================
 
   extern "C" void __cxa_pure_virtual() {  // NOLINT(readability-identifier-naming)
     assert_always(false && "Calling into C++ pure virtual functions is not allowed");
   }
 
-  ///============================================================================================
+  //============================================================================================
 
   auto main(const kernconf::KernelConfig &config) -> int;
 

@@ -24,7 +24,7 @@ namespace wesos::boot::efi {
   SystemTable *SYSTEM_TABLE_GLOBAL = nullptr;
   Handle EFI_IMAGE_HANDLE_GLOBAL = nullptr;
 
-  ///====================================================================
+  //====================================================================
 
   [[nodiscard]] static auto configure_uefi_globals(Handle image_handle, SystemTable *system_table) -> bool {
     EFI_IMAGE_HANDLE_GLOBAL = image_handle;
