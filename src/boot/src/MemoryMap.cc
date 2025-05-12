@@ -11,10 +11,10 @@
 using namespace wesos;
 using namespace wesos::boot::efi;
 
-/// SHOULD: Generate documentation for these APIs
-/// SHOULD: Strictly verify this code is compliant with the UEFI spec
-/// SHOULD: This code has been tested on limited real hardware (but some),
-///         check it on more hardware.
+// SHOULD: Generate documentation for these APIs
+// SHOULD: Strictly verify this code is compliant with the UEFI spec
+// SHOULD: This code has been tested on limited real hardware (but some),
+//         check it on more hardware.
 
 auto MemoryMap::initialize_memory_map_details(MemoryMap &mmap) -> bool {
   usize mmap_size = 0;

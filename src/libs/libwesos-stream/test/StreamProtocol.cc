@@ -9,6 +9,6 @@
 
 #include <wesos-stream/StreamProtocol.hh>
 
-/// TODO: Implement streams
+// TODO: Implement streams
 
 TEST(placeholder, placeholder) {}

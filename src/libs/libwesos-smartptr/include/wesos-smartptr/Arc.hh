@@ -101,13 +101,13 @@ namespace wesos::smartptr {
     }
 
     //=========================================================================================
-    /// LIFETIME MANAGEMENT
+    // LIFETIME MANAGEMENT
     //=========================================================================================
 
     [[nodiscard]] constexpr auto ref_count() const -> usize { return m_state.isset() ? m_state->m_data_rc.load() : 0; }
 
     //=========================================================================================
-    /// POINTER ACCESS
+    // POINTER ACCESS
     //=========================================================================================
 
     [[nodiscard]] constexpr auto unwrap() -> Object* { return m_ptr.unwrap(); }

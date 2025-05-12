@@ -9,4 +9,4 @@
 
 #include <wesos-types/Types.hh>
 
-/// TODO: Write test cases
+// TODO: Write test cases

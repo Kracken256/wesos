@@ -7,4 +7,4 @@
 
 #include <wesos-stream/InputStreamProtocol.hh>
 
-/// TODO: Implement streams
+// TODO: Implement streams

@@ -37,7 +37,7 @@ SYM_EXPORT IntrusivePool::~IntrusivePool() {
 }
 
 SYM_EXPORT auto IntrusivePool::virt_embezzle(usize max_size) -> View<u8> {
-  /// TODO: Implement memory embezzelment
+  // TODO: Implement memory embezzelment
   (void)max_size;
   return View<u8>::create_empty();
 }

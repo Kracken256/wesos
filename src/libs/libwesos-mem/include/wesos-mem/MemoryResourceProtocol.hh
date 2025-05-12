@@ -36,7 +36,7 @@ namespace wesos::mem {
     virtual ~MemoryResourceProtocol() = 0;
 
     //=============================================================================================
-    /// RAW MEMORY ALLOCATION
+    // RAW MEMORY ALLOCATION
     //=============================================================================================
 
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
@@ -44,7 +44,7 @@ namespace wesos::mem {
     auto utilize_bytes(View<u8> pool) -> void;
 
     //=============================================================================================
-    /// MEMORY ECONOMY MANAGEMENT
+    // MEMORY ECONOMY MANAGEMENT
     //=============================================================================================
 
     void eco_yield();

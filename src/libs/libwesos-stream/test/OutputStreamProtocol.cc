@@ -7,4 +7,4 @@
 
 #include <wesos-stream/OutputStreamProtocol.hh>
 
-/// TODO: Implement streams
+// TODO: Implement streams

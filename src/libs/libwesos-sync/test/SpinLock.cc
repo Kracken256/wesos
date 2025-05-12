@@ -10,5 +10,5 @@
 #include <wesos-sync/Atomic.hh>
 
 TEST(SpinLock, NotATest) {
-  /// FIXME: Write SpinLock functional test
+  // FIXME: Write SpinLock functional test
 }

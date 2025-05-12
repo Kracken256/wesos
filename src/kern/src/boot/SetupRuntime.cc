@@ -154,7 +154,7 @@ namespace wesos::kern {
 
     const auto config = move(config_opt.value());
 
-    /// TODO: Initialize usable memory regions
+    // TODO: Initialize usable memory regions
 
     (void)cxx_runtime(config);
 

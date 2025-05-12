@@ -57,7 +57,7 @@ namespace wesos::smartptr {
     }
 
     //=========================================================================================
-    /// LIFETIME MANAGEMENT
+    // LIFETIME MANAGEMENT
     //=========================================================================================
 
     constexpr auto disown() -> void { m_ptr = null; }
@@ -65,7 +65,7 @@ namespace wesos::smartptr {
     [[nodiscard]] constexpr auto memory_resource() -> mem::MemoryResourceProtocol& { return m_mm; }
 
     //=========================================================================================
-    /// POINTER ACCESS
+    // POINTER ACCESS
     //=========================================================================================
 
     [[nodiscard]] constexpr auto unwrap() -> Object* { return m_ptr.unwrap(); }

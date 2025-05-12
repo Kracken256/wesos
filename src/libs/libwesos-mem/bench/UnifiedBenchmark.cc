@@ -29,7 +29,7 @@ namespace wesos::mem::testing {
 
   static void benchmark_crunch(const auto& allocate, const auto& deallocate, const BenchmarkOptions& options,
                                usize& alloc_count) {
-    /// FIXME: Implement realistic allocation patterns
+    // FIXME: Implement realistic allocation patterns
 
     const auto [min_size, max_size, min_align, max_align] = options;
 

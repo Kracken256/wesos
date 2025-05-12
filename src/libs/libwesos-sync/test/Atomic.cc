@@ -10,5 +10,5 @@
 #include <wesos-sync/Atomic.hh>
 
 TEST(Atomic, NotATest) {
-  /// FIXME: Write Atomic<> functional test
+  // FIXME: Write Atomic<> functional test
 }

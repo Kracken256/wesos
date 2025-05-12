@@ -10,5 +10,5 @@
 #include <wesos-types/Move.hh>
 
 TEST(Lambda, Lambda) {
-  /// TODO: Test lambda implementation
+  // TODO: Test lambda implementation
 }
