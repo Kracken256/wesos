@@ -51,6 +51,10 @@ add_custom_target(${COMPONENT_NAME} ALL
 )
 add_dependencies(${COMPONENT_NAME} wesos-kernel)
 
+find_program(PARTED parted REQUIRED)
+find_program(MKFS_FAT mkfs.fat REQUIRED)
+find_program(MKFS_EXT4 mkfs.ext4 REQUIRED)
+
 add_custom_command(
   OUTPUT ${WESOS_ISO_FILE}
   DEPENDS wesos-kernel wesos-boot-efi ${CMAKE_CURRENT_SOURCE_DIR}/create_disk.sh
