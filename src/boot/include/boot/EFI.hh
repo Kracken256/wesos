@@ -117,47 +117,14 @@ namespace wesos::boot::efi {
   using TextString = Status (*)(SimpleTextOutputProtocol *, const u16 *);
 
   struct Guid {
-    u32 m_data1;
-    u16 m_data2;
-    u16 m_data3;
-    u8 m_data4[sizeof(u64)];
-  };
+    static constexpr usize BYTES_PER_GUID = 16;
+    u8 m_data[BYTES_PER_GUID];
+  } __attribute__((packed));
 
-#define W_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL_GUID                                     \
-  {                                                                                \
-    0x387477c2, 0x69c7, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
-  }
+  static_assert(sizeof(Guid) == Guid::BYTES_PER_GUID, "Guid size mismatch");
 
-#define W_EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID                                        \
-  {                                                                                \
-    0x9042a9de, 0x23dc, 0x4a38, { 0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a } \
-  }
-
-#define W_EFI_LOADED_IMAGE_PROTOCOL_GUID                                           \
-  {                                                                                \
-    0x5B1B31A1, 0x9562, 0x11d2, { 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B } \
-  }
-
-// FIXME: COULD BE BUG in 0x39 swap with -> 0x8e
-#define W_EFI_FILE_INFO_GUID                                                       \
-  {                                                                                \
-    0x09576e92, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
-  }
-
-#define W_EFI_DEVICE_PATH_PROTOCOL_GUID                                            \
-  {                                                                                \
-    0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
-  }
-
-#define W_EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID                                      \
-  {                                                                                 \
-    0x0964e5b22, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } \
-  }
-
-#define W_EFI_ACPI_TABLE_GUID                                                      \
-  {                                                                                \
-    0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-  }
+  constexpr Guid SIMPLE_FILE_SYSTEM_PROTOCOL_GUID = {0x09, 0x64, 0xe5, 0xb2, 0x64, 0x59, 0x11, 0xd2,
+                                                     0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b};
 
   using TextTestString = Status (*)(SimpleTextOutputProtocol *, u16 *);
   using TextQueryMode = Status (*)(SimpleTextOutputProtocol *, usize, usize *, usize *);
