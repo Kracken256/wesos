@@ -33,6 +33,7 @@
 #include <wesos-types/Unused.hh>
 #include <wesos-types/View.hh>
 
+/** WesOS */
 namespace wesos {
   using types::f32;
   using types::f64;
