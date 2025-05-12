@@ -295,9 +295,6 @@ rmdir $TEMP_MOUNT_POINT
 # END: CREATE APPLICATION PARTITION
 ###########################################################################################
 
-
-
-
 # Detach the loop device
 losetup -d $DEVICE_PATH
 if [ $? -ne 0 ]; then
