@@ -38,6 +38,8 @@ auto Storage::create(Handle image) -> Nullable<Storage> {
 
   NOTE << u"Creating file system manager" << ENDL;
 
+  //===============================================================================================
+
   /** Locate the loaded image protocol */
   const auto loaded_image_protocol = [&]() -> NullableRefPtr<LoadedImageProtocol> {
     void* loaded_image = nullptr;
@@ -118,6 +120,8 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   const auto& gbs = SYSTEM_TABLE_GLOBAL->boot_services();
 
+  //===============================================================================================
+
   /* Open the file */
   const auto file = [&]() -> NullableOwnPtr<FileProtocol> {
     FileProtocol* file = nullptr;
@@ -177,7 +181,7 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   //===============================================================================================
 
-  {
+  const auto file_size_opt = [&]() -> Nullable<usize> {
     auto file_info_size_tmp = file_info_size;
 
     const OpStatus status = file->m_get_info(file, &EFI_FILE_INFO_GUID, &file_info_size_tmp, file_info);
@@ -189,10 +193,20 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
     }
 
     NOTE << u"File content size: " << file_info->file_size() << ENDL;
+
+    const auto file_size = file_info->file_size();
+    gbs.m_free_pool(file_info);
+
+    return file_size;
+  }();
+
+  if (file_size_opt.is_null()) [[unlikely]] {
+    FAIL << u"Failed to get file size" << ENDL;
+    file->m_close(file);
+    return nullptr;
   }
 
-  const auto file_size = file_info->file_size();
-  gbs.m_free_pool(file_info);
+  const auto file_size = file_size_opt.value();
 
   //===============================================================================================
 
@@ -235,9 +249,9 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
       gbs.m_free_pool(file_content);
       return nullptr;
     }
-  }
 
-  NOTE << u"Read file: " << filepath << ENDL;
+    NOTE << u"Read file: " << filepath << ENDL;
+  }
 
   //===============================================================================================
 
