@@ -8,6 +8,7 @@
 #include <boot/EFI.hh>
 #include <boot/Logger.hh>
 #include <boot/MemoryMap.hh>
+#include <boot/Storage.hh>
 #include <wesos-builtin/Export.hh>
 #include <wesos-builtin/Memory.hh>
 #include <wesos-cpu/Timing.hh>
@@ -63,6 +64,22 @@ namespace wesos::boot::efi {
     }
 
     memory_map->dump(NOTE);
+
+    auto fs = Storage::create(image_handle);
+    if (fs.is_null()) [[unlikely]] {
+      FAIL << u"Failed to create the storage object." << ENDL;
+      FAIL << u"This is a critical boot error. Unable to proceed with booting WesOS." << ENDL;
+      return EFI_FAILURE;
+    }
+
+    {
+      auto file = fs->open_file(u"\\WESOS\\PROTO.ELF"_u16);
+      if (file.is_null()) [[unlikely]] {
+        FAIL << u"Failed to open the proto-kernel file." << ENDL;
+        FAIL << u"This is a critical boot error. Unable to proceed with booting WesOS." << ENDL;
+        return EFI_FAILURE;
+      }
+    }
 
     /** TODO: Outline of steps to load the proto-kernel:
      *  1. [✅] Get the current memory map.
