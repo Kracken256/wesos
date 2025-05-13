@@ -107,6 +107,17 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+# Copy the kernel to the EFI directory
+cp ../kern/wesos-kernel $TEMP_MOUNT_POINT/WESOS/PROTO.ELF
+if [ $? -ne 0 ]; then
+  echo "Failed to copy kernel to EFI directory"
+  umount $TEMP_MOUNT_POINT
+  rmdir $TEMP_MOUNT_POINT
+  losetup -d $DEVICE_PATH
+  rm -f drive.hdd
+  exit 1
+fi
+
 # Unmount the temporary partition
 umount $TEMP_MOUNT_POINT
 if [ $? -ne 0 ]; then
