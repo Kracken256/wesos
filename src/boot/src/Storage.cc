@@ -16,6 +16,13 @@ File::~File() {
   if (m_file_protocol != nullptr) {
     NOTE << u"Closing file: " << m_file_path << ENDL;
     m_file_protocol->m_close(m_file_protocol);
+
+    const auto& gbs = SYSTEM_TABLE_GLOBAL->boot_services();
+
+    const void* const_file_content = bit_cast<const void*>(m_file_content.into_ptr().unwrap());
+    void* file_content = const_cast<void*>(const_file_content);
+
+    gbs.m_free_pool(file_content);
   }
 }
 
@@ -56,7 +63,7 @@ auto Storage::create(Handle image) -> Nullable<Storage> {
   //===============================================================================================
 
   /** Locate the simple file system protocol */
-  const auto file_system_protocol_instance = [&]() -> NullableOwnPtr<SimpleFileSystemProtocol> {
+  const auto file_system_protocol_instance = [&]() -> NullableRefPtr<SimpleFileSystemProtocol> {
     void* fs_protocol = nullptr;
     auto* device_handle = loaded_image_protocol->device_handle();
 
@@ -149,7 +156,7 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   const auto file_info = [&]() -> NullableOwnPtr<FileInfo> {
     FileInfo* file_info = nullptr;
-    void** file_info_vp = reinterpret_cast<void**>(&file_info);
+    void** file_info_vp = bit_cast<void**>(&file_info);
 
     const OpStatus status = gbs.m_allocate_pool(LoaderData, file_info_size, file_info_vp);
     if (status.is_failure()) [[unlikely]] {
@@ -236,6 +243,8 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   const auto content = View<const u8>(file_content.unwrap(), file_size);
 
+  // Ownership of the file content is transferred to the File object.
+  // Sorry, no std::unique_ptr available in this environment.
   auto instance = File(*file, filepath, content);
   INFO << u"Created virtual file object for " << filepath << ENDL;
 
