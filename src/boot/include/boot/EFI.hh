@@ -27,6 +27,10 @@ namespace wesos::boot::efi {
 
   public:
     constexpr OpStatus() : m_status(0) {}
+    constexpr OpStatus(const OpStatus &) = default;
+    constexpr OpStatus(OpStatus &&) = default;
+    auto operator=(const OpStatus &) -> OpStatus & = default;
+    auto operator=(OpStatus &&) -> OpStatus & = default;
     constexpr OpStatus(usize status) : m_status(status) {}
 
     [[nodiscard]] constexpr auto is_success() const -> bool { return m_status == EFI_SUCCESS; }
@@ -117,14 +121,24 @@ namespace wesos::boot::efi {
   using TextString = Status (*)(SimpleTextOutputProtocol *, const u16 *);
 
   struct Guid {
-    static constexpr usize BYTES_PER_GUID = 16;
-    u8 m_data[BYTES_PER_GUID];
+    static constexpr auto BYTES_PER_QUAD = 8;
+    static constexpr auto UUID_SIZE = 16;
+
+    u32 m_data1;
+    u16 m_data2;
+    u16 m_data3;
+    u8 m_data4[BYTES_PER_QUAD];
   } __attribute__((packed));
 
-  static_assert(sizeof(Guid) == Guid::BYTES_PER_GUID, "Guid size mismatch");
+  static_assert(sizeof(Guid) == Guid::UUID_SIZE, "Guid size is not 16 bytes");
 
-  constexpr Guid SIMPLE_FILE_SYSTEM_PROTOCOL_GUID = {0x09, 0x64, 0xe5, 0xb2, 0x64, 0x59, 0x11, 0xd2,
-                                                     0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b};
+  constexpr Guid SIMPLE_FILE_SYSTEM_PROTOCOL_GUID = {
+      0x0964e5b22, 0x6459, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
+
+  constexpr Guid LOADED_IMAGE_PROTOCOL_GUID = {
+      0x5B1B31A1, 0x9562, 0x11d2, {0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B}};
+
+  constexpr Guid EFI_FILE_INFO_GUID = {0x09576e92, 0x6d3f, 0x11d2, {0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b}};
 
   using TextTestString = Status (*)(SimpleTextOutputProtocol *, u16 *);
   using TextQueryMode = Status (*)(SimpleTextOutputProtocol *, usize, usize *, usize *);
@@ -356,7 +370,7 @@ namespace wesos::boot::efi {
   using InstallProtocolInterface = Status (*)(Handle *, Guid *, InterfaceType, void *);
   using ReinstallProtocolInterface = Status (*)(Handle, Guid *, void *, void *);
   using UninstallProtocolInterface = Status (*)(Handle, Guid *, void *);
-  using HandleProtocol = Status (*)(Handle, Guid *, void **);
+  using HandleProtocol = Status (*)(Handle, const Guid *, void **);
   using RegisterProtocolNotify = Status (*)(Guid *, Event, void **);
   using LocateSearchType = enum { AllHandles, ByRegisterNotify, ByProtocol };
   using LocateHandle = Status (*)(LocateSearchType, Guid *, void *, usize *, Handle *);
@@ -406,7 +420,7 @@ namespace wesos::boot::efi {
   using OpenProtocolInformation = Status (*)(Handle, Guid *, OpenProtocolInformationEntry **, usize *);
   using ProtocolsPerHandle = Status (*)(Handle, Guid ***, usize *);
   using LocateHandleBuffer = Status (*)(LocateSearchType, Guid *, void *, usize *, Handle **);
-  using LocateProtocol = Status (*)(Guid *, void *, void **);
+  using LocateProtocol = Status (*)(const Guid *, void *, void **);
   using InstallMultipleProtocolInterfaces = Status (*)(Handle *, ...);
   using UninstallMultipleProtocolInterfaces = Status (*)(Handle, ...);
   using CalculateCrC32 = Status (*)(void *, usize, u32 *);
@@ -415,14 +429,14 @@ namespace wesos::boot::efi {
   using CreateEventEx = Status (*)(u32, Tpl, EventNotify, const void *, const Guid *, Event *);
 
   class FileProtocol;
-  using FileOpen = Status (*)(FileProtocol *, FileProtocol **, u16 *, u64, u64);
+  using FileOpen = Status (*)(FileProtocol *, FileProtocol **, const u16 *, u64, u64);
   using FileClose = Status (*)(FileProtocol *);
   using FileDelete = Status (*)(FileProtocol *);
   using FileRead = Status (*)(FileProtocol *, usize *, void *);
   using FileWrite = Status (*)(FileProtocol *, usize *, void *);
   using FileGetPosition = Status (*)(FileProtocol *, u64 *);
   using FileSetPosition = Status (*)(FileProtocol *, u64);
-  using FileGetInfo = Status (*)(FileProtocol *, Guid *, usize *, void *);
+  using FileGetInfo = Status (*)(FileProtocol *, const Guid *, usize *, void *);
   using FileSetInfo = Status (*)(FileProtocol *, Guid *, usize, void *);
   using FileFlush = Status (*)(FileProtocol *);
 
@@ -439,7 +453,7 @@ namespace wesos::boot::efi {
     [[nodiscard]] constexpr auto buffer() const -> void * { return m_buffer; }
   };
 
-  using FileOpenEx = Status (*)(FileProtocol *, FileProtocol **, u16 *, u64, u64, FileIoToken *);
+  using FileOpenEx = Status (*)(FileProtocol *, FileProtocol **, const u16 *, u64, u64, FileIoToken *);
   using FileReadEx = Status (*)(FileProtocol *, FileIoToken *);
   using FileWriteEx = Status (*)(FileProtocol *, FileIoToken *);
   using FileFlushEx = Status (*)(FileProtocol *, FileIoToken *);
@@ -483,7 +497,6 @@ namespace wesos::boot::efi {
     Time m_last_access_time;
     Time m_modification_time;
     u64 m_attribute;
-    u16 *m_file_name;
 
   public:
     [[nodiscard]] constexpr auto size() const -> u64 { return m_size; }
@@ -493,7 +506,6 @@ namespace wesos::boot::efi {
     [[nodiscard]] constexpr auto last_access_time() const -> Time { return m_last_access_time; }
     [[nodiscard]] constexpr auto modification_time() const -> Time { return m_modification_time; }
     [[nodiscard]] constexpr auto attribute() const -> u64 { return m_attribute; }
-    [[nodiscard]] constexpr auto file_name() const -> u16 * { return m_file_name; }
   };
 
   class FileProtocol {
