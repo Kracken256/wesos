@@ -142,7 +142,7 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   //===============================================================================================
 
-  const usize file_info_size = [&] {
+  const auto file_info_size = [&]() -> usize {
     /* The FileInfo structure is apparently variable size and a
        function of the file name length. */
 
@@ -196,7 +196,7 @@ auto Storage::open_file(const u16* filepath) -> Nullable<File> {
 
   //===============================================================================================
 
-  auto file_content = [&]() -> NullableOwnPtr<u8> {
+  const auto file_content = [&]() -> NullableOwnPtr<u8> {
     void* file_content = nullptr;
 
     const OpStatus status = gbs.m_allocate_pool(LoaderData, file_size, &file_content);
