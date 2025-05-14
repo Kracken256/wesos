@@ -10,57 +10,43 @@
 #include <wesos-sync/SpinLock.hh>
 
 namespace wesos::assert {
-  static void default_output_callback(void*, const char* message, SourceLocation source) {
-    // This will run on bare-metal, so we can't use printf
-    // or any other standard library functions. Just discard the message.
-
-    (void)message;
-    (void)source;
-  }
-
-  [[noreturn]] static void default_abort_callback(void*) { __builtin_trap(); }
-
   static struct OutputConfig {
-    OutputCallback m_func = default_output_callback;
-    void* m_data = nullptr;
-  } OUTPUT_GLOBAL;
+    OutputCallback m_output_func = nullptr;
+    void* m_output_data = nullptr;
 
-  static struct AbortConfig {
-    AbortCallback m_func = default_abort_callback;
-    void* m_data = nullptr;
-  } ABORT_GLOBAL;
+    AbortCallback m_abort_func = nullptr;
+    void* m_abort_data = nullptr;
+  } SETUP_GLOBAL;
 
-  static sync::SpinLock OUTPUT_LOCK_GLOBAL;
-  static sync::SpinLock ABORT_LOCK_GLOBAL;
+  static sync::SpinLock SETUP_LOCK_GLOBAL;
 }  // namespace wesos::assert
 
 SYM_EXPORT void wesos::assert::register_output_callback(void* m, OutputCallback cb) {
-  OUTPUT_LOCK_GLOBAL.critical_section([&] {
-    OUTPUT_GLOBAL.m_func = cb;
-    OUTPUT_GLOBAL.m_data = m;
+  SETUP_LOCK_GLOBAL.critical_section([&] {
+    SETUP_GLOBAL.m_output_func = cb;
+    SETUP_GLOBAL.m_output_data = m;
   });
 }
 
 SYM_EXPORT void wesos::assert::register_abort_callback(void* m, AbortCallback cb) {
-  ABORT_LOCK_GLOBAL.critical_section([&] {
-    ABORT_GLOBAL.m_func = cb;
-    ABORT_GLOBAL.m_data = m;
+  SETUP_LOCK_GLOBAL.critical_section([&] {
+    SETUP_GLOBAL.m_abort_func = cb;
+    SETUP_GLOBAL.m_abort_data = m;
   });
 }
 
 SYM_EXPORT void wesos::assert::assert_failure(const char* message, SourceLocation source) {
   using namespace assert;
 
-  auto output_copy = OUTPUT_LOCK_GLOBAL.critical_section([] { return OUTPUT_GLOBAL; });
-  auto abort_copy = ABORT_LOCK_GLOBAL.critical_section([] { return ABORT_GLOBAL; });
+  auto setup = SETUP_LOCK_GLOBAL.critical_section([] { return SETUP_GLOBAL; });
 
-  if (output_copy.m_func != nullptr) {
-    output_copy.m_func(output_copy.m_data, message, source);
+  if (setup.m_output_func != nullptr) {
+    setup.m_output_func(setup.m_output_data, message, source);
   }
 
-  if (abort_copy.m_func != nullptr) {
-    abort_copy.m_func(abort_copy.m_data);
+  if (setup.m_abort_func != nullptr) {
+    setup.m_abort_func(setup.m_abort_data);
   }
 
-  default_abort_callback(nullptr);
+  __builtin_trap();
 }
