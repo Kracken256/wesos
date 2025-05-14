@@ -64,7 +64,7 @@ SYM_EXPORT auto AtomicOutputStreamRef::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicStreamRef::create(mem::MemoryResourceProtocol& mm,
                                         StreamProtocol& parent) -> Nullable<Box<AtomicStreamRef>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
+    Box<SpinLock> some_lock = move(basic_spinlock.value());
     return Box<AtomicStreamRef>::create(mm, move(some_lock), parent);
   }
 
@@ -123,7 +123,7 @@ SYM_EXPORT auto AtomicOutputStream::virt_cache_size() const -> usize {
 SYM_EXPORT auto AtomicStream::create(mem::MemoryResourceProtocol& mm,
                                      Box<StreamProtocol> parent) -> Nullable<Box<AtomicStream>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
+    Box<SpinLock> some_lock = move(basic_spinlock.value());
     return Box<AtomicStream>::create(mm, move(some_lock), move(parent));
   }
 

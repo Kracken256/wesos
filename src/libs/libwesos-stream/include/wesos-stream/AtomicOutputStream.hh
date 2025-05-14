@@ -68,8 +68,7 @@ namespace wesos::stream {
     [[nodiscard]] static auto create_from(mem::MemoryResourceProtocol& mm,
                                           Args... args) -> Nullable<smartptr::Box<AtomicOutputStream>> {
       if (auto stream = smartptr::Box<OutputStream>::create(mm, forward<Args>(args)...)) [[likely]] {
-        auto base = smartptr::box_cast<OutputStreamProtocol>(move(stream.value()));
-        return smartptr::Box<AtomicOutputStream>::create(mm, mm, move(base));
+        return create(mm, move(stream.value()));
       }
 
       return null;

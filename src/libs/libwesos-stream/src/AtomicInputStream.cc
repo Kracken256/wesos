@@ -36,7 +36,7 @@ SYM_EXPORT auto AtomicInputStreamRef::virt_read_pos() const -> Nullable<usize> {
 SYM_EXPORT auto AtomicInputStreamRef::create(mem::MemoryResourceProtocol& mm,
                                              InputStreamProtocol& parent) -> Nullable<Box<AtomicInputStreamRef>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
+    Box<SpinLock> some_lock = move(basic_spinlock.value());
     return Box<AtomicInputStreamRef>::create(mm, move(some_lock), parent);
   }
 
@@ -67,7 +67,7 @@ SYM_EXPORT auto AtomicInputStream::virt_read_pos() const -> Nullable<usize> {
 SYM_EXPORT auto AtomicInputStream::create(mem::MemoryResourceProtocol& mm,
                                           Box<InputStreamProtocol> parent) -> Nullable<Box<AtomicInputStream>> {
   if (auto basic_spinlock = Box<SpinLock>::create(mm)) [[likely]] {
-    auto some_lock = box_cast<SpinLock>(move(basic_spinlock.value()));
+    Box<SpinLock> some_lock = move(basic_spinlock.value());
     return Box<AtomicInputStream>::create(mm, move(some_lock), move(parent));
   }
 
