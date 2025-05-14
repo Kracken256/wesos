@@ -33,7 +33,7 @@ namespace wesos::mem {
     MemoryResourceProtocol(MemoryResourceProtocol&&) = delete;
     auto operator=(const MemoryResourceProtocol&) -> MemoryResourceProtocol& = delete;
     auto operator=(MemoryResourceProtocol&&) -> MemoryResourceProtocol& = delete;
-    virtual ~MemoryResourceProtocol() = 0;
+    virtual ~MemoryResourceProtocol();
 
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
