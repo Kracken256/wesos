@@ -9,5 +9,29 @@
 #include <wesos-mem/NullResource.hh>
 
 using namespace wesos;
+using namespace wesos::mem;
 
-SYM_EXPORT ThreadSafe<mem::NullResource> mem::NULL_RESOURCE_GLOBAL;
+SYM_EXPORT ThreadSafe<NullResource> mem::NULL_RESOURCE_GLOBAL;
+
+SYM_EXPORT NullResource::NullResource() = default;
+
+SYM_EXPORT NullResource::~NullResource() = default;
+
+SYM_EXPORT auto NullResource::virt_embezzle(usize max_size) -> View<u8> {
+  (void)max_size;
+  return View<u8>::create_empty();
+}
+
+SYM_EXPORT auto NullResource::virt_allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+  (void)size;
+  (void)align;
+  return nullptr;
+};
+
+SYM_EXPORT void NullResource::virt_deallocate(OwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) {
+  (void)ptr;
+  (void)size;
+  (void)align;
+};
+
+SYM_EXPORT auto NullResource::virt_utilize(View<u8> pool) -> void { (void)pool; };
