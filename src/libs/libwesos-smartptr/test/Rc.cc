@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <wesos-mem/IntrusivePool.hh>
+#include <wesos-alloc/IntrusivePool.hh>
 #include <wesos-smartptr/Rc.hh>
 
 using namespace wesos;

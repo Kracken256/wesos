@@ -14,8 +14,8 @@
 #define ASAN_UNPOISON_MEMORY_REGION(addr, size) ((void)(addr), (void)(size))
 #endif
 
+#include <wesos-alloc/IntrusivePool.hh>
 #include <wesos-builtin/Export.hh>
-#include <wesos-mem/IntrusivePool.hh>
 
 using namespace wesos;
 using namespace wesos::mem;

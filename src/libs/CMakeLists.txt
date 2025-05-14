@@ -6,6 +6,7 @@ set(PROJECT_WIDE_LIBRARIES
   wesos-assert
   wesos-stream
   wesos-mem
+  wesos-alloc
   wesos-smartptr
   wesos-lambda
   wesos-kernconf

@@ -10,7 +10,7 @@
 #include <iostream>
 #include <memory_resource>
 #include <unordered_set>
-#include <wesos-mem/IntrusivePool.hh>
+#include <wesos-alloc/IntrusivePool.hh>
 
 static void deps_setup() {
   wesos::assert::register_output_callback(nullptr, [](void*, const char* message, wesos::SourceLocation source) {

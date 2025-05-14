@@ -10,7 +10,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <iostream>
-#include <wesos-mem/IntrusivePool.hh>
+#include <wesos-alloc/IntrusivePool.hh>
 #include <wesos-mem/TracingResource.hh>
 
 #include "UnifiedBenchmark.hh"
