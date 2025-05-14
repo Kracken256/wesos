@@ -25,6 +25,4 @@ namespace wesos::mem {
     auto operator=(NullResource&&) -> NullResource& = delete;
     ~NullResource() override;
   };
-
-  extern ThreadSafe<mem::NullResource> NULL_RESOURCE_GLOBAL;
 }  // namespace wesos::mem

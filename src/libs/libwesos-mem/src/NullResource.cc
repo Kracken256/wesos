@@ -11,8 +11,6 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT ThreadSafe<NullResource> mem::NULL_RESOURCE_GLOBAL;
-
 SYM_EXPORT NullResource::NullResource() = default;
 
 SYM_EXPORT NullResource::~NullResource() = default;
