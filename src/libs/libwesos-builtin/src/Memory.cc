@@ -42,3 +42,15 @@ extern "C" auto memmove(void *dest, const void *src, usize n) -> void * {
 
   return dest;
 }
+
+extern "C" auto memcmp(const void *ptr1, const void *ptr2, usize n) -> int {
+  const auto *p1 = static_cast<const u8 *>(ptr1);
+  const auto *p2 = static_cast<const u8 *>(ptr2);
+
+  for (usize i = 0; i < n; ++i) {
+    if (p1[i] != p2[i]) {
+      return p1[i] < p2[i] ? -1 : 1;
+    }
+  }
+  return 0;
+}

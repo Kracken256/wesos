@@ -15,6 +15,7 @@ namespace wesos {
   extern "C" auto memcpy(void *dest, const void *src, usize n) -> void *;
   extern "C" auto memset(void *dest, int value, usize n) -> void *;
   extern "C" auto memmove(void *dest, const void *src, usize n) -> void *;
+  extern "C" auto memcmp(const void *ptr1, const void *ptr2, usize n) -> int;
 
   // NOLINTEND(readability-identifier-naming)
 }  // namespace wesos

@@ -49,9 +49,33 @@ namespace wesos {
         : m_file(file), m_function(function), m_line(line), m_column(column) {}
 
     constexpr SourceLocation(const SourceLocation&) = default;
-    constexpr SourceLocation(SourceLocation&&) = default;
+
+    constexpr SourceLocation(SourceLocation&& o)
+        : m_file(o.m_file), m_function(o.m_function), m_line(o.m_line), m_column(o.m_column) {
+      o.m_file = "";
+      o.m_function = "";
+      o.m_line = 0;
+      o.m_column = 0;
+    }
+
     constexpr auto operator=(const SourceLocation&) -> SourceLocation& = default;
-    constexpr auto operator=(SourceLocation&&) -> SourceLocation& = default;
+
+    constexpr auto operator=(SourceLocation&& o) -> SourceLocation& {
+      if (this != &o) {
+        m_file = o.m_file;
+        m_function = o.m_function;
+        m_line = o.m_line;
+        m_column = o.m_column;
+
+        o.m_file = "";
+        o.m_function = "";
+        o.m_line = 0;
+        o.m_column = 0;
+      }
+
+      return *this;
+    };
+
     constexpr ~SourceLocation() = default;
 
     /**
