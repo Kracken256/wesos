@@ -50,6 +50,19 @@ namespace wesos {
 
     constexpr SourceLocation(const SourceLocation&) = default;
 
+    /**
+     * @brief Move constructor for SourceLocation.
+     *
+     * @param o The SourceLocation object to move from.
+     *
+     * This constructor transfers ownership of the source location details from one
+     * SourceLocation object to another, leaving the moved-from object in the
+     * following state:
+     *  - File name: ""
+     *  - Function name: ""
+     *  - Line number: 0
+     *  - Column number: 0
+     */
     constexpr SourceLocation(SourceLocation&& o)
         : m_file(o.m_file), m_function(o.m_function), m_line(o.m_line), m_column(o.m_column) {
       o.m_file = "";
@@ -60,6 +73,20 @@ namespace wesos {
 
     constexpr auto operator=(const SourceLocation&) -> SourceLocation& = default;
 
+    /**
+     * @brief Move assignment operator for SourceLocation.
+     *
+     * @param o The SourceLocation object to move from.
+     * @return A reference to the current object.
+     *
+     * This operator transfers ownership of the source location details from one
+     * SourceLocation object to another, leaving the moved-from object in the
+     * following state:
+     *  - File name: ""
+     *  - Function name: ""
+     *  - Line number: 0
+     *  - Column number: 0
+     */
     constexpr auto operator=(SourceLocation&& o) -> SourceLocation& {
       if (this != &o) {
         m_file = o.m_file;
