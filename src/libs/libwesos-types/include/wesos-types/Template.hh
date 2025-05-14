@@ -16,6 +16,38 @@ namespace wesos::types {
 
   // NOLINTBEGIN(readability-identifier-naming)
 
+  //=======================================================================
+
+  template <typename T>
+  struct add_rvalue_reference {
+    using type = T;
+  };
+
+  template <typename T>
+  struct add_rvalue_reference<T&&> {
+    using type = T&&;
+  };
+
+  template <typename T>
+  struct add_rvalue_reference<T&> {
+    using type = T&;
+  };
+
+  template <typename T>
+  struct add_rvalue_reference<T const> {
+    using type = typename add_rvalue_reference<T>::type const;
+  };
+
+  template <typename T>
+  using add_rvalue_reference_t = typename add_rvalue_reference<T>::type;
+
+  //=======================================================================
+
+  template <typename T>
+  auto declval() noexcept -> add_rvalue_reference<T>::type;
+
+  //=======================================================================
+
   template <typename T, T v>
   struct integral_constant {
     static constexpr T value = v;
