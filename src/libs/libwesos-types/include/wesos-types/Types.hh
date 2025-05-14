@@ -10,6 +10,7 @@
 #include <wesos-types/Array.hh>
 #include <wesos-types/ClampLeast.hh>
 #include <wesos-types/ClampMost.hh>
+#include <wesos-types/Defer.hh>
 #include <wesos-types/Group.hh>
 #include <wesos-types/Least.hh>
 #include <wesos-types/Most.hh>
@@ -49,6 +50,7 @@ namespace wesos {
   using types::uptr;
   using types::usize;
 
+  using types::defer;
   using types::max;
   using types::min;
   using types::numeric_limit_max;
