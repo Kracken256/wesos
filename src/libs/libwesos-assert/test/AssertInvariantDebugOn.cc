@@ -28,4 +28,6 @@ TEST(assert_invariant, ndebug) {
   // Test that assert_invariant does not abort when the condition is false
   // because NDEBUG makes it a no-op
   EXPECT_DEATH(assert_invariant(false && "This should fail"), "This should fail");
+
+  EXPECT_DEATH(assert_always(false && "This should fail"), "This should fail");
 }

@@ -29,4 +29,6 @@ TEST(assert_invariant, no_ndebug) {
 
   // Test that assert_invariant aborts when the condition is false
   EXPECT_NO_FATAL_FAILURE(assert_invariant(false && "This should fail"));
+
+  EXPECT_DEATH(assert_always(false && "This should fail"), "This should fail");
 }

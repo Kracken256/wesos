@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cstdlib>
 #include <wesos-assert/Assert.hh>
 
 TEST(assert_always, call) {
