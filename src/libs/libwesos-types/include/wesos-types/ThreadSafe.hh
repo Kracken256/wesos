@@ -24,8 +24,13 @@ namespace wesos::types {
     constexpr ~ThreadSafe() = default;
 
     [[nodiscard]] constexpr auto operator<=>(const ThreadSafe& o) const = default;
+
     [[nodiscard]] constexpr auto unwrap() const -> const T& { return m_value; }
     [[nodiscard]] constexpr auto operator->() const -> const T* { return &m_value; }
     [[nodiscard]] constexpr operator T() const { return m_value; }
+
+    [[nodiscard]] constexpr auto unwrap() -> T& { return m_value; }
+    [[nodiscard]] constexpr auto operator->() -> T* { return &m_value; }
+    [[nodiscard]] constexpr operator T() { return m_value; }
   };
 }  // namespace wesos::types
