@@ -8,44 +8,136 @@
 #include <gtest/gtest.h>
 
 #include <wesos-types/Move.hh>
+#include <wesos-types/Types.hh>
 
-TEST(wesos_types, Move) {
-  class MoveSemanticsTest {
-    bool m_active = true;
-    volatile unsigned &m_counter;
+using namespace wesos;
 
-  public:
-    MoveSemanticsTest(volatile unsigned &counter) : m_counter(counter) {}
-    MoveSemanticsTest(MoveSemanticsTest &&other) : m_counter(other.m_counter) { other.m_active = false; }
-    MoveSemanticsTest(const MoveSemanticsTest &) = default;
-    ~MoveSemanticsTest() {
-      if (m_active) {
-        m_counter = m_counter + 1;
-      }
-    }
-  };
+class MoveSemanticsTest {
+  bool m_active = true;
+  usize &m_copy_ctr;
+  usize &m_move_ctr;
 
-  volatile unsigned counter = 0;
-
-  {  // Test move semantics
-    {
-      auto obj = MoveSemanticsTest(counter);
-      auto obj2 = wesos::move(obj);
-      (void)obj2;
-    }
-
-    EXPECT_EQ(counter, 1);
+public:
+  constexpr MoveSemanticsTest(usize &copy_ctr, usize &move_ctr) : m_copy_ctr(copy_ctr), m_move_ctr(move_ctr) {
+    m_copy_ctr = 1;
+    m_move_ctr = 0;
   }
 
-  counter = 0;
+  constexpr MoveSemanticsTest(MoveSemanticsTest &&o)
+      : m_active(o.m_active), m_copy_ctr(o.m_copy_ctr), m_move_ctr(o.m_move_ctr) {
+    o.m_active = false;
+    m_move_ctr++;
+  }
 
-  {  // Test copy semantics
-    {
-      auto obj = MoveSemanticsTest(counter);
-      auto obj2 = obj;
-      (void)obj2;
+  constexpr MoveSemanticsTest(const MoveSemanticsTest &o)
+      : m_active(o.m_active), m_copy_ctr(o.m_copy_ctr), m_move_ctr(o.m_move_ctr) {
+    m_copy_ctr++;
+  }
+
+  constexpr auto operator=(const MoveSemanticsTest &o) -> MoveSemanticsTest & {
+    if (this != &o) {
+      m_active = o.m_active;
+      m_copy_ctr = o.m_copy_ctr;
+      m_move_ctr = o.m_move_ctr;
+      m_copy_ctr++;
     }
 
-    EXPECT_EQ(counter, 2);
+    return *this;
+  }
+
+  constexpr auto operator=(MoveSemanticsTest &&o) -> MoveSemanticsTest & {
+    if (this != &o) {
+      m_active = o.m_active;
+      m_copy_ctr = o.m_copy_ctr;
+      m_move_ctr = o.m_move_ctr;
+      o.m_active = false;
+      m_move_ctr++;
+    }
+
+    return *this;
+  }
+
+  [[nodiscard]] constexpr auto is_active() const -> bool { return m_active; }
+};
+
+TEST(wesos_types, Move_Control) {
+  usize copy_ctr = 0;
+  usize move_ctr = 0;
+
+  {  // Test move semantics
+    auto obj = MoveSemanticsTest(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj.is_active());
+
+    auto obj2 = obj;
+    EXPECT_EQ(copy_ctr, 2);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj2.is_active());
+    EXPECT_TRUE(obj.is_active());
+  }
+}
+
+TEST(wesos_types, Move_Test) {
+  usize copy_ctr = 0;
+  usize move_ctr = 0;
+
+  {  // Test move semantics
+    auto obj = MoveSemanticsTest(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj.is_active());
+
+    auto obj2 = wesos::move(obj);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 1);
+    EXPECT_TRUE(obj2.is_active());
+    EXPECT_FALSE(obj.is_active());
+  }
+}
+
+TEST(wesos_types, MoveAssign_Control) {
+  usize copy_ctr = 0;
+  usize move_ctr = 0;
+
+  {  // Test move semantics
+    auto obj = MoveSemanticsTest(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj.is_active());
+
+    MoveSemanticsTest obj2(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj2.is_active());
+
+    obj2 = obj;
+    EXPECT_EQ(copy_ctr, 2);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj2.is_active());
+    EXPECT_TRUE(obj.is_active());
+  }
+}
+
+TEST(wesos_types, MoveAssign_Test) {
+  usize copy_ctr = 0;
+  usize move_ctr = 0;
+
+  {  // Test move semantics
+    auto obj = MoveSemanticsTest(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj.is_active());
+
+    MoveSemanticsTest obj2(copy_ctr, move_ctr);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 0);
+    EXPECT_TRUE(obj2.is_active());
+
+    obj2 = wesos::move(obj);
+    EXPECT_EQ(copy_ctr, 1);
+    EXPECT_EQ(move_ctr, 1);
+    EXPECT_TRUE(obj2.is_active());
+    EXPECT_FALSE(obj.is_active());
   }
 }
