@@ -7,28 +7,48 @@
 
 #pragma once
 
+#include <wesos-types/Types.hh>
+
 namespace wesos::sync {
-#define W_LOCK_PROTOCOL_IMPLEMENT(LockClassName)           \
-  class LockLease final {                                  \
-    friend class LockClassName;                            \
-    LockClassName& m_parent;                               \
-                                                           \
-    LockLease(LockClassName& parent) : m_parent(parent) {} \
-                                                           \
-  public:                                                  \
-    LockLease(const LockLease&) = delete;                  \
-    LockLease(LockLease&&) = delete;                       \
-                                                           \
-    ~LockLease() { m_parent.unlock(); }                    \
-  };                                                       \
-                                                           \
-  [[nodiscard]] auto lease() -> LockLease {                \
-    lock();                                                \
-    return {*this};                                        \
-  }                                                        \
-                                                           \
-  [[nodiscard]] auto critical_section(auto code) {         \
-    auto critical_scope = lease();                         \
-    return code();                                         \
+#define W_LOCK_PROTOCOL_IMPLEMENT(LockClassName)                                                \
+  class AutoUnlock final {                                                                      \
+    friend class LockClassName;                                                                 \
+    LockClassName& m_parent;                                                                    \
+                                                                                                \
+    AutoUnlock(LockClassName& parent) : m_parent(parent) {}                                     \
+                                                                                                \
+  public:                                                                                       \
+    AutoUnlock(const AutoUnlock&) = delete;                                                     \
+    AutoUnlock(AutoUnlock&&) = default;                                                         \
+                                                                                                \
+    ~AutoUnlock() { m_parent.unlock(); }                                                        \
+  };                                                                                            \
+                                                                                                \
+  [[nodiscard]] auto lease() -> AutoUnlock {                                                    \
+    lock();                                                                                     \
+    return {*this};                                                                             \
+  }                                                                                             \
+                                                                                                \
+  [[nodiscard]] auto try_lease() -> Nullable<AutoUnlock> {                                      \
+    if (!try_lock()) {                                                                          \
+      return null;                                                                              \
+    }                                                                                           \
+                                                                                                \
+    return AutoUnlock(*this);                                                                   \
+  }                                                                                             \
+                                                                                                \
+  [[nodiscard]] auto critical_section(const auto& code) {                                       \
+    lock();                                                                                     \
+    auto _ = defer([&] { unlock(); });                                                          \
+    return code();                                                                              \
+  }                                                                                             \
+                                                                                                \
+  template <class Callable>                                                                     \
+  [[nodiscard]] auto try_critical_section(const Callable& code) -> Nullable<decltype(code())> { \
+    if (!try_lock()) {                                                                          \
+      return null;                                                                              \
+    }                                                                                           \
+    auto _ = defer([&] { unlock(); });                                                          \
+    return code();                                                                              \
   }
 }  // namespace wesos::sync
