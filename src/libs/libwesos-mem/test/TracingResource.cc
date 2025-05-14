@@ -8,7 +8,6 @@
 #include <gtest/gtest.h>
 
 #include <cstdarg>
-#include <sstream>
 #include <wesos-mem/NullResource.hh>
 #include <wesos-mem/TracingResource.hh>
 #include <wesos-types/Types.hh>
