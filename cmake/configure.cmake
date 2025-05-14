@@ -11,6 +11,16 @@ if(WESOS_BUILD_TESTING)
   target_compile_options(wesos-test PRIVATE -O0)
   install(TARGETS wesos-test)
   add_test(NAME wesos-test COMMAND wesos-test)
+
+  if(WESOS_ADDRESS_SANITIZER)
+    target_compile_options(wesos-test PRIVATE -fsanitize=address)
+    target_link_options(wesos-test PRIVATE -fsanitize=address)
+  endif()
+
+  if(WESOS_UNDEFINED_SANITIZER)
+    target_compile_options(wesos-test PRIVATE -fsanitize=undefined)
+    target_link_options(wesos-test PRIVATE -fsanitize=undefined)
+  endif()
 endif()
 
 if(WESOS_COVERAGE)
