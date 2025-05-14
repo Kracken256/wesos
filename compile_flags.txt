@@ -3,6 +3,7 @@
 -Isrc/libs/libwesos-cpu/include
 -Isrc/libs/libwesos-kernconf/include
 -Isrc/libs/libwesos-lambda/include
+-Isrc/libs/libwesos-alloc/include
 -Isrc/libs/libwesos-mem/include
 -Isrc/libs/libwesos-smartptr/include
 -Isrc/libs/libwesos-stream/include
