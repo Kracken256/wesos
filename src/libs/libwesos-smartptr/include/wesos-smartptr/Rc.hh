@@ -25,9 +25,11 @@ namespace wesos::smartptr {
     NullableRefPtr<Object> m_ptr;
     NullableRefPtr<State> m_state;
 
-    constexpr Rc(OwnPtr<Object> ptr, OwnPtr<State> state) : m_ptr(ptr), m_state(state) {}
+    // constexpr Rc(OwnPtr<Object> ptr, OwnPtr<State> state) : m_ptr(ptr), m_state(state) {}
 
   public:
+    constexpr Rc() = delete;
+
     constexpr Rc(const Rc& o) : m_ptr(o.m_ptr), m_state(o.m_state) {
       assert_invariant(m_state.isset());
 

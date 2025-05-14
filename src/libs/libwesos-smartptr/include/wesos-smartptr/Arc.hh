@@ -26,9 +26,11 @@ namespace wesos::smartptr {
     NullableRefPtr<Object> m_ptr;
     NullableRefPtr<State> m_state;
 
-    constexpr Arc(OwnPtr<Object> ptr, OwnPtr<State> state) : m_ptr(ptr), m_state(state) {}
+    // constexpr Arc(OwnPtr<Object> ptr, OwnPtr<State> state) : m_ptr(ptr), m_state(state) {}
 
   public:
+    constexpr Arc() = delete;
+
     constexpr Arc(const Arc& o) : m_ptr(o.m_ptr), m_state(o.m_state) {
       ++m_state->m_state_rc;
       ++m_state->m_data_rc;
