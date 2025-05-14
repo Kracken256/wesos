@@ -17,9 +17,9 @@ namespace wesos::sync {
   public:
     constexpr SpinLock() : m_locked(false) {}
     constexpr SpinLock(const SpinLock&) = delete;
-    constexpr SpinLock(SpinLock&&) = delete;
+    constexpr SpinLock(SpinLock&&) = default;
     constexpr auto operator=(const SpinLock&) -> SpinLock& = delete;
-    constexpr auto operator=(SpinLock&&) -> SpinLock& = delete;
+    constexpr auto operator=(SpinLock&&) -> SpinLock& = default;
     constexpr ~SpinLock() = default;
 
     auto lock() -> void;
