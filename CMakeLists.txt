@@ -13,6 +13,7 @@ option(WESOS_BUILD_KERN "Build WesOS kernel (good luck)" ON)
 option(WESOS_BUILD_USER "Build WesOS userspace (the hard part)" ON)
 option(WESOS_ADDRESS_SANITIZER "Enable the -fsanitize=address compiler flag" OFF)
 option(WESOS_UNDEFINED_SANITIZER "Enable the -fsanitize=undefined compiler flag" OFF)
+option(WESOS_COVERAGE "Enable the code coverage" OFF)
 option(WESOS_WORLD_LTO "Enable Link Time Optimization (LTO) for the entire build" ON)
 
 set(WESOS_TARGET_TRIPLE x86_64-pc-linux-gnu)
