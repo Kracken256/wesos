@@ -30,22 +30,28 @@ namespace wesos::types {
     constexpr Nullable(nullptr_t) {}
     constexpr Nullable(T x) { assign(move(x)); }
 
-    template <class U, typename = enable_if_t<is_copy_constructible_v<U>>>
-    constexpr Nullable(const Nullable<U>& o) {
+    template <class U>
+    constexpr Nullable(const Nullable<U>& o)
+      requires(is_copy_constructible_v<U>)
+    {
       if (o.isset()) {
         assign(o.get());
       }
     };
 
-    template <class U, typename = enable_if_t<is_move_constructible_v<U>>>
-    constexpr Nullable(Nullable<U>&& o) {
+    template <class U>
+    constexpr Nullable(Nullable<U>&& o)
+      requires(is_move_constructible_v<U>)
+    {
       if (o.isset()) {
         assign(move(o.get()));
       }
     }
 
-    template <class U, typename = enable_if_t<is_copy_constructible_v<U>>>
-    constexpr auto operator=(const Nullable<U>& o) -> Nullable& {
+    template <class U>
+    constexpr auto operator=(const Nullable<U>& o) -> Nullable&
+      requires(is_copy_constructible_v<U>)
+    {
       if (o.isset()) {
         assign(o.get());
       } else {
@@ -53,8 +59,10 @@ namespace wesos::types {
       }
     }
 
-    template <class U, typename = enable_if_t<is_move_constructible_v<U>>>
-    constexpr auto operator=(Nullable<U>&& o) -> Nullable& {
+    template <class U>
+    constexpr auto operator=(Nullable<U>&& o) -> Nullable&
+      requires(is_move_constructible_v<U>)
+    {
       if (this != &o) {
         if (o.isset()) {
           assign(move(o.get()));
