@@ -7,4 +7,4 @@
 
 #include <gtest/gtest.h>
 
-TEST(placeholder, placeholder) {}
+TEST(cpu, placeholder) {}

@@ -26,11 +26,6 @@ if(WESOS_UNDEFINED_SANITIZER)
   add_link_options(-fsanitize=undefined)
 endif()
 
-if(WESOS_COVERAGE)
-  add_compile_options(-fprofile-instr-generate -fcoverage-mapping)
-  add_link_options(-fprofile-instr-generate -fcoverage-mapping)
-endif()
-
 foreach(LIB ${PROJECT_WIDE_LIBRARIES})
   message(STATUS "Adding subdirectory: lib${LIB}")
   set(COMPONENT_NAME "${LIB}")
