@@ -9,7 +9,7 @@
 
 #include <wesos-types/Types.hh>
 
-TEST(Number, min) {
+TEST(wesos_types, min) {
   using namespace wesos;
 
   constexpr i64 u8_min = 0;
@@ -31,7 +31,7 @@ TEST(Number, min) {
   EXPECT_EQ(wesos::numeric_limit_min<i64>(), i64_min);
 }
 
-TEST(Number, max) {
+TEST(wesos_types, max) {
   using namespace wesos;
 
   constexpr u64 u8_max = 0xff;

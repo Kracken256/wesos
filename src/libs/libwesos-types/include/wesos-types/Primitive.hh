@@ -11,8 +11,6 @@
 
 namespace wesos::types::detail {
   enum class PrimitiveTypeSize : unsigned char {
-    Empty = 0,
-
     U8 = 1,
     U16 = 2,
     U32 = 4,

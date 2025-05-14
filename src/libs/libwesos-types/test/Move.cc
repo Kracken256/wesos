@@ -9,7 +9,7 @@
 
 #include <wesos-types/Move.hh>
 
-TEST(Move, Move) {
+TEST(wesos_types, Move) {
   class MoveSemanticsTest {
     bool m_active = true;
     volatile unsigned &m_counter;

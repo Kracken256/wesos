@@ -9,7 +9,7 @@
 
 #include <wesos-types/Types.hh>
 
-TEST(Null, Null) {
+TEST(wesos_types, Null) {
   // Ensure proper type alias
   static_assert(wesos::types::is_same_v<decltype(wesos::types::null), const wesos::types::Null>);
 
