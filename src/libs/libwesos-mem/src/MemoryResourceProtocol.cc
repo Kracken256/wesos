@@ -6,7 +6,7 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-mem/AtomicMemoryEconomy.hh>
+#include <wesos-mem/MemoryEconomy.hh>
 #include <wesos-mem/MemoryResourceProtocol.hh>
 
 using namespace wesos::mem;

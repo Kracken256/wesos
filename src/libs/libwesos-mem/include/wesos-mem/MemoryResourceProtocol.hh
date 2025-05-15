@@ -11,11 +11,11 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
-  class AtomicMemoryEconomy;
+  class MemoryEconomy;
 
   class MemoryResourceProtocol {
     friend class TracingResource;
-    friend class AtomicMemoryEconomy;
+    friend class MemoryEconomy;
 
     sync::Atomic<usize> m_eco_request_size;
     sync::Atomic<bool> m_eco_should_yield;

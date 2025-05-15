@@ -6,12 +6,12 @@
  */
 
 #include <wesos-builtin/Export.hh>
-#include <wesos-mem/AtomicMemoryEconomy.hh>
+#include <wesos-mem/MemoryEconomy.hh>
 
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+SYM_EXPORT auto MemoryEconomy::allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
   return m_lock.critical_section([&] {
     // TODO: allocate memory from any child
     (void)size;
@@ -21,14 +21,14 @@ SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size, PowerOfTwo<usize> alig
   });
 }
 
-SYM_EXPORT auto AtomicMemoryEconomy::utilize(View<u8> pool) -> void {
+SYM_EXPORT auto MemoryEconomy::utilize(View<u8> pool) -> void {
   m_lock.critical_section([&] {
     // TODO: distribute memory across children (uniformly?)
     (void)pool;
   });
 }
 
-SYM_EXPORT auto AtomicMemoryEconomy::add_resource(MemoryResourceProtocol& child) -> void {
+SYM_EXPORT auto MemoryEconomy::add_resource(MemoryResourceProtocol& child) -> void {
   m_lock.critical_section([&] {
     assert_invariant(child.m_eco_chain_next.is_null());
 
@@ -37,7 +37,7 @@ SYM_EXPORT auto AtomicMemoryEconomy::add_resource(MemoryResourceProtocol& child)
   });
 }
 
-SYM_EXPORT auto AtomicMemoryEconomy::remove_resource(MemoryResourceProtocol& child) -> void {
+SYM_EXPORT auto MemoryEconomy::remove_resource(MemoryResourceProtocol& child) -> void {
   m_lock.critical_section([&] {
     NullableRefPtr<MemoryResourceProtocol> node = m_front;
     NullableRefPtr<MemoryResourceProtocol> prev = null;
@@ -62,7 +62,7 @@ SYM_EXPORT auto AtomicMemoryEconomy::remove_resource(MemoryResourceProtocol& chi
   });
 }
 
-SYM_EXPORT auto wesos::mem::global_memory_economy() -> AtomicMemoryEconomy& {
-  static AtomicMemoryEconomy INSTANCE_STATIC;
+SYM_EXPORT auto wesos::mem::global_memory_economy() -> MemoryEconomy& {
+  static MemoryEconomy INSTANCE_STATIC;
   return INSTANCE_STATIC;
 }

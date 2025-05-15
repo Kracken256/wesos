@@ -12,7 +12,7 @@
 #include <wesos-types/Types.hh>
 
 namespace wesos::mem {
-  class AtomicMemoryEconomy final {
+  class MemoryEconomy final {
     friend class MemoryResourceProtocol;
 
     sync::SpinLock m_lock;
@@ -22,16 +22,16 @@ namespace wesos::mem {
     auto remove_resource(MemoryResourceProtocol& child) -> void;
 
   public:
-    AtomicMemoryEconomy() = default;
-    AtomicMemoryEconomy(const AtomicMemoryEconomy&) = delete;
-    AtomicMemoryEconomy(AtomicMemoryEconomy&&) = delete;
-    auto operator=(const AtomicMemoryEconomy&) -> AtomicMemoryEconomy& = delete;
-    auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
-    ~AtomicMemoryEconomy() = default;
+    MemoryEconomy() = default;
+    MemoryEconomy(const MemoryEconomy&) = delete;
+    MemoryEconomy(MemoryEconomy&&) = delete;
+    auto operator=(const MemoryEconomy&) -> MemoryEconomy& = delete;
+    auto operator=(MemoryEconomy&&) -> MemoryEconomy& = delete;
+    ~MemoryEconomy() = default;
 
     [[nodiscard]] auto allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto utilize(View<u8> pool) -> void;
   };
 
-  [[nodiscard]] auto global_memory_economy() -> AtomicMemoryEconomy&;
+  [[nodiscard]] auto global_memory_economy() -> MemoryEconomy&;
 }  // namespace wesos::mem

@@ -9,7 +9,7 @@
 #include <wesos-cpu/Target.hh>
 #include <wesos-cpu/Timing.hh>
 #include <wesos-kernconf/Parser.hh>
-#include <wesos-mem/AtomicMemoryEconomy.hh>
+#include <wesos-mem/MemoryEconomy.hh>
 #include <wesos-sync/MemoryOrder.hh>
 #include <wesos-types/Types.hh>
 
