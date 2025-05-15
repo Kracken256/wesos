@@ -29,7 +29,7 @@ namespace wesos::mem {
     auto operator=(AtomicMemoryEconomy&&) -> AtomicMemoryEconomy& = delete;
     ~AtomicMemoryEconomy() = default;
 
-    [[nodiscard]] auto allocate(usize size) -> NullableOwnPtr<void>;
+    [[nodiscard]] auto allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto utilize(View<u8> pool) -> void;
   };
 

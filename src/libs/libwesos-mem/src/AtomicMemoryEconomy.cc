@@ -11,13 +11,14 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size) -> NullableOwnPtr<void> {
-  m_lock.critical_section([&] {
+SYM_EXPORT auto AtomicMemoryEconomy::allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
+  return m_lock.critical_section([&] {
     // TODO: allocate memory from any child
     (void)size;
-  });
+    (void)align;
 
-  return null;
+    return null;
+  });
 }
 
 SYM_EXPORT auto AtomicMemoryEconomy::utilize(View<u8> pool) -> void {
