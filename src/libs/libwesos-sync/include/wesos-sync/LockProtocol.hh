@@ -37,7 +37,7 @@ namespace wesos::sync {
     return AutoUnlock(*this);                                                                   \
   }                                                                                             \
                                                                                                 \
-  [[nodiscard]] auto critical_section(const auto& code) {                                       \
+  auto critical_section(const auto& code) {                                                     \
     lock();                                                                                     \
     auto _ = defer([&] { unlock(); });                                                          \
     return code();                                                                              \

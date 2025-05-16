@@ -22,14 +22,14 @@ namespace wesos::mem {
     auto remove_resource(MemoryResourceProtocol& child) -> void;
 
   public:
-    MemoryEconomy() = default;
+    MemoryEconomy();
     MemoryEconomy(const MemoryEconomy&) = delete;
     MemoryEconomy(MemoryEconomy&&) = delete;
     auto operator=(const MemoryEconomy&) -> MemoryEconomy& = delete;
     auto operator=(MemoryEconomy&&) -> MemoryEconomy& = delete;
     ~MemoryEconomy() = default;
 
-    [[nodiscard]] auto allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
+    [[nodiscard]] auto allocate(usize size) -> NullableOwnPtr<void>;
     auto utilize(View<u8> pool) -> void;
   };
 

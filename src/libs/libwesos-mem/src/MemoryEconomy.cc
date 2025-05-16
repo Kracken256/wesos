@@ -11,14 +11,18 @@
 using namespace wesos;
 using namespace wesos::mem;
 
-SYM_EXPORT auto MemoryEconomy::allocate(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void> {
-  return m_lock.critical_section([&] {
-    // TODO: allocate memory from any child
-    (void)size;
-    (void)align;
+SYM_EXPORT MemoryEconomy::MemoryEconomy() {}
 
-    return null;
+SYM_EXPORT auto MemoryEconomy::allocate(usize size) -> NullableOwnPtr<void> {
+  m_lock.critical_section([&] {
+    /* Request that all children yield some of their memory */
+    for (auto node = m_front; node.isset(); node = node->m_eco_chain_next) {
+      node->m_eco_request_size.fetch_add(size);
+      node->m_eco_should_yield.store(true);
+    }
   });
+
+  return null;
 }
 
 SYM_EXPORT auto MemoryEconomy::utilize(View<u8> pool) -> void {
