@@ -25,7 +25,7 @@ static void deps_setup() {
   });
 }
 
-TEST(IntrusivePool, CreatePool) {
+TEST(wesos_alloc, IntrusivePool_CreatePool) {
   deps_setup();
 
   using namespace wesos;
@@ -35,10 +35,10 @@ TEST(IntrusivePool, CreatePool) {
   std::vector<u8> buf(buffer_size);
   View<u8> pool(buf.data(), buf.size());
 
-  auto mm = mem::IntrusivePool(sizeof(int), alignof(int), pool);
+  auto mm = alloc::IntrusivePool(sizeof(int), alignof(int), pool);
 }
 
-TEST(IntrusivePool, Allocate) {
+TEST(wesos_alloc, IntrusivePool_Allocate) {
   deps_setup();
 
   using namespace wesos;
@@ -49,7 +49,7 @@ TEST(IntrusivePool, Allocate) {
 
   const auto min_size = 16;
   const auto max_size = 257;
-  const PowerOfTwo<usize> min_align = mem::IntrusivePool::minimum_alignment();
+  const PowerOfTwo<usize> min_align = alloc::IntrusivePool::minimum_alignment();
   const PowerOfTwo<usize> max_align = 64;
 
   constexpr auto alloc_limit = 9;
@@ -66,7 +66,7 @@ TEST(IntrusivePool, Allocate) {
       ASSERT_NE(buf, nullptr);
 
       auto buf_view = View<u8>(buf, exact_buffer_size);
-      auto mm = mem::IntrusivePool(size, align, buf_view);
+      auto mm = alloc::IntrusivePool(size, align, buf_view);
 
       {  // Use all avaiable memory in pool
         pointers.clear();

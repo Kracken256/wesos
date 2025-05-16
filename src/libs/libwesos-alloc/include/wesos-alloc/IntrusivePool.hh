@@ -10,8 +10,8 @@
 #include <wesos-mem/MemoryResourceProtocol.hh>
 #include <wesos-types/Types.hh>
 
-namespace wesos::mem {
-  class IntrusivePool final : public MemoryResourceProtocol {
+namespace wesos::alloc {
+  class IntrusivePool final : public mem::MemoryResourceProtocol {
     struct FreeNode {
       NullableRefPtr<FreeNode> m_next;
     };
@@ -44,4 +44,4 @@ namespace wesos::mem {
     [[nodiscard]] static constexpr auto minimum_size() { return sizeof(FreeNode); }
     [[nodiscard]] static constexpr auto minimum_alignment() { return alignof(FreeNode); }
   };
-}  // namespace wesos::mem
+}  // namespace wesos::alloc

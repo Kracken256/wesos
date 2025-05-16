@@ -19,6 +19,7 @@
 
 using namespace wesos;
 using namespace wesos::mem;
+using namespace wesos::alloc;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool)
     : m_front(nullptr),
