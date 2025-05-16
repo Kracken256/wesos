@@ -36,6 +36,12 @@ SYM_EXPORT auto MemoryResourceProtocol::utilize_bytes(View<u8> pool) -> void {
   virt_utilize(pool);
 }
 
+SYM_EXPORT auto MemoryResourceProtocol::embezzle_bytes(usize max_size) -> View<u8> {
+  eco_yield();
+
+  return virt_embezzle(max_size);
+}
+
 SYM_EXPORT void MemoryResourceProtocol::eco_yield() {
   if (const auto should_yield = m_eco_should_yield.load(sync::memory_order_acquire)) [[unlikely]] {
     m_eco_should_yield.store(false, sync::memory_order_relaxed);

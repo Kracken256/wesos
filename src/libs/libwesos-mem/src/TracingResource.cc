@@ -34,7 +34,7 @@ SYM_EXPORT auto TracingResource::virt_utilize(View<u8> pool) -> void {
 }
 
 SYM_EXPORT auto TracingResource::virt_embezzle(usize max_size) -> View<u8> {
-  auto embezzled = m_debugee.virt_embezzle(max_size);
+  auto embezzled = m_debugee.embezzle_bytes(max_size);
 
   m_print("TracingResource::embezzle_bytes(%zu) -> (%p, %zu)\n", max_size,
           static_cast<void*>(embezzled.into_ptr().unwrap()), embezzled.size());

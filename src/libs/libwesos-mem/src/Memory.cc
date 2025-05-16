@@ -9,12 +9,11 @@
 #include <wesos-mem/Memory.hh>
 
 SYM_EXPORT auto wesos::mem::get_default_resource() -> MemoryResourceProtocol & {
-  /// TODO: Make a thread-safe wrapper that implements the MemoryResourceProtocol
+  static NullResource NULL_RESOURCE_STATIC;  // Replace with a real allocator
 
-  static NullResource NULL_RESOURCE_STATIC;
-  static MemoryResourceProtocol &DEFAULT_RESOURCE_STATIC = NULL_RESOURCE_STATIC;
+  static AtomicResource ATOMIC_RESOURCE_STATIC(NULL_RESOURCE_STATIC);
 
-  return DEFAULT_RESOURCE_STATIC;
+  return ATOMIC_RESOURCE_STATIC;
 }
 
 SYM_EXPORT auto wesos::mem::initialize(Kickstart initial_buffer) -> bool {

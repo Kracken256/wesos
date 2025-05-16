@@ -14,7 +14,6 @@ namespace wesos::mem {
   class MemoryEconomy;
 
   class MemoryResourceProtocol {
-    friend class TracingResource;
     friend class MemoryEconomy;
 
     sync::Atomic<usize> m_eco_request_size;
@@ -35,6 +34,7 @@ namespace wesos::mem {
     auto operator=(MemoryResourceProtocol&&) -> MemoryResourceProtocol& = delete;
     virtual ~MemoryResourceProtocol();
 
+    [[nodiscard]] auto embezzle_bytes(usize max_size) -> View<u8>;
     [[nodiscard]] auto allocate_bytes(usize size, PowerOfTwo<usize> align) -> NullableOwnPtr<void>;
     auto deallocate_bytes(NullableOwnPtr<void> ptr, usize size, PowerOfTwo<usize> align) -> void;
     auto utilize_bytes(View<u8> pool) -> void;
