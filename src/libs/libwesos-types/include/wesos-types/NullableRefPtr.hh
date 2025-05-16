@@ -66,6 +66,18 @@ namespace wesos::types {
       assert_invariant(isset());
       return *unwrap();
     }
+
+    template <class To>
+    [[nodiscard]] constexpr auto cast_to() const -> NullableRefPtr<To>
+      requires(is_convertible_v<Pointee*, To*>)
+    {
+      return NullableRefPtr<To>(static_cast<To*>(unwrap()));
+    }
+
+    template <class To>
+    [[nodiscard]] constexpr auto bitcast_to() const -> NullableRefPtr<To> {
+      return NullableRefPtr<To>(bit_cast<To*>(unwrap()));
+    }
   };
 
   static_assert(sizeof(NullableRefPtr<void*>) == sizeof(void*),

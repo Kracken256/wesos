@@ -68,6 +68,18 @@ namespace wesos::types {
     [[nodiscard]] constexpr auto as_ref() const -> NullableRefPtr<Pointee> {
       return this->unwrap();
     }
+
+    template <class To>
+    [[nodiscard]] constexpr auto cast_to() const -> NullableOwnPtr<To>
+      requires(is_convertible_v<Pointee*, To*>)
+    {
+      return NullableOwnPtr<To>(static_cast<To*>(unwrap()));
+    }
+
+    template <class To>
+    [[nodiscard]] constexpr auto bitcast_to() const -> NullableOwnPtr<To> {
+      return NullableOwnPtr<To>(bit_cast<To*>(unwrap()));
+    }
   };
 
   static_assert(sizeof(NullableOwnPtr<void*>) == sizeof(void*),

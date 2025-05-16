@@ -92,6 +92,18 @@ namespace wesos::types {
     {
       return unwrap() - 1;
     }
+
+    template <class To>
+    [[nodiscard]] constexpr auto cast_to() const -> RefPtr<To>
+      requires(is_convertible_v<Pointee*, To*>)
+    {
+      return RefPtr<To>(static_cast<To*>(unwrap()));
+    }
+
+    template <class To>
+    [[nodiscard]] constexpr auto bitcast_to() const -> RefPtr<To> {
+      return RefPtr<To>(bit_cast<To*>(unwrap()));
+    }
   };
 
   static_assert(sizeof(RefPtr<void*>) == sizeof(void*), "Size of RefPtr<void*> must be equal to size of void*");
