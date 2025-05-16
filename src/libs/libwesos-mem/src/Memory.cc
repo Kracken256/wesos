@@ -9,7 +9,7 @@
 #include <wesos-mem/Memory.hh>
 
 SYM_EXPORT auto wesos::mem::get_default_resource() -> MemoryResourceProtocol & {
-  static NullResource NULL_RESOURCE_STATIC;  // Replace with a real allocator
+  static NullResource NULL_RESOURCE_STATIC;  // FIXME: Replace with a real allocator
 
   static AtomicResource ATOMIC_RESOURCE_STATIC(NULL_RESOURCE_STATIC);
 
