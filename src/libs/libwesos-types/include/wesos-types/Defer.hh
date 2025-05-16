@@ -8,18 +8,30 @@
 #pragma once
 
 #include <wesos-types/Move.hh>
+#include <wesos-types/Nullable.hh>
 
 namespace wesos::types {
   template <typename Callable>
   class DeferBomb {
-    Callable m_code;
+    Nullable<Callable> m_func;
 
   public:
-    constexpr DeferBomb(Callable code) : m_code(move(code)) {}
-    constexpr ~DeferBomb() { m_code(); }
-    constexpr DeferBomb(DeferBomb&&) = delete;
+    constexpr DeferBomb(Callable code) : m_func(move(code)) {}
+    constexpr ~DeferBomb() {
+      if (m_func.isset()) {
+        m_func.value()();
+      }
+    }
+    constexpr DeferBomb(DeferBomb&& o) : m_func(move(o.m_func)) { o.m_func.unset(); };
     constexpr DeferBomb(const DeferBomb&) = delete;
-    constexpr auto operator=(DeferBomb&&) -> DeferBomb& = delete;
+    constexpr auto operator=(DeferBomb&& o) -> DeferBomb& {
+      if (this != &o) {
+        m_func = move(o.m_func);
+        o.m_func.unset();
+      }
+
+      return *this;
+    }
     constexpr auto operator=(const DeferBomb&) -> DeferBomb& = delete;
   };
 
