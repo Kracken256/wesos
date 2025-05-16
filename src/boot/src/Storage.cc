@@ -19,7 +19,7 @@ File::~File() {
 
     const auto& gbs = SYSTEM_TABLE_GLOBAL->boot_services();
 
-    const void* const_file_content = bit_cast<const void*>(m_file_content.into_ptr().unwrap());
+    const void* const_file_content = m_file_content.into_ptr().bitcast_to<void>();
     void* file_content = const_cast<void*>(const_file_content);
 
     gbs.m_free_pool(file_content);

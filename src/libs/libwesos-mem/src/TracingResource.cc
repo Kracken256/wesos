@@ -30,14 +30,14 @@ SYM_EXPORT void TracingResource::virt_deallocate(OwnPtr<void> ptr, usize size, P
 SYM_EXPORT auto TracingResource::virt_utilize(View<u8> pool) -> void {
   m_debugee.utilize_bytes(pool);
 
-  m_print("TracingResource::utilize_bytes(%p, %zu)\n", pool.into_ptr().unwrap(), pool.size());
+  m_print("TracingResource::utilize_bytes(%p, %zu)\n", pool.into_ptr().cast_to<void>(), pool.size());
 }
 
 SYM_EXPORT auto TracingResource::virt_embezzle(usize max_size) -> View<u8> {
   auto embezzled = m_debugee.embezzle_bytes(max_size);
 
-  m_print("TracingResource::embezzle_bytes(%zu) -> (%p, %zu)\n", max_size,
-          static_cast<void*>(embezzled.into_ptr().unwrap()), embezzled.size());
+  m_print("TracingResource::embezzle_bytes(%zu) -> (%p, %zu)\n", max_size, embezzled.into_ptr().cast_to<void>(),
+          embezzled.size());
 
   return embezzled;
 }

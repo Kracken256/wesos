@@ -23,7 +23,6 @@ namespace wesos::alloc {
     NullableRefPtr<FreeNode> m_front;
     ObjectSize m_object_size;
     PowerOfTwo<usize> m_object_align;
-    View<u8> m_initial_pool;
 
     [[nodiscard]] constexpr auto object_size() const { return m_object_size.unwrap(); }
     [[nodiscard]] constexpr auto object_align() const { return m_object_align.unwrap(); }

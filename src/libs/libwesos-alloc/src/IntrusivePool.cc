@@ -22,10 +22,7 @@ using namespace wesos::mem;
 using namespace wesos::alloc;
 
 SYM_EXPORT IntrusivePool::IntrusivePool(ObjectSize object_size, PowerOfTwo<usize> object_align, View<u8> pool)
-    : m_front(nullptr),
-      m_object_size(object_size),
-      m_object_align(max(object_align.unwrap(), alignof(FreeNode))),
-      m_initial_pool(pool) {
+    : m_front(nullptr), m_object_size(object_size), m_object_align(max(object_align.unwrap(), alignof(FreeNode))) {
   IntrusivePool::virt_utilize(pool);
 }
 
