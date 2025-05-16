@@ -18,6 +18,10 @@ SYM_EXPORT auto wesos::mem::get_default_resource() -> MemoryResourceProtocol & {
 }
 
 SYM_EXPORT auto wesos::mem::initialize(Kickstart initial_buffer) -> bool {
-  /// TODO: Implement the memory library initialization logic
-  return false;
+  const auto view = View<u8>(initial_buffer.m_buffer_ptr, initial_buffer.m_buffer_size.unwrap());
+
+  auto &default_resource = get_default_resource();
+  default_resource.utilize_bytes(view);
+
+  return true;
 }

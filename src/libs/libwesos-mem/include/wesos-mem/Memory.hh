@@ -19,7 +19,42 @@ namespace wesos::mem {
 
     OwnPtr<u8> m_buffer_ptr;
     Least<usize, MINIMUM_INITIALIZATION_SIZE> m_buffer_size;
+
+    Kickstart(OwnPtr<u8> buffer_ptr, Least<usize, MINIMUM_INITIALIZATION_SIZE> buffer_size)
+        : m_buffer_ptr(move(buffer_ptr)), m_buffer_size(buffer_size) {}
   };
 
+  /**
+   * @brief Initializes the memory system with a given initial buffer.
+   *
+   * This function sets up the memory system using the provided `Kickstart`
+   * object as the initial buffer. It ensures that the memory system is
+   * ready for further operations.
+   *
+   * @param initial_buffer The initial buffer used to kickstart the memory system.
+   * @return true if the initialization was successful, false otherwise.
+   */
   [[nodiscard]] auto initialize(Kickstart initial_buffer) -> bool;
 };  // namespace wesos::mem
+
+#ifdef WESOS_MEM_INITIALIZE_WITH_MALLOC
+#include <cstdlib>
+
+namespace wesos::mem {
+  [[nodiscard]] static inline auto initialize_with_malloc() -> Nullable<RefPtr<void>> {
+    void* buffer = std::malloc(Kickstart::MINIMUM_INITIALIZATION_SIZE);
+    if (!buffer) {
+      return null;
+    }
+
+    auto initial_buffer = Kickstart(static_cast<u8*>(buffer), Kickstart::MINIMUM_INITIALIZATION_SIZE);
+
+    if (!initialize(initial_buffer)) {
+      std::free(buffer);
+      return null;
+    }
+
+    return RefPtr<void>(buffer);
+  }
+}  // namespace wesos::mem
+#endif
