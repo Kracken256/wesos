@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <wesos-mem/AtomicResource.hh>
 #include <wesos-mem/Global.hh>
 #include <wesos-mem/MemoryEconomy.hh>
 #include <wesos-mem/MemoryResourceProtocol.hh>
