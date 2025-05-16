@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <wesos-mem/Global.hh>
 #include <wesos-mem/MemoryResourceProtocol.hh>
 #include <wesos-types/NullableOwnPtr.hh>
 #include <wesos-types/Template.hh>
@@ -379,7 +380,7 @@ namespace wesos::smartptr {
      *       resource protocol in smart pointers (`OwnPtr` and `RefPtr`) to
      *       ensure proper resource management.
      */
-    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm) {
+    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm = mem::get_default_resource()) {
       return [&mm](auto&&... args) -> Nullable<Box> {
         const auto object_storage = mm.allocate_bytes(sizeof(Object), alignof(Object));
         if (object_storage.is_null()) [[unlikely]] {
