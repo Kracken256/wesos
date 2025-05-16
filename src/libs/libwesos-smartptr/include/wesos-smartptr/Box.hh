@@ -359,31 +359,40 @@ namespace wesos::smartptr {
     };
 
     /**
-     * @brief Creates a new instance of a Box containing an Object, using the provided memory resource and arguments.
+     * @brief Creates a factory function for constructing a `Box` object.
      *
-     * @tparam Args Variadic template parameter for the types of arguments to be forwarded to the Object constructor.
-     * @param mm A reference to a MemoryResourceProtocol object used for memory allocation.
-     * @param args Arguments to be forwarded to the constructor of the Object.
-     * @return Nullable<Box> A Box containing the newly created Object if allocation succeeds, or null if allocation
-     * fails.
+     * This static constexpr function generates a callable object (lambda) that
+     * constructs a `Box` instance using the provided memory resource protocol
+     * and forwarded arguments for the `Object` constructor. The lambda ensures
+     * proper memory allocation and object construction, returning a nullable
+     * `Box` in case of allocation failure.
      *
-     * @note The function uses placement new to construct the Object in the allocated memory.
-     * @warning If memory allocation fails, the function returns null. Ensure proper handling of the Nullable<Box>
-     * return value.
+     * @param mm A reference to a `mem::MemoryResourceProtocol` instance used
+     *           for memory allocation.
+     *
+     * @return A callable lambda function that takes variadic arguments for
+     *         constructing an `Object` and returns a `Nullable<Box>`. If memory
+     *         allocation fails, the lambda returns `null`.
+     *
+     * @note The lambda performs placement new to construct the `Object` in the
+     *       allocated memory. It also wraps the allocated memory and memory
+     *       resource protocol in smart pointers (`OwnPtr` and `RefPtr`) to
+     *       ensure proper resource management.
      */
-    template <class... Args>
-    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm, Args&&... args) -> Nullable<Box> {
-      const auto object_storage = mm.allocate_bytes(sizeof(Object), alignof(Object));
-      if (object_storage.is_null()) [[unlikely]] {
-        return null;
-      }
+    [[nodiscard]] static constexpr auto create(mem::MemoryResourceProtocol& mm) {
+      return [&mm](auto&&... args) -> Nullable<Box> {
+        const auto object_storage = mm.allocate_bytes(sizeof(Object), alignof(Object));
+        if (object_storage.is_null()) [[unlikely]] {
+          return null;
+        }
 
-      ::new (object_storage.unwrap()) Object(forward<Args>(args)...);
+        ::new (object_storage.unwrap()) Object(forward<decltype(args)>(args)...);
 
-      const auto object_ptr = OwnPtr(static_cast<Object*>(object_storage.unwrap()));
-      const auto mm_ptr = RefPtr<mem::MemoryResourceProtocol>(&mm);
+        const auto object_ptr = OwnPtr(static_cast<Object*>(object_storage.unwrap()));
+        const auto mm_ptr = RefPtr<mem::MemoryResourceProtocol>(&mm);
 
-      return Box(object_ptr, mm_ptr);
+        return Box(object_ptr, mm_ptr);
+      };
     }
   };
 
