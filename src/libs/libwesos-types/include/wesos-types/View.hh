@@ -145,6 +145,20 @@ namespace wesos::types {
       return *this;
     }
 
+    constexpr auto align_or_truncate_to(PowerOfTwo<usize> align) -> View& {
+      const usize offset = bytes_until_next_aligned_pow2(m_base, align);
+      if (offset >= size()) {
+        clear();
+      } else {
+        m_base += offset;
+        m_size -= offset;
+      }
+
+      assert_invariant(empty() || is_aligned_pow2(m_base, align));
+
+      return *this;
+    }
+
     //========================================================================================
 
     [[nodiscard]] static constexpr auto create_empty() -> View { return View(); }
