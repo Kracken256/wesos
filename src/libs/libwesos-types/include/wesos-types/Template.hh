@@ -247,14 +247,14 @@ namespace wesos::types {
   template <typename T>
   inline constexpr bool is_move_constructible_v = is_move_constructible<T>::value;
 
+  //===========================================================================
+
   template <typename T>
   struct is_copy_constructible {
   private:
-    // Try to instantiate a copy constructor
-    template <typename U, typename = decltype(U(declval<const U&>()))>
+    template <typename U, typename = decltype(static_cast<U>(declval<const U&>()))>
     static auto test(int) -> true_type;
 
-    // Fallback
     template <typename>
     static auto test(...) -> false_type;
 
@@ -264,6 +264,34 @@ namespace wesos::types {
 
   template <typename T>
   inline constexpr bool is_copy_constructible_v = is_copy_constructible<T>::value;
+
+  //===========================================================================
+
+  template <typename T>
+  auto test_copy_assignable(int) -> decltype(declval<T&>() = declval<const T&>(), true_type{});
+
+  template <typename>
+  auto test_copy_assignable(...) -> false_type;
+
+  template <typename T>
+  struct is_copy_assignable : decltype(test_copy_assignable<T>(0)) {};
+
+  template <typename T>
+  inline constexpr bool is_copy_assignable_v = is_copy_assignable<T>::value;
+
+  //===========================================================================
+
+  template <typename T>
+  auto test_move_assignable(int) -> decltype(declval<T&>() = declval<T&&>(), true_type{});
+
+  template <typename>
+  auto test_move_assignable(...) -> false_type;
+
+  template <typename T>
+  struct is_move_assignable : decltype(test_move_assignable<T>(0)) {};
+
+  template <typename T>
+  inline constexpr bool is_move_assignable_v = is_move_assignable<T>::value;
 
   //===========================================================================
 

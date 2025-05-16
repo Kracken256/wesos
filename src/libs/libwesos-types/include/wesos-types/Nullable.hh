@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <wesos-assert/Assert.hh>
 #include <wesos-types/Array.hh>
 #include <wesos-types/Bitcast.hh>
@@ -30,28 +31,28 @@ namespace wesos::types {
     constexpr Nullable(nullptr_t) {}
     constexpr Nullable(T x) { assign(move(x)); }
 
-    template <class U>
-    constexpr Nullable(const Nullable<U>& o)
-      requires(is_copy_constructible_v<U>)
-    {
+    constexpr Nullable(const Nullable& o) {
+      static_assert(is_copy_constructible_v<T>,
+                    "Nullable<T> requires T to be copy constructible if you want to copy construct it.");
+
       if (o.isset()) {
         assign(o.get());
       }
     };
 
-    template <class U>
-    constexpr Nullable(Nullable<U>&& o)
-      requires(is_move_constructible_v<U>)
-    {
+    constexpr Nullable(Nullable&& o) {
+      static_assert(is_move_constructible_v<T>,
+                    "Nullable<T> requires T to be move constructible if you want to move construct it.");
+
       if (o.isset()) {
         assign(move(o.get()));
       }
     }
 
-    template <class U>
-    constexpr auto operator=(const Nullable<U>& o) -> Nullable&
-      requires(is_copy_constructible_v<U>)
-    {
+    constexpr auto operator=(const Nullable& o) -> Nullable& {
+      static_assert(is_copy_assignable_v<T>,
+                    "Nullable<T> requires T to be copy assignable if you want to copy assign it.");
+
       if (o.isset()) {
         assign(o.get());
       } else {
@@ -59,10 +60,10 @@ namespace wesos::types {
       }
     }
 
-    template <class U>
-    constexpr auto operator=(Nullable<U>&& o) -> Nullable&
-      requires(is_move_constructible_v<U>)
-    {
+    constexpr auto operator=(Nullable&& o) -> Nullable& {
+      static_assert(is_move_assignable_v<T>,
+                    "Nullable<T> requires T to be move assignable if you want to move assign it.");
+
       if (this != &o) {
         if (o.isset()) {
           assign(move(o.get()));
@@ -73,6 +74,7 @@ namespace wesos::types {
 
       return *this;
     }
+
     constexpr ~Nullable() { unset(); }
 
     [[nodiscard]] constexpr auto operator<=>(const Nullable& o) const -> std::strong_ordering
