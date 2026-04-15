@@ -1,0 +1,6 @@
+[build]
+target = "buildsys/x86_64-wesos.json"
+rustflags = ["-Z", "build-std=core,compiler_builtins", "-Z", "json-target-spec"]
+
+[target.x86_64-wesos]
+rustflags = ["-Z", "build-std=core,compiler_builtins", "-Z", "json-target-spec"]
