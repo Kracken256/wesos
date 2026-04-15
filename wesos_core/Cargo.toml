@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+multiboot2 = "0.24.0"
+buddy_system_allocator = "0.13.0"
+spin = "0.10.0"
+uart_16550 = "0.3.0"
 
 [profile.dev]
 panic = "abort"
