@@ -1,6 +1,8 @@
 FROM rust:1.94
 
 RUN apt update && apt install -y build-essential grub-pc-bin grub-efi-amd64-bin xorriso mtools qemu-system-x86
+RUN rustup toolchain install nightly
+RUN rustup component add rust-src --toolchain nightly
 
 RUN mkdir -p /buildsys
 COPY buildsys /buildsys
