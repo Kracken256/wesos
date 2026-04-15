@@ -1,6 +1,24 @@
 [build]
+# Forces cargo to always use your custom target
 target = "buildsys/x86_64-wesos.json"
-rustflags = ["-Z", "build-std=core,compiler_builtins", "-Z", "json-target-spec"]
 
-[target.x86_64-wesos]
-rustflags = ["-Z", "build-std=core,compiler_builtins", "-Z", "json-target-spec"]
+[unstable]
+# Tells Cargo to recompile core/alloc for your target
+# 'alloc' is required for the professional allocator we set up
+build-std = ["core", "compiler_builtins", "alloc"]
+# Required for memory operations like memcpy/memset in a kernel
+build-std-features = ["compiler-builtins-mem"]
+
+[target.'cfg(all())']
+# Flags applied to every build of your custom target
+rustflags = [
+    # Force the linker to use your specific script
+    "-C",
+    "link-arg=-Tbuildsys/x86_64-wesos.ld",
+    # Disables "Red Zone" optimization (essential for x86_64 kernels)
+    "-C",
+    "no-redzone=yes",
+    # Ensures we don't use hardware floating point (keeps it simple for now)
+    "-C",
+    "target-feature=-mmx,-sse,+soft-float",
+]
