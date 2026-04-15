@@ -52,36 +52,56 @@ fn main() {
 }
 
 fn build_and_create_iso(build_type: BuildType) {
-    // 1. Build wesos_core (kernel)
     let profile = match build_type {
         BuildType::Dev => "debug",
         BuildType::Release => "release",
     };
 
-    println!("Building wesos_core in {profile} mode...");
+    println!("Building wesos_core in {profile} mode with custom target...");
 
-    let mut cmd = Command::new("cargo");
+    // Set RUSTFLAGS so rustc knows about your linker script
+    let rustflags = "-C link-arg=-Tbuildsys/x86_64-wesos.ld";
 
-    cmd.arg("build")
+    let mut cmd = Command::new("rustup");
+    cmd.env("RUSTFLAGS", rustflags) // <--- Set the environment variable here
+        .arg("run")
+        .arg("nightly")
+        .arg("cargo")
+        .arg("build")
         .arg("--manifest-path")
-        .arg("wesos_core/Cargo.toml");
+        .arg("wesos_core/Cargo.toml")
+        .arg("--target")
+        .arg("buildsys/x86_64-wesos.json")
+        .arg("-Z")
+        .arg("build-std=core,alloc,compiler_builtins")
+        .arg("-Z")
+        .arg("json-target-spec");
 
     if build_type == BuildType::Release {
         cmd.arg("--release");
     }
 
-    let status = cmd.status().expect("Failed to run cargo build");
-
+    let status = cmd
+        .status()
+        .expect("Failed to run cargo build (nightly required for -Z build-std)");
     if !status.success() {
         eprintln!("Kernel build failed");
         std::process::exit(1);
     }
 
-    // 2. Create ISO image with GRUB2
+    // 2. Strip the kernel binary to reduce size (optional but recommended)
+
+    let kernel_src = format!("target/x86_64-wesos/{}/wesos_core", profile);
+
+    Command::new("strip")
+        .arg(&kernel_src)
+        .status()
+        .expect("Failed to strip kernel");
+
+    // 3. Create ISO image with GRUB2
     println!("Creating ISO image with GRUB2...");
     let out_dir = format!("target/{}/iso_root", profile);
     let boot_dir = format!("{}/boot/grub", out_dir);
-    let kernel_src = format!("target/{}/wesos_core", profile);
     let kernel_dst = format!("{}/boot/wesos_core", out_dir);
     let grub_cfg = format!("{}/grub.cfg", boot_dir);
     let iso_path = format!("target/{}/wesos.iso", profile);
