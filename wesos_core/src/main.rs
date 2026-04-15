@@ -1,50 +1,79 @@
 #![no_std]
 #![no_main]
 
-use core::alloc::{GlobalAlloc, Layout};
 use core::panic::PanicInfo;
+use multiboot2::{BootInformation, BootInformationHeader};
+pub use print::_print;
 
-#[repr(C, align(8))]
-pub struct Multiboot2Header {
-    magic: u32,
-    architecture: u32,
-    header_length: u32,
-    checksum: u32,
-    end_tag_type: u16,
-    end_tag_flags: u16,
-    end_tag_size: u32,
-}
+mod heap;
+mod multiboot;
+mod print;
+mod uart;
 
-#[unsafe(link_section = ".multiboot2_header")]
-#[unsafe(no_mangle)]
-#[used]
-pub static MULTIBOOT_HEADER: Multiboot2Header = Multiboot2Header {
-    magic: 0xE85250D6,
-    architecture: 0, // i386 (protected mode)
-    header_length: 24,
-    checksum: 0x17ADAF12, // Exact calculation for 24-byte header
-    end_tag_type: 0,
-    end_tag_flags: 0,
-    end_tag_size: 8,
-};
-
-// --- DUMMY ALLOCATOR ---
-struct DummyAllocator;
-unsafe impl GlobalAlloc for DummyAllocator {
-    unsafe fn alloc(&self, _layout: Layout) -> *mut u8 {
-        core::ptr::null_mut()
-    }
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {}
-}
-#[global_allocator]
-static ALLOCATOR: DummyAllocator = DummyAllocator;
-
-#[unsafe(no_mangle)]
-pub extern "C" fn _start() -> ! {
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    println!("Kernel panic: {}", info);
     loop {}
 }
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+#[unsafe(no_mangle)]
+pub extern "C" fn _start(magic: u32, mbi_address: *const BootInformationHeader) -> ! {
+    uart::init();
+
+    if magic != 0x36d76289 {
+        panic!(
+            "Invalid magic number: expected 0x36d76289, got {:#x}",
+            magic
+        );
+    }
+
+    let boot_info =
+        unsafe { BootInformation::load(mbi_address).expect("Failed to load Multiboot info") };
+    println!("Multiboot information loaded successfully!");
+
+    println!("Memory areas:");
+    for area in boot_info
+        .memory_map_tag()
+        .expect("No memory map tag found")
+        .memory_areas()
+    {
+        println!(
+            "  Start: {:#010x}, Length: {:#010x}, Type: {:?}",
+            area.start_address(),
+            area.size(),
+            area.typ()
+        );
+    }
+
+    println!("Modules:");
+    for module in boot_info.module_tags() {
+        println!(
+            "  Start: {:#010x}, End: {:#010x}, Cmdline: {}",
+            module.start_address(),
+            module.end_address(),
+            module.cmdline().unwrap_or("<unknown>")
+        );
+    }
+
+    println!(
+        "Bootloader name: {}",
+        boot_info
+            .boot_loader_name_tag()
+            .map(|tag| tag.name().unwrap_or("<unknown>"))
+            .unwrap_or("<unknown>")
+    );
+
+    println!(
+        "Command line: {}",
+        boot_info
+            .command_line_tag()
+            .map(|tag| tag.cmdline().unwrap_or("<unknown>"))
+            .unwrap_or("<unknown>")
+    );
+
+    heap::init(&boot_info);
+
+    println!("Hello, WesOS!");
+
     loop {}
 }
